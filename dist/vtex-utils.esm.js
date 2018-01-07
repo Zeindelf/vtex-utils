@@ -1,12 +1,12 @@
 
 /**
- * VtexUtils.js v0.2.1
+ * VtexUtils.js v0.2.2
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-07T20:10:11.043Z
+ * Date: 2018-01-07T21:15:27.482Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -1033,11 +1033,31 @@ if ('rivets' in window) {
  */
 
 var VtexUtils = function VtexUtils() {
-    classCallCheck(this, VtexUtils);
+  classCallCheck(this, VtexUtils);
 
-    this.version = '0.2.1';
-    this.globalHelpers = new GlobalHelpers();
-    this.vtexHelpers = new VtexHelpers();
+  /**
+   * Version
+   * @type {String}
+   */
+  this.version = '0.2.2';
+
+  /**
+   * Package name
+   * @type {String}
+   */
+  this.name = '@VtexUtils';
+
+  /**
+   * Global Helpers instance
+   * @type {GlobalHelpers}
+   */
+  this.globalHelpers = new GlobalHelpers();
+
+  /**
+   * Vtex Helpers instance
+   * @type {VtexHelpers}
+   */
+  this.vtexHelpers = new VtexHelpers();
 };
 
 export default VtexUtils;
