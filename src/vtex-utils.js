@@ -9,8 +9,28 @@ import './utils/rivets-formatters.js';
  */
 class VtexUtils {
     constructor() {
+        /**
+         * Version
+         * @type {String}
+         */
         this.version = '0.2.1';
+
+        /**
+         * Package name
+         * @type {String}
+         */
+        this.name = '@VtexUtils';
+
+        /**
+         * Global Helpers instance
+         * @type {GlobalHelpers}
+         */
         this.globalHelpers = new GlobalHelpers();
+
+        /**
+         * Vtex Helpers instance
+         * @type {VtexHelpers}
+         */
         this.vtexHelpers = new VtexHelpers();
     }
 }
