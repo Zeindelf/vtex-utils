@@ -16,10 +16,10 @@ A collection of utilities methods for Vtex stores
 
 ```text
 dist/
-├── vtex-helpers.js        (UMD)
-├── vtex-helpers.min.js    (UMD, compressed)
-├── vtex-helpers.common.js (CommonJS, default)
-└── vtex-helpers.esm.js    (ES Module)
+├── vtex-utils.js        (UMD)
+├── vtex-utils.min.js    (UMD, compressed)
+├── vtex-utils.common.js (CommonJS, default)
+└── vtex-utils.esm.js    (ES Module)
 ```
 
 ## Getting started
@@ -33,7 +33,7 @@ npm install vtex-utils --save
 Include files:
 
 ```html
-<script type="text/javascript" src="/arquivos/vtex-helpers.min.js"></script>
+<script type="text/javascript" src="/arquivos/vtex-utils.min.js"></script>
 ```
 
 ### Usage
