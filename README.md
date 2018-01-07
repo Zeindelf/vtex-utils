@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/Zeindelf/vtex-utils.svg?branch=master)](https://travis-ci.org/Zeindelf/vtex-utils)
+[![npm version](https://badge.fury.io/js/vtex-utils.svg)](https://badge.fury.io/js/vtex-utils)
+[![David](https://david-dm.org/zeindelf/vtex-utils.svg)](https://github.com/Zeindelf/vtex-utils)
+
 # VtexUtils.js
 
 A collection of utilities methods for Vtex stores
