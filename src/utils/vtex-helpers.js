@@ -13,7 +13,7 @@ export default {
      * @return {string} The formatted price
      */
     formatPrice(number, thousands, decimals, length, currency) {
-        currency = typeof currency === 'string' ? currency + ' ' : 'R$ ';
+        currency = typeof currency === 'string' ? currency : 'R$ ';
         length = typeof length !== 'number' ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';

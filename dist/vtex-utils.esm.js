@@ -1,12 +1,12 @@
 
 /**
- * VtexUtils.js v0.1.0
+ * VtexUtils.js v0.1.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-07T05:16:22.619Z
+ * Date: 2018-01-07T06:11:32.660Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -398,7 +398,7 @@ var vtexHelpers = {
      * @return {string} The formatted price
      */
     formatPrice: function formatPrice(number, thousands, decimals, length, currency) {
-        currency = typeof currency === 'string' ? currency + ' ' : 'R$ ';
+        currency = typeof currency === 'string' ? currency : 'R$ ';
         length = typeof length !== 'number' ? 2 : length;
 
         var re = '\\d(?=(\\d{' + 3 + '})+' + (length > 0 ? '\\D' : '$') + ')';
@@ -600,7 +600,8 @@ var vtexHelpers = {
 };
 
 /**
- * Create a new VtexHelpers
+ * Create a VtexHelpers class
+ * Vtex utilities methods
  */
 
 var VtexHelpers = function () {
@@ -656,6 +657,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -942,10 +948,15 @@ if ('rivets' in window) {
     };
 }
 
+/**
+ * Create a VtexUtils class
+ * Main class
+ */
+
 var VtexUtils = function VtexUtils() {
     classCallCheck(this, VtexUtils);
 
-    this.version = '0.1.0';
+    this.version = '0.1.1';
     this.globalHelpers = new GlobalHelpers();
     this.vtexHelpers = new VtexHelpers();
 };
