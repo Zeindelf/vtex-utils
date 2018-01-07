@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-07T17:45:42.711Z
+ * Date: 2018-01-07T19:45:33.614Z
  */
 
 'use strict';
@@ -50,6 +50,56 @@ var createClass = function () {
     return Constructor;
   };
 }();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
 
 var globalHelpers = {
     /**
@@ -97,6 +147,37 @@ var globalHelpers = {
 
 
     /**
+     * Extend the given object
+     * @param {object} obj - The object to be extended
+     * @param {*} args - The rest objects which will be merged to the first object
+     * @return {object} The extended object
+     */
+    extend: function extend(obj) {
+        var _this = this;
+
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+        }
+
+        if (this.isObject(obj) && args.length > 0) {
+            if (Object.assign) {
+                return Object.assign.apply(Object, [obj].concat(toConsumableArray(args)));
+            }
+
+            args.forEach(function (arg) {
+                if (_this.isObject(arg)) {
+                    Object.keys(arg).forEach(function (key) {
+                        obj[key] = arg[key];
+                    });
+                }
+            });
+        }
+
+        return obj;
+    },
+
+
+    /**
      * Join array elements with glue string - PHP implode alike
      * @param {object|array} pieces - The array|object to implode.  If object it will implode the values, not the keys.
      * @param {string} [glue=','] - The glue
@@ -119,6 +200,16 @@ var globalHelpers = {
         }
 
         return '';
+    },
+
+
+    /**
+     * Check if the given value is an object
+     * @param {*} value - The value to check
+     * @return {boolean} Returns `true` if the given value is an object, else `false`
+     */
+    isObject: function isObject(value) {
+        return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value !== null;
     },
 
 
@@ -660,9 +751,23 @@ var GlobalHelpers = function () {
             return globalHelpers.cleanArray(array);
         }
     }, {
+        key: 'extend',
+        value: function extend(obj) {
+            for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+                args[_key - 1] = arguments[_key];
+            }
+
+            return globalHelpers.extend.apply(globalHelpers, [obj].concat(args));
+        }
+    }, {
         key: 'implode',
         value: function implode(pieces, glue) {
             return globalHelpers.implode(pieces, glue);
+        }
+    }, {
+        key: 'isObject',
+        value: function isObject(value) {
+            return globalHelpers.isObject(value);
         }
     }, {
         key: 'isObjectEmpty',

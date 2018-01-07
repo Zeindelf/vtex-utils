@@ -18,8 +18,16 @@ class GlobalHelpers {
         return globalHelpers.cleanArray(array);
     }
 
+    extend(obj, ...args) {
+        return globalHelpers.extend(obj, ...args);
+    }
+
     implode(pieces, glue) {
         return globalHelpers.implode(pieces, glue);
+    }
+
+    isObject(value) {
+        return globalHelpers.isObject(value);
     }
 
     isObjectEmpty(obj) {

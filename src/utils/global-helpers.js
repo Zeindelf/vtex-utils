@@ -42,6 +42,30 @@ export default {
     },
 
     /**
+     * Extend the given object
+     * @param {object} obj - The object to be extended
+     * @param {*} args - The rest objects which will be merged to the first object
+     * @return {object} The extended object
+     */
+    extend(obj, ...args) {
+        if ( this.isObject(obj) && args.length > 0 ) {
+            if ( Object.assign ) {
+                return Object.assign(obj, ...args);
+            }
+
+            args.forEach((arg) => {
+                if ( this.isObject(arg) ) {
+                    Object.keys(arg).forEach((key) => {
+                        obj[key] = arg[key];
+                    });
+                }
+            });
+        }
+
+        return obj;
+    },
+
+    /**
      * Join array elements with glue string - PHP implode alike
      * @param {object|array} pieces - The array|object to implode.  If object it will implode the values, not the keys.
      * @param {string} [glue=','] - The glue
@@ -64,6 +88,15 @@ export default {
         }
 
         return '';
+    },
+
+    /**
+     * Check if the given value is an object
+     * @param {*} value - The value to check
+     * @return {boolean} Returns `true` if the given value is an object, else `false`
+     */
+    isObject(value) {
+        return typeof value === 'object' && value !== null;
     },
 
     /**
