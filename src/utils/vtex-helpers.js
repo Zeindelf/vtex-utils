@@ -125,7 +125,7 @@ export default {
     getCategories(depth, categoryId) {
         /* eslint-disable */
         return $.Deferred((def) => {
-        /* eslint-enable */
+            /* eslint-enable */
             return $.ajax({
                 type: 'GET',
                 url: '/api/catalog_system/pub/category/tree/' + (depth || 50),
@@ -176,7 +176,7 @@ export default {
     checkLogin() {
         /* eslint-disable */
         return $.Deferred((def) => {
-        /* eslint-enable */
+            /* eslint-enable */
             return $.ajax({
                 type: 'get',
                 url: '/no-cache/profileSystem/getProfile',

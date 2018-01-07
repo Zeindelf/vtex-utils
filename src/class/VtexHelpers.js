@@ -2,7 +2,8 @@
 import vtexHelpers from './../utils/vtex-helpers.js';
 
 /**
- * Create a new VtexHelpers
+ * Create a VtexHelpers class
+ * Vtex utilities methods
  */
 class VtexHelpers {
     formatPrice(number, thousands, decimals, length, currency) {

@@ -1,6 +1,10 @@
 
 import globalHelpers from './../utils/global-helpers.js';
 
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 class GlobalHelpers {
     arrayUnique(arr) {
         return globalHelpers.arrayUnique(arr);

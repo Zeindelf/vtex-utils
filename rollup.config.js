@@ -16,7 +16,7 @@ const banner = `
 `;
 
 module.exports = {
-  // Export banner
+    // Export banner
     banner,
     input: 'src/vtex-utils.js',
     output: [
