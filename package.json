@@ -1,6 +1,6 @@
 {
   "name": "vtex-utils",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A collection of utilities methods for Vtex stores",
   "main": "dist/vtex-utils.common.js",
   "module": "dist/vtex-utils.esm.js",
@@ -10,7 +10,7 @@
     "clear": "del-cli dist",
     "compress": "uglifyjs dist/vtex-utils.js -o dist/vtex-utils.min.js -c -m --comments /^!/",
     "lint": "eslint src --fix",
-    "release": "npm run clear && npm run lint && npm run build && npm run compress",
+    "release": "npm run clear && npm run lint && npm run build && npm run compress && npm test",
     "start": "npm-run-all --parallel watch:*",
     "test": "mocha ./test/*.js -r jsdom-global/register --colors --timeout 20000",
     "watch:js": "rollup -c -m -w"

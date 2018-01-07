@@ -1,12 +1,12 @@
 
 /**
- * VtexUtils.js v0.1.1
+ * VtexUtils.js v0.2.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-07T17:11:30.820Z
+ * Date: 2018-01-07T17:45:42.711Z
  */
 
 'use strict';
@@ -932,7 +932,7 @@ if ('rivets' in window) {
 var VtexUtils = function VtexUtils() {
     classCallCheck(this, VtexUtils);
 
-    this.version = '0.1.1';
+    this.version = '0.2.0';
     this.globalHelpers = new GlobalHelpers();
     this.vtexHelpers = new VtexHelpers();
 };
