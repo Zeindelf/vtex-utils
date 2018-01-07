@@ -8,7 +8,7 @@
   "scripts": {
     "build": "rollup -c",
     "clear": "del-cli dist",
-    "compress": "uglifyjs dist/vtex-utils.js -o dist/vtex-utils.min.js -c -m --comments /^!/",
+    "compress": "uglifyjs dist/vtex-utils.js -o dist/vtex-utils.min.js -c -m --comments /^!!/",
     "lint": "eslint src --fix",
     "release": "npm run clear && npm run lint && npm run build && npm run compress && npm test",
     "start": "npm-run-all --parallel watch:*",

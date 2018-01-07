@@ -4,7 +4,7 @@ const pkg = require('./package');
 
 const now = new Date();
 const banner = `
-/**
+/*!!
  * VtexUtils.js v${pkg.version}
  * https://github.com/${pkg.repository}
  *
