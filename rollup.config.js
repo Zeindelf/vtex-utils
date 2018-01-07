@@ -21,18 +21,18 @@ module.exports = {
     input: 'src/vtex-utils.js',
     output: [
         {
-            banner,
+            banner: banner,
             file: 'dist/vtex-utils.js',
             format: 'umd',
             name: 'VTEX.VtexUtils',
         },
         {
-            banner,
+            banner: banner,
             file: 'dist/vtex-utils.common.js',
             format: 'cjs',
         },
         {
-            banner,
+            banner: banner,
             file: 'dist/vtex-utils.esm.js',
             format: 'es',
         },
