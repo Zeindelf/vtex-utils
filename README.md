@@ -4,7 +4,7 @@
 
 # VtexUtils.js
 
-A collection of utilities methods for Vtex stores
+A collection of utilities methods for Vtex stores.
 
 ## Table of contents
 
@@ -28,24 +28,40 @@ dist/
 
 ## Getting started
 
-### Install
+### Direct download
 
-```shell
-npm install vtex-utils --save
-```
-
-Include files:
+Download the script [here](https://github.com/Zeindelf/vtex-utils/blob/master/dist/vtex-utils.min.js) and include it.
 
 ```html
 <script type="text/javascript" src="/arquivos/vtex-utils.min.js"></script>
 ```
 
-### Usage
+### Package Managers
 
-The package is available on `VTEX` namespace.
+VtexUtils.js supports [npm](https://www.npmjs.com/package/vtex-utils) under the name `vtex-utils`.
+
+```shell
+npm install vtex-utils --save
+```
+
+### Module Loaders
+
+VtexUtils.js can also be loaded as an CommonJS or ES6 module (recomended).
 
 ```js
-// Instantiate class
+// CommomJS
+var VtexUtils = require('vtex-utils');
+
+// ES6 module
+import VtexUtils from 'vtex-utils';
+```
+
+### Usage
+
+With UMD (Universal Module Definition), the package is available on `VTEX` namespace.
+
+```js
+// Initialize constructor
 var vtexUtils = new VTEX.VtexUtils();
 
 // VtexHelpers
