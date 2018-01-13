@@ -14,7 +14,7 @@ export default {
     /**
      * Capitalize a string
      * @param {string} str - The String
-     * @returns {string} The modified string
+     * @return {string} The modified string
      * @example
      *     capitalize('foo bar'); // 'Foo Bar'
      */
@@ -63,6 +63,30 @@ export default {
         }
 
         return obj;
+    },
+
+    /**
+     * Get url params from a query string
+     * @param {string} name - Param name
+     * @param {string} entryPoint - Full url or query string
+     * @return {string} Value query string param
+     * @example
+     *     // URL: https://site.com?param1=foo&param2=bar
+     *     getUrlParameter('param1'); // foo
+     *     getUrlParameter('param2'); // bar
+     *
+     *     // Given entry point
+     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
+     *     getUrlParameter('param3', url); // baz
+     */
+    getUrlParameter(name, entryPoint) {
+        entryPoint = typeof entryPoint !== 'string' ? window.location.href : entryPoint;
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+
+        const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        const results = regex.exec(entryPoint);
+
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
     /**
@@ -129,7 +153,7 @@ export default {
     /**
      * Return the length of an item (Object mostly)
      * @param {mixed}
-     * @returns {int}
+     * @return {int}
      */
     length(item) {
         if ( typeof item.length !== 'undefined' ) {
@@ -328,5 +352,28 @@ export default {
         }
 
         return subject;
+    },
+
+    /**
+     * Unserialize a query string into an object
+     * @param {string} str - The string that will be converted into a object
+     * @return {object}
+     * @example
+     *     // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
+     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
+     *     unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+     */
+    unserialize(str) {
+        str = ( str.indexOf('?') === 0 ) ? str.substr(1) : str.slice(str.indexOf('?') + 1);
+
+        let query = {};
+        let parts = str.split('&');
+
+        for ( let i = 0, len = parts.length; i < len; i += 1 ) {
+            let part = parts[i].split('=');
+            query[decodeURIComponent(part[0])] = decodeURIComponent(part[1] || '');
+        }
+
+        return query;
     },
 };
