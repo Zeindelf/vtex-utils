@@ -68,11 +68,15 @@ describe('Global Methods', () => {
     const urlToStrip = 'https://zeindelf.com/foo/bar';
     const emailToPassTest = 'zeindelf@hotmail.com';
     const emailToNotPassTest = 'zeindelf@hotmail';
+    const queryStringUrl = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
 
     const stripHost = globalHelpers.stripHost(urlToStrip);
     const stripHttp = globalHelpers.stripHttp(urlToStrip);
     const isEmail = globalHelpers.isEmail(emailToPassTest);
     const isNotEmail = globalHelpers.isEmail(emailToNotPassTest);
+    const getUrlParameter1 = globalHelpers.getUrlParameter('param1', queryStringUrl);
+    const getUrlParameter2 = globalHelpers.getUrlParameter('param2', queryStringUrl);
+    const unserialize = globalHelpers.unserialize(queryStringUrl);
 
     // Array methods test
     it('array unique', (done) => {
@@ -163,6 +167,17 @@ describe('Global Methods', () => {
     it('email test', (done) => {
         expect(isEmail).to.equal(true);
         expect(isNotEmail).to.equal(false);
+        done();
+    });
+
+    it('query string param', (done) => {
+        expect(getUrlParameter1).to.equal('foo');
+        expect(getUrlParameter2).to.equal('bar');
+        done();
+    });
+
+    it('unserialize query string', (done) => {
+        expect(unserialize).to.deep.equal({param1: 'foo', param2: 'bar', param3: 'baz'});
         done();
     });
 });

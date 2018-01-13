@@ -22,6 +22,10 @@ class GlobalHelpers {
         return globalHelpers.extend(obj, ...args);
     }
 
+    getUrlParameter(name, entryPoint) {
+        return globalHelpers.getUrlParameter(name, entryPoint);
+    }
+
     implode(pieces, glue) {
         return globalHelpers.implode(pieces, glue);
     }
@@ -68,6 +72,10 @@ class GlobalHelpers {
 
     strReplace(search, replace, subject) {
         return globalHelpers.strReplace(search, replace, subject);
+    }
+
+    unserialize(str) {
+        return globalHelpers.unserialize(str);
     }
 }
 

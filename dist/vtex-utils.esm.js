@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-08T20:43:20.534Z
+ * Date: 2018-01-13T15:23:23.210Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -115,7 +115,7 @@ var globalHelpers = {
     /**
      * Capitalize a string
      * @param {string} str - The String
-     * @returns {string} The modified string
+     * @return {string} The modified string
      * @example
      *     capitalize('foo bar'); // 'Foo Bar'
      */
@@ -172,6 +172,31 @@ var globalHelpers = {
         }
 
         return obj;
+    },
+
+
+    /**
+     * Get url params from a query string
+     * @param {string} name - Param name
+     * @param {string} entryPoint - Full url or query string
+     * @return {string} Value query string param
+     * @example
+     *     // URL: https://site.com?param1=foo&param2=bar
+     *     getUrlParameter('param1'); // foo
+     *     getUrlParameter('param2'); // bar
+     *
+     *     // Given entry point
+     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
+     *     getUrlParameter('param3', url); // baz
+     */
+    getUrlParameter: function getUrlParameter(name, entryPoint) {
+        entryPoint = typeof entryPoint !== 'string' ? window.location.href : entryPoint;
+        name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+
+        var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+        var results = regex.exec(entryPoint);
+
+        return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
     },
 
 
@@ -243,7 +268,7 @@ var globalHelpers = {
     /**
      * Return the length of an item (Object mostly)
      * @param {mixed}
-     * @returns {int}
+     * @return {int}
      */
     length: function length(item) {
         if (typeof item.length !== 'undefined') {
@@ -448,6 +473,30 @@ var globalHelpers = {
         }
 
         return subject;
+    },
+
+
+    /**
+     * Unserialize a query string into an object
+     * @param {string} str - The string that will be converted into a object
+     * @return {object}
+     * @example
+     *     // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
+     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
+     *     unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+     */
+    unserialize: function unserialize(str) {
+        str = str.indexOf('?') === 0 ? str.substr(1) : str.slice(str.indexOf('?') + 1);
+
+        var query = {};
+        var parts = str.split('&');
+
+        for (var i = 0, len = parts.length; i < len; i += 1) {
+            var part = parts[i].split('=');
+            query[decodeURIComponent(part[0])] = decodeURIComponent(part[1] || '');
+        }
+
+        return query;
     }
 };
 
@@ -758,6 +807,11 @@ var GlobalHelpers = function () {
             return globalHelpers.extend.apply(globalHelpers, [obj].concat(args));
         }
     }, {
+        key: 'getUrlParameter',
+        value: function getUrlParameter(name, entryPoint) {
+            return globalHelpers.getUrlParameter(name, entryPoint);
+        }
+    }, {
         key: 'implode',
         value: function implode(pieces, glue) {
             return globalHelpers.implode(pieces, glue);
@@ -816,6 +870,11 @@ var GlobalHelpers = function () {
         key: 'strReplace',
         value: function strReplace(search, replace, subject) {
             return globalHelpers.strReplace(search, replace, subject);
+        }
+    }, {
+        key: 'unserialize',
+        value: function unserialize(str) {
+            return globalHelpers.unserialize(str);
         }
     }]);
     return GlobalHelpers;
