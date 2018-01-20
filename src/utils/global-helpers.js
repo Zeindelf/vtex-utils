@@ -305,7 +305,8 @@ export default {
      * Removes the host from an url
      * @param {string} url - The url
      * @return {string} The modified string
-     * @example stripHost("http://test.com.br/contact/test"); //  "/contact/test"
+     * @example
+     *     stripHost("http://test.com.br/contact/test"); //  "/contact/test"
      */
     stripHost(url) {
         let newUrl = url;

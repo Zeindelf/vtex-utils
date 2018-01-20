@@ -63,7 +63,7 @@ export default {
     },
 
     /**
-     * Get the VTEX server time
+     * Get the Vtex server time
      * @param {function} callback - The callback to call when the request finishes. The callback will a javascript Date object.
      * @return {promise} - jquery Ajax promise
      * @example
@@ -143,7 +143,7 @@ export default {
     },
 
     /**
-     * Check if the user is logged into VTEX
+     * Check if the user is logged into Vtex
      * @return {promise} jQuery Ajax Promise
      * @example
      *     vtexHelpers.checkLogin().then((res) => {
