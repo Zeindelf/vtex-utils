@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.3.3
+ * VtexUtils.js v0.4.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-20T05:15:42.840Z
+ * Date: 2018-01-20T15:17:34.326Z
  */
 
 (function (global, factory) {
@@ -606,19 +606,19 @@ var vtexHelpers = {
 
     /**
      * Get category tree
-     * @param [depth=50] - The tree depth
      * @param [categoryId] - Return the specific Category
+     * @param [depth=50] - The tree depth
      * @return {promise} Promise
      * @example
      *     vtexHelpers.getCategories().then((res) => console.log(res)) // Return all categories
-     *     vtexHelpers.getCategories(1, 1000001).then((res) => console.log(res)) // Return 1 level from category id
+     *     vtexHelpers.getCategories(1000001, 1).then((res) => console.log(res)) // Return 1 level from category id
      */
-    getCategories: function getCategories(depth, categoryId) {
+    getCategories: function getCategories(categoryId, depth) {
         /* eslint-disable */
         return $.Deferred(function (def) {
             /* eslint-enable */
             return $.ajax({
-                type: 'GET',
+                type: 'get',
                 url: '/api/catalog_system/pub/category/tree/' + (depth || 50),
                 dataType: 'json',
                 headers: {
@@ -688,14 +688,16 @@ var vtexHelpers = {
 
     /**
      * Open default Vtex popup login
+     *
+     * @param  {boolean}  [noReload = false]  Reload page after login
      * @return {void}
      */
-    openPopupLogin: function openPopupLogin() {
+    openPopupLogin: function openPopupLogin(noReload) {
+        noReload = typeof noReload === 'boolean' ? noReload : false;
+        var _url = noReload ? window.location.href : '/';
+
         vtexid.start({
-            returnUrl: '/',
-            userEmail: '',
-            locale: 'pt-BR',
-            forceReload: false
+            returnUrl: _url
         });
     }
 };
@@ -752,8 +754,8 @@ var VtexHelpers = function () {
         }
     }, {
         key: 'openPopupLogin',
-        value: function openPopupLogin() {
-            return vtexHelpers.openPopupLogin();
+        value: function openPopupLogin(noReload) {
+            return vtexHelpers.openPopupLogin(noReload);
         }
     }]);
     return VtexHelpers;
@@ -1085,7 +1087,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.3.3';
+  this.version = '0.4.0';
 
   /**
    * Package name
