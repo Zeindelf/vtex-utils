@@ -24,24 +24,6 @@ export default {
     },
 
     /**
-     * Check if the given price is valid
-     *
-     * @param {string}      price               The price to check
-     * @param {string}      [thousand = ','']   The thousands separator
-     * @param {string}      [decimal = '.'']    The decimal separator
-     * @param {int}         [decimalLength = 2] The decimal length
-     * @return {boolean}
-     */
-    isValidPrice(price, thousands, decimal, decimalLength) {
-        // ^[0-9]{1,3}(?:\,(?:(?:[0-9]{3}(?:,|))+))?(?:\.[0-9]{0,2})?$
-        thousands = thousands || ',';
-        decimal = decimal || '.';
-        decimalLength = typeof decimalLength !== 'number' ? 2 : decimalLength;
-        const regex = new RegExp('^[0-9]{1,3}(?:\\' + thousands + '(?:(?:[0-9]{3}(?:' + thousands + '|))+))?(?:\\' + decimal + '[0-9]{0,' + decimalLength + '})?$');
-        return regex.test(price.toString());
-    },
-
-    /**
      * Get the original VTEX image source from a thumb
      *
      * @param {string}      [src]   The source of the thumb
@@ -155,7 +137,7 @@ export default {
      * @return {string}       New string with <br /> break lines
      */
     replaceBreakLines(str) {
-        src = ( str.replace ) ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
+        str = ( str.replace ) ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
 
         return str;
     },

@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-13T15:27:55.635Z
+ * Date: 2018-01-20T04:58:46.028Z
  */
 
 'use strict';
@@ -526,25 +526,6 @@ var vtexHelpers = {
 
 
     /**
-     * Check if the given price is valid
-     *
-     * @param {string}      price               The price to check
-     * @param {string}      [thousand = ','']   The thousands separator
-     * @param {string}      [decimal = '.'']    The decimal separator
-     * @param {int}         [decimalLength = 2] The decimal length
-     * @return {boolean}
-     */
-    isValidPrice: function isValidPrice(price, thousands, decimal, decimalLength) {
-        // ^[0-9]{1,3}(?:\,(?:(?:[0-9]{3}(?:,|))+))?(?:\.[0-9]{0,2})?$
-        thousands = thousands || ',';
-        decimal = decimal || '.';
-        decimalLength = typeof decimalLength !== 'number' ? 2 : decimalLength;
-        var regex = new RegExp('^[0-9]{1,3}(?:\\' + thousands + '(?:(?:[0-9]{3}(?:' + thousands + '|))+))?(?:\\' + decimal + '[0-9]{0,' + decimalLength + '})?$');
-        return regex.test(price.toString());
-    },
-
-
-    /**
      * Get the original VTEX image source from a thumb
      *
      * @param {string}      [src]   The source of the thumb
@@ -662,7 +643,7 @@ var vtexHelpers = {
      * @return {string}       New string with <br /> break lines
      */
     replaceBreakLines: function replaceBreakLines(str) {
-        src = str.replace ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
+        str = str.replace ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
 
         return str;
     },
