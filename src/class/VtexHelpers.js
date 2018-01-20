@@ -38,8 +38,8 @@ class VtexHelpers {
         return vtexHelpers.checkLogin();
     }
 
-    openPopupLogin() {
-        return vtexHelpers.openPopupLogin();
+    openPopupLogin(noReload) {
+        return vtexHelpers.openPopupLogin(noReload);
     }
 }
 

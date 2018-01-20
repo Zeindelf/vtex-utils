@@ -97,19 +97,19 @@ export default {
 
     /**
      * Get category tree
-     * @param [depth=50] - The tree depth
      * @param [categoryId] - Return the specific Category
+     * @param [depth=50] - The tree depth
      * @return {promise} Promise
      * @example
      *     vtexHelpers.getCategories().then((res) => console.log(res)) // Return all categories
-     *     vtexHelpers.getCategories(1, 1000001).then((res) => console.log(res)) // Return 1 level from category id
+     *     vtexHelpers.getCategories(1000001, 1).then((res) => console.log(res)) // Return 1 level from category id
      */
-    getCategories(depth, categoryId) {
+    getCategories(categoryId, depth) {
         /* eslint-disable */
         return $.Deferred((def) => {
             /* eslint-enable */
             return $.ajax({
-                type: 'GET',
+                type: 'get',
                 url: '/api/catalog_system/pub/category/tree/' + (depth || 50),
                 dataType: 'json',
                 headers: {
@@ -176,14 +176,16 @@ export default {
 
     /**
      * Open default Vtex popup login
+     *
+     * @param  {boolean}  [noReload = false]  Reload page after login
      * @return {void}
      */
-    openPopupLogin() {
+    openPopupLogin(noReload) {
+        noReload = typeof noReload === 'boolean' ? noReload : false;
+        const _url = ( noReload ) ? window.location.href : '/';
+
         vtexid.start({
-            returnUrl: '/',
-            userEmail: '',
-            locale: 'pt-BR',
-            forceReload: false,
+            returnUrl: _url,
         });
     },
 };
