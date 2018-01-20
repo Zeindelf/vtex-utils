@@ -1,6 +1,114 @@
 
 export default {
     /**
+     * Check if the given value is a string.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isString(value) {
+        return typeof value === 'string';
+    },
+
+    /**
+     * Check if the given value is a number.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a number, else 'false'.
+     */
+    isNumber(value) {
+        const isNaN = Number.isNaN || window.isNaN;
+
+        return typeof value === 'number' && ! isNaN(value);
+    },
+
+    /**
+     * Check if the given value is undefined.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
+     */
+    isUndefined(value) {
+        return typeof value === 'undefined';
+    },
+
+    /**
+     * Check if the given value is an object
+     * @param {*} value - The value to check
+     * @return {boolean} Returns 'true' if the given value is an object, else 'false'
+     */
+    isObject(value) {
+        return typeof value === 'object' && value !== null;
+    },
+
+    /**
+     * Verify if as objects is empty
+     * @param {object} obj - The object to verify
+     * @return {boolean}
+     * @example
+     *     isObjectEmpty({}); // true
+     */
+    isObjectEmpty(obj) {
+        for ( let x in obj ) {
+            if ({}.hasOwnProperty.call(obj, x)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+    /**
+     * Check if the given value is a plain object.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a plain object, else 'false'.
+     */
+    isPlainObject(value) {
+        if ( ! this.isObject(value) ) {
+            return false;
+        }
+
+        try {
+            const { constructor } = value;
+            const { prototype } = constructor;
+
+            return constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
+        } catch (e) {
+            return false;
+        }
+    },
+
+    /**
+     * Check if the given value is a function.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
+     */
+    isFunction(value) {
+        return typeof value === 'function';
+    },
+
+    /**
+     * Check if a string is a valid mail.
+     * @param {string} email - The string to check
+     * @return {boolean}
+     */
+    isEmail(email) {
+        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+        return regex.test(email);
+    },
+
+    /**
+     * Check if a string is a valid JSON.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    isJson(str) {
+        try {
+            const obj = JSON.parse(str);
+            return !! obj && typeof obj === 'object';
+        } catch (e) { /* ignore */ }
+
+        return false;
+    },
+
+    /**
      * Return an array with unique values
      * @param {Array} arr - The array
      * @return {Array}
@@ -39,6 +147,26 @@ export default {
         }
 
         return newArray;
+    },
+
+    contains(str, elem) {
+        return str.indexOf(toString(elem)) >= 0;
+    }
+
+    /**
+     * Replace <, >, &, ', " and / with HTML entities.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    escape(str) {
+        return (str.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#x27;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\//g, '&#x2F;')
+            .replace(/\\/g, '&#x5C;')
+            .replace(/`/g, '&#96;'));
     },
 
     /**
@@ -112,42 +240,6 @@ export default {
         }
 
         return '';
-    },
-
-    /**
-     * Check if the given value is an object
-     * @param {*} value - The value to check
-     * @return {boolean} Returns `true` if the given value is an object, else `false`
-     */
-    isObject(value) {
-        return typeof value === 'object' && value !== null;
-    },
-
-    /**
-     * Verify if as objects is empty
-     * @param {object} obj - The object to verify
-     * @return {boolean}
-     * @example
-     *     isObjectEmpty({}); // true
-     */
-    isObjectEmpty(obj) {
-        for ( let x in obj ) {
-            if ({}.hasOwnProperty.call(obj, x)) {
-                return false;
-            }
-        }
-
-        return true;
-    },
-
-    /**
-     * Check if a string is a valid mail
-     * @param {string} email - The string to check
-     * @return {boolean}
-     */
-    isEmail(email) {
-        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-        return regex.test(email);
     },
 
     /**
@@ -353,6 +445,22 @@ export default {
         }
 
         return subject;
+    },
+
+    /**
+     * Replaces HTML encoded entities with <, >, &, ', " and /.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    unescape(str) {
+        return (str.replace(/&amp;/g, '&')
+            .replace(/&quot;/g, '"')
+            .replace(/&#x27;/g, "'")
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&#x2F;/g, '/')
+            .replace(/&#x5C;/g, '\\')
+            .replace(/&#96;/g, '`'));
     },
 
     /**

@@ -12,6 +12,7 @@ A collection of utilities methods for Vtex stores.
 - [Getting started](#getting-started)
 - [Vtex Methods](#vtex-methods)
 - [Global Methods](#global-methods)
+- [Tests](#tests)
 - [License](#license)
 - [Dependencies](#dependencies)
 - [Todo](#todo)
@@ -244,6 +245,139 @@ vtexHelpers.openPopupLogin(true); // Open popup and don't reload page after succ
 
 ## Global Methods
 
+### globalHelpers.isString(value)
+
+Check if the given value is a string.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+```js
+globalHelpers.isString('string'); // true
+globalHelpers.isString(123); // false
+globalHelpers.isString(123.45); // false
+```
+
+### globalHelpers.isNumber(value)
+
+Check if the given value is a number.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+```js
+globalHelpers.isNumber(123); // true
+globalHelpers.isNumber(123.45); // true
+globalHelpers.isNumber('string'); // false
+```
+
+### globalHelpers.isUndefined(value)
+
+Check if the given value is undefined.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+```js
+globalHelpers.isUndefined(foo); // true
+
+var foo = 'Foo';
+globalHelpers.isUndefined(foo); // false
+```
+
+### globalHelpers.isObject(value)
+
+Check if the given value is an object
+
+- **value**:
+  - Type: `Mixed`
+  - The String
+
+#### Example
+
+```js
+globalHelpers.isObject({foo: 'Foo'}); // true
+globalHelpers.isObject('Foo'); // false
+```
+
+### globalHelpers.isObjectEmpty(obj)
+
+Verify if as objects is empty
+
+- **obj**:
+  - Type: `Object`
+  - The object to verify
+
+#### Example
+
+```js
+isObjectEmpty({}); // true
+isObjectEmpty({foo: 'Foo'}); // false
+```
+
+### globalHelpers.isPlainObject(value)
+
+Check if the given value is a plain object.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+```js
+globalHelpers.isPlainObject({}); // true
+globalHelpers.isPlainObject([{}]); // false
+globalHelpers.isPlainObject('foo'); // false
+```
+
+### globalHelpers.isFunction(value)
+
+Check if the given value is a function.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+```js
+var foo = function() {};
+var bar = '';
+
+globalHelpers.isFunction(foo); // true
+globalHelpers.isFunction(bar); // false
+```
+
+### globalHelpers.isEmail(email)
+
+Check if a string is a valid mail.
+
+- **email**:
+  - Type: `String`
+  - The string to check
+
+#### Example
+
+```js
+globalHelpers.isEmail('email@email.com'); // true
+globalHelpers.isEmail('email@email'); // false
+```
+
+### globalHelpers.isJson(str)
+
+Check if a string is a valid JSON.
+
+- **str**:
+  - Type: `String`
+  - The string to check
+
+```js
+var json = '{"foo": "Foo", "bar": "Bar"}';
+
+globalHelpers.isJson(json); // true
+globalHelpers.isJson('json'); // false
+```
+
 ### globalHelpers.arrayUnique(arr)
 
 Return an array with unique values
@@ -284,6 +418,21 @@ Removes empty index from a array
 
 ```js
 globalHelpers.cleanArray([1, 2, , 3, , , 4]); // [1, 2, 3, 4]
+```
+
+### globalHelpers.escape(str)
+
+Replace <, >, &, ', " and / with HTML entities.
+
+- **str**:
+  - Type: `String`
+  - The string to check
+
+```js
+var markup = '<p>"Lorem ipsum"</p>';
+
+globalHelpers.escape(markup);
+// &lt;p&gt;&quot;Lorem ipsum&quot;&lt;&#x2F;p&gt;
 ```
 
 ### globalHelpers.extend(obj, args)
@@ -349,51 +498,6 @@ Join array elements with glue string - PHP implode alike
 
 ```js
 globalHelpers.implode(['Foo', 'Bar']); // 'Foo,Bar'
-```
-
-### globalHelpers.isObject(value)
-
-Check if the given value is an object
-
-- **value**:
-  - Type: `Mixed`
-  - The String
-
-#### Example
-
-```js
-globalHelpers.isObject({foo: 'Foo'}); // true
-globalHelpers.isObject('Foo'); // false
-```
-
-### globalHelpers.isObjectEmpty(obj)
-
-Verify if as objects is empty
-
-- **obj**:
-  - Type: `Object`
-  - The object to verify
-
-#### Example
-
-```js
-isObjectEmpty({}); // true
-isObjectEmpty({foo: 'Foo'}); // false
-```
-
-### globalHelpers.isEmail(email)
-
-Capitalize a string
-
-- **email**:
-  - Type: `String`
-  - The string to check
-
-#### Example
-
-```js
-globalHelpers.isEmail('email@email.com'); // true
-globalHelpers.isEmail('email@email'); // false
 ```
 
 ### globalHelpers.length(item)
@@ -546,6 +650,21 @@ globalHelpers.strReplace(['olá', 'mundo'], ['hello', 'world'], 'olá mundo'); /
 globalHelpers.strReplace(['um', 'dois'], 'olá', 'um dois três'); // Output 'olá olá três'
 ```
 
+### globalHelpers.unescape(str)
+
+Replaces HTML encoded entities with <, >, &, ', " and /.
+
+- **str**:
+  - Type: `String`
+  - The string to check
+
+```js
+var markup = '&lt;p&gt;&quot;Lorem ipsum&quot;&lt;&#x2F;p&gt;';
+
+globalHelpers.unescape(markup);
+// <p>"Lorem ipsum"</p>
+```
+
 ### globalHelpers.unserialize(str)
 
 Unserialize a query string into an object
@@ -559,10 +678,20 @@ Unserialize a query string into an object
 ```js
 // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
 var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
-unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+globalHelpers.unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+```
+
+
+## Tests
+
+Tests are using mocha, to run the tests use:
+
+```shell
+$ npm test
 ```
 
 ## License
+
 VtexUtils.js is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ## Dependencies

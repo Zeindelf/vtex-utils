@@ -6,6 +6,42 @@ import globalHelpers from './../utils/global-helpers.js';
  * Javascript utilities methods
  */
 class GlobalHelpers {
+    isString(value) {
+        return globalHelpers.isString(value);
+    }
+
+    isNumber(value) {
+        return globalHelpers.isNumber(value);
+    }
+
+    isUndefined(value) {
+        return globalHelpers.isUndefined(value);
+    }
+
+    isObject(value) {
+        return globalHelpers.isObject(value);
+    }
+
+    isObjectEmpty(obj) {
+        return globalHelpers.isObjectEmpty(obj);
+    }
+
+    isPlainObject(value) {
+        return globalHelpers.isPlainObject(value);
+    }
+
+    isFunction(value) {
+        return globalHelpers.isFunction(value);
+    }
+
+    isEmail(email) {
+        return globalHelpers.isEmail(email);
+    }
+
+    isJson(str) {
+        return globalHelpers.isJson(str);
+    }
+
     arrayUnique(arr) {
         return globalHelpers.arrayUnique(arr);
     }
@@ -18,6 +54,10 @@ class GlobalHelpers {
         return globalHelpers.cleanArray(array);
     }
 
+    escape(str) {
+        return globalHelpers.escape(str);
+    }
+
     extend(obj, ...args) {
         return globalHelpers.extend(obj, ...args);
     }
@@ -28,18 +68,6 @@ class GlobalHelpers {
 
     implode(pieces, glue) {
         return globalHelpers.implode(pieces, glue);
-    }
-
-    isObject(value) {
-        return globalHelpers.isObject(value);
-    }
-
-    isObjectEmpty(obj) {
-        return globalHelpers.isObjectEmpty(obj);
-    }
-
-    isEmail(email) {
-        return globalHelpers.isEmail(email);
     }
 
     length(item) {
@@ -72,6 +100,10 @@ class GlobalHelpers {
 
     strReplace(search, replace, subject) {
         return globalHelpers.strReplace(search, replace, subject);
+    }
+
+    unescape(str) {
+        return globalHelpers.unescape(str);
     }
 
     unserialize(str) {
