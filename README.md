@@ -241,22 +241,97 @@ Open default Vtex popup login
 ```js
 vtexHelpers.openPopupLogin(); // Open popup and reload page after success login
 vtexHelpers.openPopupLogin(true); // Open popup and don't reload page after success login
+
 ```
+#### TIP
+Use `$(window).on('closed.vtexid', callback)` event to set any property if `noReload` is `true
+`
 
 ## Global Methods
 
-### globalHelpers.isString(value)
+### globalHelpers.isArray(value)
 
-Check if the given value is a string.
+Check if the given value is an array.
 
 - **value**:
   - Type: `Mixed`
   - The value to check.
 
+#### Example
+
 ```js
-globalHelpers.isString('string'); // true
-globalHelpers.isString(123); // false
-globalHelpers.isString(123.45); // false
+globalHelpers.isArray([]); // true
+globalHelpers.isArray([{}, {}]); // true
+globalHelpers.isArray({}); // false
+```
+
+### globalHelpers.isBoolean(value)
+
+Check if the given value is a boolean value.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+#### Example
+
+```js
+globalHelpers.isNumber(true); // true
+globalHelpers.isNumber(false); // true
+globalHelpers.isNumber(!0); // true
+globalHelpers.isNumber(!1); // true
+globalHelpers.isNumber('true'); // false
+globalHelpers.isNumber('false'); // false
+```
+
+### globalHelpers.isEmail(email)
+
+Check if a string is a valid mail.
+
+- **email**:
+  - Type: `String`
+  - The string to check
+
+#### Example
+
+```js
+globalHelpers.isEmail('email@email.com'); // true
+globalHelpers.isEmail('email@email'); // false
+```
+
+### globalHelpers.isFunction(value)
+
+Check if the given value is a function.
+
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
+
+#### Example
+
+```js
+var foo = function() {};
+var bar = '';
+
+globalHelpers.isFunction(foo); // true
+globalHelpers.isFunction(bar); // false
+```
+
+### globalHelpers.isJson(str)
+
+Check if a string is a valid JSON.
+
+- **str**:
+  - Type: `String`
+  - The string to check
+
+#### Example
+
+```js
+var json = '{"foo": "Foo", "bar": "Bar"}';
+
+globalHelpers.isJson(json); // true
+globalHelpers.isJson('json'); // false
 ```
 
 ### globalHelpers.isNumber(value)
@@ -267,25 +342,12 @@ Check if the given value is a number.
   - Type: `Mixed`
   - The value to check.
 
+#### Example
+
 ```js
 globalHelpers.isNumber(123); // true
 globalHelpers.isNumber(123.45); // true
 globalHelpers.isNumber('string'); // false
-```
-
-### globalHelpers.isUndefined(value)
-
-Check if the given value is undefined.
-
-- **value**:
-  - Type: `Mixed`
-  - The value to check.
-
-```js
-globalHelpers.isUndefined(foo); // true
-
-var foo = 'Foo';
-globalHelpers.isUndefined(foo); // false
 ```
 
 ### globalHelpers.isObject(value)
@@ -326,56 +388,45 @@ Check if the given value is a plain object.
   - Type: `Mixed`
   - The value to check.
 
+#### Example
+
 ```js
 globalHelpers.isPlainObject({}); // true
 globalHelpers.isPlainObject([{}]); // false
 globalHelpers.isPlainObject('foo'); // false
 ```
 
-### globalHelpers.isFunction(value)
+### globalHelpers.isString(value)
 
-Check if the given value is a function.
+Check if the given value is a string.
 
 - **value**:
   - Type: `Mixed`
   - The value to check.
 
-```js
-var foo = function() {};
-var bar = '';
+#### Example
 
-globalHelpers.isFunction(foo); // true
-globalHelpers.isFunction(bar); // false
+```js
+globalHelpers.isString('string'); // true
+globalHelpers.isString(123); // false
+globalHelpers.isString(123.45); // false
 ```
 
-### globalHelpers.isEmail(email)
+### globalHelpers.isUndefined(value)
 
-Check if a string is a valid mail.
+Check if the given value is undefined.
 
-- **email**:
-  - Type: `String`
-  - The string to check
+- **value**:
+  - Type: `Mixed`
+  - The value to check.
 
 #### Example
 
 ```js
-globalHelpers.isEmail('email@email.com'); // true
-globalHelpers.isEmail('email@email'); // false
-```
+globalHelpers.isUndefined(foo); // true
 
-### globalHelpers.isJson(str)
-
-Check if a string is a valid JSON.
-
-- **str**:
-  - Type: `String`
-  - The string to check
-
-```js
-var json = '{"foo": "Foo", "bar": "Bar"}';
-
-globalHelpers.isJson(json); // true
-globalHelpers.isJson('json'); // false
+var foo = 'Foo';
+globalHelpers.isUndefined(foo); // false
 ```
 
 ### globalHelpers.arrayUnique(arr)
@@ -427,6 +478,8 @@ Replace <, >, &, ', " and / with HTML entities.
 - **str**:
   - Type: `String`
   - The string to check
+
+#### Example
 
 ```js
 var markup = '<p>"Lorem ipsum"</p>';

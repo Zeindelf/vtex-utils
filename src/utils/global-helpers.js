@@ -1,12 +1,55 @@
 
 export default {
     /**
-     * Check if the given value is a string.
+     * Check if the given value is an array.
      * @param {*} value - The value to check.
      * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
      */
-    isString(value) {
-        return typeof value === 'string';
+    isArray(value) {
+        return value instanceof Array;
+    },
+
+    /**
+     * Check if the given value is a boolean value.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isBoolean(value) {
+        return typeof value === 'boolean';
+    },
+
+    /**
+     * Check if a string is a valid mail.
+     * @param {string} email - The string to check
+     * @return {boolean}
+     */
+    isEmail(email) {
+        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+        return regex.test(email);
+    },
+
+    /**
+     * Check if the given value is a function.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
+     */
+    isFunction(value) {
+        return typeof value === 'function';
+    },
+
+    /**
+     * Check if a string is a valid JSON.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    isJson(str) {
+        try {
+            const obj = JSON.parse(str);
+            return this.isObject(obj);
+        } catch (e) { /* ignore */ }
+
+        return false;
     },
 
     /**
@@ -18,15 +61,6 @@ export default {
         const isNaN = Number.isNaN || window.isNaN;
 
         return typeof value === 'number' && ! isNaN(value);
-    },
-
-    /**
-     * Check if the given value is undefined.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
-     */
-    isUndefined(value) {
-        return typeof value === 'undefined';
     },
 
     /**
@@ -46,8 +80,12 @@ export default {
      *     isObjectEmpty({}); // true
      */
     isObjectEmpty(obj) {
+        if ( ! this.isObject(obj) ) {
+            return false;
+        }
+
         for ( let x in obj ) {
-            if ({}.hasOwnProperty.call(obj, x)) {
+            if ( {}.hasOwnProperty.call(obj, x) ) {
                 return false;
             }
         }
@@ -76,36 +114,21 @@ export default {
     },
 
     /**
-     * Check if the given value is a function.
+     * Check if the given value is a string.
      * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
      */
-    isFunction(value) {
-        return typeof value === 'function';
+    isString(value) {
+        return typeof value === 'string';
     },
 
     /**
-     * Check if a string is a valid mail.
-     * @param {string} email - The string to check
-     * @return {boolean}
+     * Check if the given value is undefined.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
      */
-    isEmail(email) {
-        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-        return regex.test(email);
-    },
-
-    /**
-     * Check if a string is a valid JSON.
-     * @param {string} str - The string to check
-     * @return {boolean}
-     */
-    isJson(str) {
-        try {
-            const obj = JSON.parse(str);
-            return !! obj && typeof obj === 'object';
-        } catch (e) { /* ignore */ }
-
-        return false;
+    isUndefined(value) {
+        return typeof value === 'undefined';
     },
 
     /**
@@ -208,7 +231,7 @@ export default {
      *     getUrlParameter('param3', url); // baz
      */
     getUrlParameter(name, entryPoint) {
-        entryPoint = typeof entryPoint !== 'string' ? window.location.href : entryPoint;
+        entryPoint = ! this.isString(entryPoint) ? window.location.href : entryPoint;
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
 
         const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -226,9 +249,9 @@ export default {
      *     implode(['Foo', 'Bar']); // 'Foo,Bar'
      */
     implode(pieces, glue) {
-        if ( pieces instanceof Array ) {
+        if ( this.isArray(pieces) ) {
             return pieces.join(glue || ',');
-        } else if ( typeof pieces === 'object' ) {
+        } else if ( this.isObject(pieces) ) {
             let arr = [];
             for ( let o in pieces ) {
                 if ( object.hasOwnProperty(o) ) {
@@ -248,11 +271,11 @@ export default {
      * @return {int}
      */
     length(item) {
-        if ( typeof item.length !== 'undefined' ) {
+        if ( ! this.isUndefined(item.length) ) {
             return item.length;
         }
 
-        if ( typeof item === 'object') {
+        if ( this.isObject(item) ) {
             return Object.keys(item).length;
         }
 
@@ -432,16 +455,16 @@ export default {
     strReplace(search, replace, subject) {
         let regex;
 
-        if ( search instanceof Array ) {
+        if ( this.isArray(search) ) {
             for ( let i = 0; i < search.length; i++ ) {
                 search[i] = search[i].replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
                 regex = new RegExp(search[i], 'g');
-                subject = subject.replace(regex, (replace instanceof Array ? replace[i] : replace));
+                subject = subject.replace(regex, (this.isArray(replace) ? replace[i] : replace));
             }
         } else {
             search = search.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             regex = new RegExp(search, 'g');
-            subject = subject.replace(regex, (replace instanceof Array ? replace[0] : replace));
+            subject = subject.replace(regex, (this.isArray(replace) ? replace[0] : replace));
         }
 
         return subject;

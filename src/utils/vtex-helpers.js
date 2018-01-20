@@ -13,8 +13,8 @@ export default {
      * @return {string} The formatted price
      */
     formatPrice(number, thousands, decimals, length, currency) {
-        currency = typeof currency === 'string' ? currency : 'R$ ';
-        length = typeof length !== 'number' ? 2 : length;
+        currency = globalHelpers.isString(currency) ? currency : 'R$ ';
+        length = globalHelpers.isNumber(length) ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;
@@ -33,7 +33,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
     getOriginalImage(src) {
-        return typeof src === 'string' ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+        return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
     },
 
     /**
@@ -51,7 +51,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
     getResizedImage(src, width, height) {
-        if ( width === undefined || height === undefined || typeof src != 'string' ) {
+        if ( globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || ! globalHelpers.isString(src) ) {
             return src;
         }
 
@@ -89,7 +89,7 @@ export default {
                 month = `0${month}`;
             }
 
-            if ( typeof callback === 'function' ) {
+            if ( globalHelpers.isFunction(callback) ) {
                 callback.call(null, new Date(`${year}/${month}/${day} ${time}`));
             }
         });
@@ -117,7 +117,7 @@ export default {
                     contentType: 'application/json; charset=utf-8',
                 },
             }).done((res) => {
-                if ( typeof categoryId !== 'undefined' ) {
+                if ( ! globalHelper.isUndefined(categoryId) ) {
                     def.resolve(globalHelpers.objectSearch(res, {
                         id: categoryId,
                     }));
@@ -163,7 +163,7 @@ export default {
                 type: 'get',
                 url: '/no-cache/profileSystem/getProfile',
             }).done((res) => {
-                if ( typeof res.IsUserDefined === 'undefined' || ! res.IsUserDefined ) {
+                if ( globalHelpers.isUndefined(res.IsUserDefined) || ! res.IsUserDefined ) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
@@ -181,7 +181,7 @@ export default {
      * @return {void}
      */
     openPopupLogin(noReload) {
-        noReload = typeof noReload === 'boolean' ? noReload : false;
+        noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
         const _url = ( noReload ) ? window.location.href : '/';
 
         vtexid.start({
