@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.4.0
+ * VtexUtils.js v0.4.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-20T15:17:34.326Z
+ * Date: 2018-01-20T17:05:34.739Z
  */
 
 'use strict';
@@ -426,7 +426,8 @@ var globalHelpers = {
      * Removes the host from an url
      * @param {string} url - The url
      * @return {string} The modified string
-     * @example stripHost("http://test.com.br/contact/test"); //  "/contact/test"
+     * @example
+     *     stripHost("http://test.com.br/contact/test"); //  "/contact/test"
      */
     stripHost: function stripHost(url) {
         var newUrl = url;
@@ -567,7 +568,7 @@ var vtexHelpers = {
 
 
     /**
-     * Get the VTEX server time
+     * Get the Vtex server time
      * @param {function} callback - The callback to call when the request finishes. The callback will a javascript Date object.
      * @return {promise} - jquery Ajax promise
      * @example
@@ -650,7 +651,7 @@ var vtexHelpers = {
 
 
     /**
-     * Check if the user is logged into VTEX
+     * Check if the user is logged into Vtex
      * @return {promise} jQuery Ajax Promise
      * @example
      *     vtexHelpers.checkLogin().then((res) => {
@@ -1083,7 +1084,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.4.0';
+  this.version = '0.4.1';
 
   /**
    * Package name
