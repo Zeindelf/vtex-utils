@@ -104,10 +104,10 @@ Formats Vtex price
 #### Example
 
 ```js
-vtexUtils.formatPrice(1234); // R$ 12,34
-vtexUtils.formatPrice(123456); // R$ 1.234,56
-vtexUtils.formatPrice(123456, null, ',', 3); // R$ 1234,560
-vtexUtils.formatPrice(123456, ',', '.', 2, '$ '); // $ 1,234.56
+vtexHelpers.formatPrice(1234); // R$ 12,34
+vtexHelpers.formatPrice(123456); // R$ 1.234,56
+vtexHelpers.formatPrice(123456, null, ',', 3); // R$ 1234,560
+vtexHelpers.formatPrice(123456, ',', '.', 2, '$ '); // $ 1,234.56
 ```
 
 ## Global Methods
