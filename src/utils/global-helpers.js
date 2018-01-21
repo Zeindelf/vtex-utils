@@ -47,7 +47,7 @@ export default {
         try {
             const obj = JSON.parse(str);
             return this.isObject(obj);
-        } catch (e) { /* ignore */ }
+        } catch (e) {/* ignore */}
 
         return false;
     },
@@ -104,8 +104,8 @@ export default {
         }
 
         try {
-            const { constructor } = value;
-            const { prototype } = constructor;
+            const {constructor} = value;
+            const {prototype} = constructor;
 
             return constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
         } catch (e) {
@@ -174,7 +174,7 @@ export default {
 
     contains(str, elem) {
         return str.indexOf(toString(elem)) >= 0;
-    }
+    },
 
     /**
      * Replace <, >, &, ', " and / with HTML entities.
@@ -478,7 +478,7 @@ export default {
     unescape(str) {
         return (str.replace(/&amp;/g, '&')
             .replace(/&quot;/g, '"')
-            .replace(/&#x27;/g, "'")
+            .replace(/&#x27;/g, '\'')
             .replace(/&lt;/g, '<')
             .replace(/&gt;/g, '>')
             .replace(/&#x2F;/g, '/')

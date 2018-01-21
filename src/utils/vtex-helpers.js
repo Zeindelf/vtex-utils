@@ -14,7 +14,7 @@ export default {
      */
     formatPrice(number, thousands, decimals, length, currency) {
         currency = globalHelpers.isString(currency) ? currency : 'R$ ';
-        length = globalHelpers.isNumber(length) ? 2 : length;
+        length = ! globalHelpers.isNumber(length) ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;

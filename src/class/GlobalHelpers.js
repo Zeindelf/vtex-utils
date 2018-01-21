@@ -6,16 +6,28 @@ import globalHelpers from './../utils/global-helpers.js';
  * Javascript utilities methods
  */
 class GlobalHelpers {
-    isString(value) {
-        return globalHelpers.isString(value);
+    isArray(value) {
+        return globalHelpers.isArray(value);
+    }
+
+    isBoolean(value) {
+        return globalHelpers.isBoolean(value);
+    }
+
+    isEmail(email) {
+        return globalHelpers.isEmail(email);
+    }
+
+    isFunction(value) {
+        return globalHelpers.isFunction(value);
+    }
+
+    isJson(str) {
+        return globalHelpers.isJson(str);
     }
 
     isNumber(value) {
         return globalHelpers.isNumber(value);
-    }
-
-    isUndefined(value) {
-        return globalHelpers.isUndefined(value);
     }
 
     isObject(value) {
@@ -30,16 +42,12 @@ class GlobalHelpers {
         return globalHelpers.isPlainObject(value);
     }
 
-    isFunction(value) {
-        return globalHelpers.isFunction(value);
+    isString(value) {
+        return globalHelpers.isString(value);
     }
 
-    isEmail(email) {
-        return globalHelpers.isEmail(email);
-    }
-
-    isJson(str) {
-        return globalHelpers.isJson(str);
+    isUndefined(value) {
+        return globalHelpers.isUndefined(value);
     }
 
     arrayUnique(arr) {

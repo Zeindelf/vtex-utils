@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.4.1
+ * VtexUtils.js v0.5.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-20T17:05:34.739Z
+ * Date: 2018-01-21T00:08:54.186Z
  */
 
 (function (global, factory) {
@@ -107,6 +107,149 @@ var toConsumableArray = function (arr) {
 
 var globalHelpers = {
     /**
+     * Check if the given value is an array.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isArray: function isArray(value) {
+        return value instanceof Array;
+    },
+
+
+    /**
+     * Check if the given value is a boolean value.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isBoolean: function isBoolean(value) {
+        return typeof value === 'boolean';
+    },
+
+
+    /**
+     * Check if a string is a valid mail.
+     * @param {string} email - The string to check
+     * @return {boolean}
+     */
+    isEmail: function isEmail(email) {
+        var regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+        return regex.test(email);
+    },
+
+
+    /**
+     * Check if the given value is a function.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
+     */
+    isFunction: function isFunction(value) {
+        return typeof value === 'function';
+    },
+
+
+    /**
+     * Check if a string is a valid JSON.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    isJson: function isJson(str) {
+        try {
+            var obj = JSON.parse(str);
+            return this.isObject(obj);
+        } catch (e) {/* ignore */}
+
+        return false;
+    },
+
+
+    /**
+     * Check if the given value is a number.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a number, else 'false'.
+     */
+    isNumber: function isNumber(value) {
+        var isNaN = Number.isNaN || window.isNaN;
+
+        return typeof value === 'number' && !isNaN(value);
+    },
+
+
+    /**
+     * Check if the given value is an object
+     * @param {*} value - The value to check
+     * @return {boolean} Returns 'true' if the given value is an object, else 'false'
+     */
+    isObject: function isObject(value) {
+        return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value !== null;
+    },
+
+
+    /**
+     * Verify if as objects is empty
+     * @param {object} obj - The object to verify
+     * @return {boolean}
+     * @example
+     *     isObjectEmpty({}); // true
+     */
+    isObjectEmpty: function isObjectEmpty(obj) {
+        if (!this.isObject(obj)) {
+            return false;
+        }
+
+        for (var x in obj) {
+            if ({}.hasOwnProperty.call(obj, x)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+
+    /**
+     * Check if the given value is a plain object.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a plain object, else 'false'.
+     */
+    isPlainObject: function isPlainObject(value) {
+        if (!this.isObject(value)) {
+            return false;
+        }
+
+        try {
+            var _constructor = value.constructor;
+            var prototype = _constructor.prototype;
+
+
+            return _constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
+        } catch (e) {
+            return false;
+        }
+    },
+
+
+    /**
+     * Check if the given value is a string.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isString: function isString(value) {
+        return typeof value === 'string';
+    },
+
+
+    /**
+     * Check if the given value is undefined.
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
+     */
+    isUndefined: function isUndefined(value) {
+        return typeof value === 'undefined';
+    },
+
+
+    /**
      * Return an array with unique values
      * @param {Array} arr - The array
      * @return {Array}
@@ -147,6 +290,19 @@ var globalHelpers = {
         }
 
         return newArray;
+    },
+    contains: function contains(str, elem) {
+        return str.indexOf(toString(elem)) >= 0;
+    },
+
+
+    /**
+     * Replace <, >, &, ', " and / with HTML entities.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    escape: function escape(str) {
+        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
     },
 
 
@@ -196,7 +352,7 @@ var globalHelpers = {
      *     getUrlParameter('param3', url); // baz
      */
     getUrlParameter: function getUrlParameter(name, entryPoint) {
-        entryPoint = typeof entryPoint !== 'string' ? window.location.href : entryPoint;
+        entryPoint = !this.isString(entryPoint) ? window.location.href : entryPoint;
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
 
         var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -215,9 +371,9 @@ var globalHelpers = {
      *     implode(['Foo', 'Bar']); // 'Foo,Bar'
      */
     implode: function implode(pieces, glue) {
-        if (pieces instanceof Array) {
+        if (this.isArray(pieces)) {
             return pieces.join(glue || ',');
-        } else if ((typeof pieces === 'undefined' ? 'undefined' : _typeof(pieces)) === 'object') {
+        } else if (this.isObject(pieces)) {
             var arr = [];
             for (var o in pieces) {
                 if (object.hasOwnProperty(o)) {
@@ -233,55 +389,16 @@ var globalHelpers = {
 
 
     /**
-     * Check if the given value is an object
-     * @param {*} value - The value to check
-     * @return {boolean} Returns `true` if the given value is an object, else `false`
-     */
-    isObject: function isObject(value) {
-        return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value !== null;
-    },
-
-
-    /**
-     * Verify if as objects is empty
-     * @param {object} obj - The object to verify
-     * @return {boolean}
-     * @example
-     *     isObjectEmpty({}); // true
-     */
-    isObjectEmpty: function isObjectEmpty(obj) {
-        for (var x in obj) {
-            if ({}.hasOwnProperty.call(obj, x)) {
-                return false;
-            }
-        }
-
-        return true;
-    },
-
-
-    /**
-     * Check if a string is a valid mail
-     * @param {string} email - The string to check
-     * @return {boolean}
-     */
-    isEmail: function isEmail(email) {
-        var regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-        return regex.test(email);
-    },
-
-
-    /**
      * Return the length of an item (Object mostly)
      * @param {mixed}
      * @return {int}
      */
     length: function length(item) {
-        if (typeof item.length !== 'undefined') {
+        if (!this.isUndefined(item.length)) {
             return item.length;
         }
 
-        if ((typeof item === 'undefined' ? 'undefined' : _typeof(item)) === 'object') {
+        if (this.isObject(item)) {
             return Object.keys(item).length;
         }
 
@@ -467,19 +584,29 @@ var globalHelpers = {
     strReplace: function strReplace(search, replace, subject) {
         var regex = void 0;
 
-        if (search instanceof Array) {
+        if (this.isArray(search)) {
             for (var i = 0; i < search.length; i++) {
                 search[i] = search[i].replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
                 regex = new RegExp(search[i], 'g');
-                subject = subject.replace(regex, replace instanceof Array ? replace[i] : replace);
+                subject = subject.replace(regex, this.isArray(replace) ? replace[i] : replace);
             }
         } else {
             search = search.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             regex = new RegExp(search, 'g');
-            subject = subject.replace(regex, replace instanceof Array ? replace[0] : replace);
+            subject = subject.replace(regex, this.isArray(replace) ? replace[0] : replace);
         }
 
         return subject;
+    },
+
+
+    /**
+     * Replaces HTML encoded entities with <, >, &, ', " and /.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    unescape: function unescape(str) {
+        return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, '\'').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x2F;/g, '/').replace(/&#x5C;/g, '\\').replace(/&#96;/g, '`');
     },
 
 
@@ -519,8 +646,8 @@ var vtexHelpers = {
      * @return {string} The formatted price
      */
     formatPrice: function formatPrice(number, thousands, decimals, length, currency) {
-        currency = typeof currency === 'string' ? currency : 'R$ ';
-        length = typeof length !== 'number' ? 2 : length;
+        currency = globalHelpers.isString(currency) ? currency : 'R$ ';
+        length = !globalHelpers.isNumber(length) ? 2 : length;
 
         var re = '\\d(?=(\\d{' + 3 + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;
@@ -540,7 +667,7 @@ var vtexHelpers = {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
     getOriginalImage: function getOriginalImage(src) {
-        return typeof src === 'string' ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+        return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
     },
 
 
@@ -559,7 +686,7 @@ var vtexHelpers = {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
     getResizedImage: function getResizedImage(src, width, height) {
-        if (width === undefined || height === undefined || typeof src != 'string') {
+        if (globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || !globalHelpers.isString(src)) {
             return src;
         }
 
@@ -598,7 +725,7 @@ var vtexHelpers = {
                 month = '0' + month;
             }
 
-            if (typeof callback === 'function') {
+            if (globalHelpers.isFunction(callback)) {
                 callback.call(null, new Date(year + '/' + month + '/' + day + ' ' + time));
             }
         });
@@ -627,7 +754,7 @@ var vtexHelpers = {
                     contentType: 'application/json; charset=utf-8'
                 }
             }).done(function (res) {
-                if (typeof categoryId !== 'undefined') {
+                if (!globalHelper.isUndefined(categoryId)) {
                     def.resolve(globalHelpers.objectSearch(res, {
                         id: categoryId
                     }));
@@ -675,7 +802,7 @@ var vtexHelpers = {
                 type: 'get',
                 url: '/no-cache/profileSystem/getProfile'
             }).done(function (res) {
-                if (typeof res.IsUserDefined === 'undefined' || !res.IsUserDefined) {
+                if (globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
@@ -694,7 +821,7 @@ var vtexHelpers = {
      * @return {void}
      */
     openPopupLogin: function openPopupLogin(noReload) {
-        noReload = typeof noReload === 'boolean' ? noReload : false;
+        noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
         var _url = noReload ? window.location.href : '/';
 
         vtexid.start({
@@ -773,6 +900,61 @@ var GlobalHelpers = function () {
     }
 
     createClass(GlobalHelpers, [{
+        key: 'isArray',
+        value: function isArray(value) {
+            return globalHelpers.isArray(value);
+        }
+    }, {
+        key: 'isBoolean',
+        value: function isBoolean(value) {
+            return globalHelpers.isBoolean(value);
+        }
+    }, {
+        key: 'isEmail',
+        value: function isEmail(email) {
+            return globalHelpers.isEmail(email);
+        }
+    }, {
+        key: 'isFunction',
+        value: function isFunction(value) {
+            return globalHelpers.isFunction(value);
+        }
+    }, {
+        key: 'isJson',
+        value: function isJson(str) {
+            return globalHelpers.isJson(str);
+        }
+    }, {
+        key: 'isNumber',
+        value: function isNumber(value) {
+            return globalHelpers.isNumber(value);
+        }
+    }, {
+        key: 'isObject',
+        value: function isObject(value) {
+            return globalHelpers.isObject(value);
+        }
+    }, {
+        key: 'isObjectEmpty',
+        value: function isObjectEmpty(obj) {
+            return globalHelpers.isObjectEmpty(obj);
+        }
+    }, {
+        key: 'isPlainObject',
+        value: function isPlainObject(value) {
+            return globalHelpers.isPlainObject(value);
+        }
+    }, {
+        key: 'isString',
+        value: function isString(value) {
+            return globalHelpers.isString(value);
+        }
+    }, {
+        key: 'isUndefined',
+        value: function isUndefined(value) {
+            return globalHelpers.isUndefined(value);
+        }
+    }, {
         key: 'arrayUnique',
         value: function arrayUnique(arr) {
             return globalHelpers.arrayUnique(arr);
@@ -786,6 +968,11 @@ var GlobalHelpers = function () {
         key: 'cleanArray',
         value: function cleanArray(array) {
             return globalHelpers.cleanArray(array);
+        }
+    }, {
+        key: 'escape',
+        value: function escape(str) {
+            return globalHelpers.escape(str);
         }
     }, {
         key: 'extend',
@@ -805,21 +992,6 @@ var GlobalHelpers = function () {
         key: 'implode',
         value: function implode(pieces, glue) {
             return globalHelpers.implode(pieces, glue);
-        }
-    }, {
-        key: 'isObject',
-        value: function isObject(value) {
-            return globalHelpers.isObject(value);
-        }
-    }, {
-        key: 'isObjectEmpty',
-        value: function isObjectEmpty(obj) {
-            return globalHelpers.isObjectEmpty(obj);
-        }
-    }, {
-        key: 'isEmail',
-        value: function isEmail(email) {
-            return globalHelpers.isEmail(email);
         }
     }, {
         key: 'length',
@@ -860,6 +1032,11 @@ var GlobalHelpers = function () {
         key: 'strReplace',
         value: function strReplace(search, replace, subject) {
             return globalHelpers.strReplace(search, replace, subject);
+        }
+    }, {
+        key: 'unescape',
+        value: function unescape(str) {
+            return globalHelpers.unescape(str);
         }
     }, {
         key: 'unserialize',
@@ -1088,7 +1265,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.4.1';
+  this.version = '0.5.0';
 
   /**
    * Package name
