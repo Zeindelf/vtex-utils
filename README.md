@@ -168,7 +168,7 @@ vtexHelpers.getServerTime(function(date) {
 });
 ```
 
-### vtexHelpers.getCategories(categoryId, depth)
+### vtexHelpers.getCategories([categoryId[, depth]])
 
 Get category tree
 
@@ -227,7 +227,7 @@ vtexHelpers.checkLogin().then(function(res) {
 });
 ```
 
-### vtexHelpers.openPopupLogin(noReload)
+### vtexHelpers.openPopupLogin([noReload])
 
 Open default Vtex popup login
 
@@ -509,7 +509,7 @@ var obj2 = {foz: 'Foz', baz: 'Baz'};
 globalHelpers.extend({}, obj1, obj2); // {foo: 'Foo', bar: 'Bar', foz: 'Foz', baz: 'Baz'}
 ```
 
-### globalHelpers.getUrlParameter(name, entryPoint)
+### globalHelpers.getUrlParameter(name[, entryPoint])
 
 Get url params from a query string
 
@@ -525,7 +525,7 @@ Get url params from a query string
 #### Example
 
 ```js
-globalHelpers.// URL: https://site.com?param1=foo&param2=bar
+// URL: https://site.com?param1=foo&param2=bar
 globalHelpers.getUrlParameter('param1'); // foo
 globalHelpers.getUrlParameter('param2'); // bar
 
@@ -534,7 +534,7 @@ var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
 globalHelpers.getUrlParameter('param3', url); // baz
 ```
 
-### globalHelpers.implode(pieces, glue)
+### globalHelpers.implode(pieces[, glue])
 
 Join array elements with glue string - PHP implode alike
 
@@ -737,7 +737,7 @@ globalHelpers.unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
 
 ## Tests
 
-Tests are using mocha, to run the tests use:
+Tests are using mocha. To run the tests use:
 
 ```shell
 $ npm test
