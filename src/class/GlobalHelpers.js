@@ -1,4 +1,5 @@
 
+import validateHelpers from './../utils/validate-helpers.js';
 import globalHelpers from './../utils/global-helpers.js';
 
 /**
@@ -6,50 +7,92 @@ import globalHelpers from './../utils/global-helpers.js';
  * Javascript utilities methods
  */
 class GlobalHelpers {
+    /**
+     * Validate type methods
+     */
+    isArguments(value) {
+        return validateHelpers.isArguments(value);
+    }
+
     isArray(value) {
-        return globalHelpers.isArray(value);
+        return validateHelpers.isArray(value);
     }
 
     isBoolean(value) {
-        return globalHelpers.isBoolean(value);
+        return validateHelpers.isBoolean(value);
+    }
+
+    isChar(value) {
+        return validateHelpers.isChar(value);
+    }
+
+    isDate(value) {
+        return validateHelpers.isDate(value);
+    }
+
+    isDomNode(object) {
+        return validateHelpers.isDomNode(object);
     }
 
     isEmail(email) {
-        return globalHelpers.isEmail(email);
+        return validateHelpers.isEmail(email);
+    }
+
+    isEmpty(value) {
+        return validateHelpers.isEmpty(value);
+    }
+
+    isError(value) {
+        return validateHelpers.isError(value);
     }
 
     isFunction(value) {
-        return globalHelpers.isFunction(value);
+        return validateHelpers.isFunction(value);
     }
 
     isJson(str) {
-        return globalHelpers.isJson(str);
+        return validateHelpers.isJson(str);
+    }
+
+    isNull(value) {
+        return validateHelpers.isNull(value);
     }
 
     isNumber(value) {
-        return globalHelpers.isNumber(value);
+        return validateHelpers.isNumber(value);
     }
 
     isObject(value) {
-        return globalHelpers.isObject(value);
+        return validateHelpers.isObject(value);
     }
 
     isObjectEmpty(obj) {
-        return globalHelpers.isObjectEmpty(obj);
+        return validateHelpers.isObjectEmpty(obj);
     }
 
     isPlainObject(value) {
-        return globalHelpers.isPlainObject(value);
+        return validateHelpers.isPlainObject(value);
+    }
+
+    isRegexp(value) {
+        return validateHelpers.isRegexp(value);
+    }
+
+    isSameType(value, other) {
+        return validateHelpers.isSameType(value, other);
     }
 
     isString(value) {
-        return globalHelpers.isString(value);
+        return validateHelpers.isString(value);
     }
 
     isUndefined(value) {
-        return globalHelpers.isUndefined(value);
+        return validateHelpers.isUndefined(value);
     }
 
+    /**
+     * Global Methods
+     */
     arrayUnique(arr) {
         return globalHelpers.arrayUnique(arr);
     }

@@ -1,136 +1,10 @@
 
+import validateHelpers from './validate-helpers.js';
+
+// cache some methods to call later on
+const slice = Array.prototype.slice;
+
 export default {
-    /**
-     * Check if the given value is an array.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isArray(value) {
-        return value instanceof Array;
-    },
-
-    /**
-     * Check if the given value is a boolean value.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isBoolean(value) {
-        return typeof value === 'boolean';
-    },
-
-    /**
-     * Check if a string is a valid mail.
-     * @param {string} email - The string to check
-     * @return {boolean}
-     */
-    isEmail(email) {
-        const regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-
-        return regex.test(email);
-    },
-
-    /**
-     * Check if the given value is a function.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
-     */
-    isFunction(value) {
-        return typeof value === 'function';
-    },
-
-    /**
-     * Check if a string is a valid JSON.
-     * @param {string} str - The string to check
-     * @return {boolean}
-     */
-    isJson(str) {
-        try {
-            const obj = JSON.parse(str);
-            return this.isObject(obj);
-        } catch (e) {/* ignore */}
-
-        return false;
-    },
-
-    /**
-     * Check if the given value is a number.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a number, else 'false'.
-     */
-    isNumber(value) {
-        const isNaN = Number.isNaN || window.isNaN;
-
-        return typeof value === 'number' && ! isNaN(value);
-    },
-
-    /**
-     * Check if the given value is an object
-     * @param {*} value - The value to check
-     * @return {boolean} Returns 'true' if the given value is an object, else 'false'
-     */
-    isObject(value) {
-        return typeof value === 'object' && value !== null;
-    },
-
-    /**
-     * Verify if as objects is empty
-     * @param {object} obj - The object to verify
-     * @return {boolean}
-     * @example
-     *     isObjectEmpty({}); // true
-     */
-    isObjectEmpty(obj) {
-        if ( ! this.isObject(obj) ) {
-            return false;
-        }
-
-        for ( let x in obj ) {
-            if ( {}.hasOwnProperty.call(obj, x) ) {
-                return false;
-            }
-        }
-
-        return true;
-    },
-
-    /**
-     * Check if the given value is a plain object.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a plain object, else 'false'.
-     */
-    isPlainObject(value) {
-        if ( ! this.isObject(value) ) {
-            return false;
-        }
-
-        try {
-            const {constructor} = value;
-            const {prototype} = constructor;
-
-            return constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
-        } catch (e) {
-            return false;
-        }
-    },
-
-    /**
-     * Check if the given value is a string.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isString(value) {
-        return typeof value === 'string';
-    },
-
-    /**
-     * Check if the given value is undefined.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
-     */
-    isUndefined(value) {
-        return typeof value === 'undefined';
-    },
-
     /**
      * Return an array with unique values
      * @param {Array} arr - The array
@@ -156,6 +30,28 @@ export default {
     },
 
     /**
+     * Creates an array of elements split into groups the length of size.
+     * If array can't be split evenly, the final chunk will be the remaining elements.
+     * @param  {Array}    array  The array to proccess.
+     * @param  {Integer}  size   The length of each chunk.
+     * @return {Array}           Returns the new array of chunks.
+     */
+    chunk(array, size) {
+        if ( validateHelpers.isNull(size) || this.lenght(size) < 1 ) {
+            return [];
+        }
+
+        let result = [];
+        let i = 0;
+        const len = array.length;
+        while ( i < len ) {
+            result.push(slice.call(array, i, i += size));
+        }
+
+        return result;
+    },
+
+    /**
      * Removes empty index from a array
      * @param {Array} arr - The array
      * @return {Array}
@@ -172,8 +68,26 @@ export default {
         return newArray;
     },
 
-    contains(str, elem) {
-        return str.indexOf(toString(elem)) >= 0;
+    /**
+     * Check if value contains in an element
+     * @param {String} value - Value to check
+     * @param {String|Array} elem - String or array
+     * @return {Boolean} - Return true if element contains a value
+     */
+    contains(value, elem) {
+        if ( validateHelpers.isArray(elem) ) {
+            for ( let i = 0, len = elem.length; i < len; i += 1 ) {
+                if ( elem[i] === value ) {
+                    return true;
+                }
+            }
+        }
+
+        if ( validateHelpers.isString(elem) ) {
+            return elem.indexOf(value) >= 0;
+        }
+
+        return false;
     },
 
     /**
@@ -199,13 +113,13 @@ export default {
      * @return {object} The extended object
      */
     extend(obj, ...args) {
-        if ( this.isObject(obj) && args.length > 0 ) {
+        if ( validateHelpers.isObject(obj) && args.length > 0 ) {
             if ( Object.assign ) {
                 return Object.assign(obj, ...args);
             }
 
             args.forEach((arg) => {
-                if ( this.isObject(arg) ) {
+                if ( validateHelpers.isObject(arg) ) {
                     Object.keys(arg).forEach((key) => {
                         obj[key] = arg[key];
                     });
@@ -231,7 +145,7 @@ export default {
      *     getUrlParameter('param3', url); // baz
      */
     getUrlParameter(name, entryPoint) {
-        entryPoint = ! this.isString(entryPoint) ? window.location.href : entryPoint;
+        entryPoint = ! validateHelpers.isString(entryPoint) ? window.location.href : entryPoint;
         name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
 
         const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
@@ -249,9 +163,9 @@ export default {
      *     implode(['Foo', 'Bar']); // 'Foo,Bar'
      */
     implode(pieces, glue) {
-        if ( this.isArray(pieces) ) {
+        if ( validateHelpers.isArray(pieces) ) {
             return pieces.join(glue || ',');
-        } else if ( this.isObject(pieces) ) {
+        } else if ( validateHelpers.isObject(pieces) ) {
             let arr = [];
             for ( let o in pieces ) {
                 if ( object.hasOwnProperty(o) ) {
@@ -271,11 +185,11 @@ export default {
      * @return {int}
      */
     length(item) {
-        if ( ! this.isUndefined(item.length) ) {
+        if ( ! validateHelpers.isUndefined(item.length) ) {
             return item.length;
         }
 
-        if ( this.isObject(item) ) {
+        if ( validateHelpers.isObject(item) ) {
             return Object.keys(item).length;
         }
 
@@ -455,16 +369,16 @@ export default {
     strReplace(search, replace, subject) {
         let regex;
 
-        if ( this.isArray(search) ) {
+        if ( validateHelpers.isArray(search) ) {
             for ( let i = 0; i < search.length; i++ ) {
                 search[i] = search[i].replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
                 regex = new RegExp(search[i], 'g');
-                subject = subject.replace(regex, (this.isArray(replace) ? replace[i] : replace));
+                subject = subject.replace(regex, (validateHelpers.isArray(replace) ? replace[i] : replace));
             }
         } else {
             search = search.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&');
             regex = new RegExp(search, 'g');
-            subject = subject.replace(regex, (this.isArray(replace) ? replace[0] : replace));
+            subject = subject.replace(regex, (validateHelpers.isArray(replace) ? replace[0] : replace));
         }
 
         return subject;
@@ -488,14 +402,21 @@ export default {
 
     /**
      * Unserialize a query string into an object
-     * @param {string} str - The string that will be converted into a object
+     * @param {string} [str = actual url] - The string that will be converted into a object
      * @return {object}
      * @example
      *     // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
+     *     // If no provided, will get actual url
      *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
      *     unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
      */
     unserialize(str) {
+        str = ! validateHelpers.isString(str) ? window.location.href : str;
+
+        if ( str.indexOf('?') < 0 ) {
+            return {};
+        }
+
         str = ( str.indexOf('?') === 0 ) ? str.substr(1) : str.slice(str.indexOf('?') + 1);
 
         let query = {};

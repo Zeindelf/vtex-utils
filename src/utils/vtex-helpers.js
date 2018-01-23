@@ -1,4 +1,5 @@
 
+import validateHelpers from './validate-helpers.js';
 import globalHelpers from './global-helpers.js';
 
 export default {
@@ -13,8 +14,8 @@ export default {
      * @return {string} The formatted price
      */
     formatPrice(number, thousands, decimals, length, currency) {
-        currency = globalHelpers.isString(currency) ? currency : 'R$ ';
-        length = ! globalHelpers.isNumber(length) ? 2 : length;
+        currency = validateHelpers.isString(currency) ? currency : 'R$ ';
+        length = ! validateHelpers.isNumber(length) ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;
@@ -33,7 +34,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
     getOriginalImage(src) {
-        return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+        return validateHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
     },
 
     /**
@@ -51,7 +52,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
     getResizedImage(src, width, height) {
-        if ( globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || ! globalHelpers.isString(src) ) {
+        if ( validateHelpers.isUndefined(width) || validateHelpers.isUndefined(height) || ! validateHelpers.isString(src) ) {
             return src;
         }
 
@@ -89,7 +90,7 @@ export default {
                 month = `0${month}`;
             }
 
-            if ( globalHelpers.isFunction(callback) ) {
+            if ( validateHelpers.isFunction(callback) ) {
                 callback.call(null, new Date(`${year}/${month}/${day} ${time}`));
             }
         });
@@ -163,7 +164,7 @@ export default {
                 type: 'get',
                 url: '/no-cache/profileSystem/getProfile',
             }).done((res) => {
-                if ( globalHelpers.isUndefined(res.IsUserDefined) || ! res.IsUserDefined ) {
+                if ( validateHelpers.isUndefined(res.IsUserDefined) || ! res.IsUserDefined ) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
@@ -181,7 +182,7 @@ export default {
      * @return {void}
      */
     openPopupLogin(noReload) {
-        noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
+        noReload = validateHelpers.isBoolean(noReload) ? noReload : false;
         const _url = ( noReload ) ? window.location.href : '/';
 
         vtexid.start({
