@@ -247,6 +247,46 @@ vtexHelpers.openPopupLogin(true); // Open popup and don't reload page after succ
 Use `$(window).on('closed.vtexid', callback)` event to set any property if `noReload` is `true
 `
 
+### vtexHelpers.addToCart(items[, expectedOrderFormSections[, salesChannel]])
+
+Open default Vtex popup login
+
+- **items**:
+  - Type: `Array`
+  - An Array of Objects with item(s) to add
+
+- **expectedOrderFormSections** (optional):
+  - Type: `Array`
+  - Default: `null`
+  - Fields to retrieve
+
+- **salesChannel** (optional):
+  - Type: `Integer/String`
+  - Default: `1`
+  - Sales Channel id
+
+#### Example
+
+```js
+var items = [{
+    id: 1,
+    quantity: 1,
+    seller: '1',
+  }, {
+    id: 2,
+    quantity: 2,
+    seller: '1',
+  }];
+
+vtexHelpers.addToCart(items).then(function(res) {
+  window.console.log(res);
+})
+.fail(function(err) {
+  window.console.log(err);
+});
+
+```
+
 ## Global Methods
 
 ### globalHelpers.isArray(value)

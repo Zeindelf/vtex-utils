@@ -1,6 +1,6 @@
 {
   "name": "vtex-utils",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "A collection of utilities methods for Vtex stores",
   "main": "dist/vtex-utils.common.js",
   "module": "dist/vtex-utils.esm.js",
@@ -54,10 +54,10 @@
     "eslint": "^4.13.1",
     "eslint-config-google": "^0.9.1",
     "eslint-plugin-import": "^2.8.0",
-    "jsdom": "11.5.1",
+    "jsdom": "11.6.2",
     "jsdom-global": "3.0.2",
     "npm-run-all": "^4.1.2",
-    "rollup": "^0.54.1",
+    "rollup": "^0.55.5",
     "rollup-plugin-babel": "^3.0.3",
     "rollup-watch": "^4.3.1",
     "uglify-js": "^3.2.2"

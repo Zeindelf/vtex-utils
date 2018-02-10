@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.6.0
+ * VtexUtils.js v0.7.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-10T15:57:24.690Z
+ * Date: 2018-02-10T18:33:24.570Z
  */
 
 (function (global, factory) {
@@ -329,6 +329,7 @@ var validateHelpers = {
     }
 };
 
+// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -997,6 +998,11 @@ var vtexHelpers = {
     }
 };
 
+/**
+ * Create a VtexHelpers class
+ * Vtex utilities methods
+ */
+
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1055,6 +1061,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1469,6 +1480,11 @@ if ('rivets' in window) {
     };
 }
 
+/**
+ * Create a VtexUtils class
+ * Main class
+ */
+
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
 
@@ -1476,7 +1492,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.6.0';
+  this.version = '0.7.0';
 
   /**
    * Package name
