@@ -189,4 +189,39 @@ export default {
             returnUrl: _url,
         });
     },
+
+    /**
+     * Add items to cart
+     *
+     * @param  {Array}  items  Array of object with item(s)
+     * @param  {Array}  [expectedOrderFormSections=null]  OrderForm fields to retrieve
+     * @param  {Integer/String} [salesChannel=1]  Sales channel id
+     * @return {promise}
+     */
+    addToCart(items, expectedOrderFormSections, salesChannel) {
+        if ( ! validateHelpers.isArray(items) ) {
+            throw new TypeError(`Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: '1'}, {id: 321, quantity: 2, seller: '1'}]`);
+        }
+
+        if ( globalHelpers.length(items) < 1 ) {
+            throw new Error(`Items can't be an empty Array.`);
+        }
+
+        expectedOrderFormSections = ( validateHelpers.isUndefined(expectedOrderFormSections) ) ? null : expectedOrderFormSections;
+        salesChannel = ( validateHelpers.isUndefined ) ? 1 : salesChannel;
+
+        /* eslint-disable */
+        return $.Deferred((def) => {
+            /* eslint-enable */
+            return vtexjs.checkout.getOrderForm().done(() => {
+                return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done((orderForm) => {
+                    def.resolve(orderForm);
+                }).fail((err) => {
+                    def.reject();
+                });
+            }).fail((err) => {
+                def.reject();
+            });
+        }).promise();
+    },
 };

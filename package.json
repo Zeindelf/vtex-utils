@@ -11,7 +11,7 @@
     "compress": "uglifyjs dist/vtex-utils.js -o dist/vtex-utils.min.js -c -m --comments /^!!/",
     "lint": "eslint src --fix",
     "release": "npm run clear && npm run lint && npm run build && npm run compress && npm test",
-    "start": "npm-run-all --parallel watch:*",
+    "start": "./node_modules/.bin/rollup -c --watch",
     "test": "mocha ./test/*.js -r jsdom-global/register --colors --timeout 20000"
   },
   "repository": "zeindelf/vtex-utils",

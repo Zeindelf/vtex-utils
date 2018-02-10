@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-01-23T19:26:34.852Z
+ * Date: 2018-02-10T15:57:24.690Z
  */
 
 (function (global, factory) {
@@ -329,7 +329,6 @@ var validateHelpers = {
     }
 };
 
-// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -959,13 +958,44 @@ var vtexHelpers = {
         vtexid.start({
             returnUrl: _url
         });
+    },
+
+
+    /**
+     * Add items to cart
+     *
+     * @param  {Array}  items  Array of object with item(s)
+     * @param  {Array}  [expectedOrderFormSections=null]  OrderForm fields to retrieve
+     * @param  {Integer/String} [salesChannel=1]  Sales channel id
+     * @return {promise}
+     */
+    addToCart: function addToCart(items, expectedOrderFormSections, salesChannel) {
+        if (!validateHelpers.isArray(items)) {
+            throw new TypeError('Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: \'1\'}, {id: 321, quantity: 2, seller: \'1\'}]');
+        }
+
+        if (globalHelpers.length(items) < 1) {
+            throw new Error('Items can\'t be an empty Array.');
+        }
+
+        expectedOrderFormSections = validateHelpers.isUndefined(expectedOrderFormSections) ? null : expectedOrderFormSections;
+        salesChannel = validateHelpers.isUndefined ? 1 : salesChannel;
+
+        /* eslint-disable */
+        return $.Deferred(function (def) {
+            /* eslint-enable */
+            return vtexjs.checkout.getOrderForm().done(function () {
+                return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done(function (orderForm) {
+                    def.resolve(orderForm);
+                }).fail(function (err) {
+                    def.reject();
+                });
+            }).fail(function (err) {
+                def.reject();
+            });
+        }).promise();
     }
 };
-
-/**
- * Create a VtexHelpers class
- * Vtex utilities methods
- */
 
 var VtexHelpers = function () {
     function VtexHelpers() {
@@ -1017,14 +1047,14 @@ var VtexHelpers = function () {
         value: function openPopupLogin(noReload) {
             return vtexHelpers.openPopupLogin(noReload);
         }
+    }, {
+        key: 'addToCart',
+        value: function addToCart(items, expectedOrderFormSections, salesChannel) {
+            return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
+        }
     }]);
     return VtexHelpers;
 }();
-
-/**
- * Create a GlobalHelpers class
- * Javascript utilities methods
- */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1438,11 +1468,6 @@ if ('rivets' in window) {
         return vtexHelpers.getResizedImage(val, arg1, arg2);
     };
 }
-
-/**
- * Create a VtexUtils class
- * Main class
- */
 
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);

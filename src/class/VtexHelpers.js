@@ -41,6 +41,10 @@ class VtexHelpers {
     openPopupLogin(noReload) {
         return vtexHelpers.openPopupLogin(noReload);
     }
+
+    addToCart(items, expectedOrderFormSections, salesChannel) {
+        return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
+    }
 }
 
 export default VtexHelpers;
