@@ -1,4 +1,5 @@
 
+import validateHelpers from './../utils/validate-helpers.js';
 import Private from './vtex-catalog.private.js';
 
 const _private = new Private();
@@ -8,27 +9,19 @@ export default {
      * Sets Catalog instance
      * @return {Void}
      */
-    setInstance() {
+    _setInstance(catalogCache) {
+        catalogCache = validateHelpers.isUndefined(catalogCache) ? false : catalogCache;
+
         _private._getInstance(this);
+        _private._setSessionCache(catalogCache);
     },
 
-    /**
-     * Init and validate Session Store Cache
-     * @return {Void}
-     */
-    initStorage() {
-        if ( this.sessionCache ) {
-            this.productCacheName = 'PRODUCT_CACHE';
-            this.skuCacheName = 'SKU_CACHE';
+    getProductCache() {
+        return _private._getProductCache();
+    },
 
-            if ( this.globalHelpers.isNull(this.session.get(this.productCacheName)) ) {
-                this.session.set(this.productCacheName, {});
-            }
-
-            if ( this.globalHelpers.isNull(this.session.get(this.skuCacheName)) ) {
-                this.session.set(this.skuCacheName, {});
-            }
-        }
+    getSkusProductId() {
+        return _private._getSkuCache();
     },
 
     /**
@@ -37,25 +30,26 @@ export default {
      * @return {Promise}                    Promise with search results
      */
     searchProduct(productId) {
-        if ( ! productId ) {
+        if ( validateHelpers.isUndefined(productId) ) {
             return _private._error('productIdNotDefined');
         }
 
         /* eslint-disable */
-        let def = $.Deferred();
+        const def = $.Deferred();
         /* eslint-enable */
 
-        // Check if productId is in cache
-        const _productCache = ( this.sessionCache ) ? this.session.get(this.productCacheName) : this.productCache;
+        def.then(() => _private._requestProductStartEvent());
+
+        const _productCache = _private._getProductCache();
+
         if ( _productCache[productId] ) {
             def.resolve(_productCache[productId]);
         } else {
-            // Search product
             let params = {
                 fq: [`productId:${productId}`],
             };
 
-            let search = _private._search(params);
+            const search = _private._search(params);
 
             // Since it should be only 1 item set index is 0
             search.done((products) => def.resolve(products[0]));
@@ -73,25 +67,27 @@ export default {
      * @return {Promise}            Promise with search results
      */
     searchSku(skuId) {
-        if ( ! skuId ) {
+        if ( validateHelpers.isUndefined(skuId) ) {
             return _private._error('skuIdNotDefined');
         }
 
         /* eslint-disable */
-        let def = $.Deferred();
+        const def = $.Deferred();
         /* eslint-enable */
 
-        // Check if skuId is in skusProductIds map
-        const _productCache = ( this.sessionCache ) ? this.session.get(this.productCacheName) : this.productCache;
-        if ( this.skusProductIds[skuId] ) {
-            def.resolve(_productCache[this.skusProductIds[skuId]]);
+        def.then(() => _private._requestSkuStartEvent());
+
+        const _productCache = _private._getProductCache();
+        const _skuCache = _private._getSkuCache();
+
+        if ( _skuCache[skuId] ) {
+            def.resolve(_productCache[_skuCache[skuId]]);
         } else {
-            // Search product
             let params = {
                 fq: [`skuId:${skuId}`],
             };
 
-            let search = _private._search(params);
+            const search = _private._search(params);
 
             // Since it should be only 1 item set index is 0
             search.done((products) => def.resolve(products[0]));
@@ -108,47 +104,37 @@ export default {
      * @return {Promise}                            Promise with search results
      */
     searchProductArray(productIdArray) {
-        if ( ! productIdArray ) {
+        if ( validateHelpers.isUndefined(productIdArray) ) {
             return _private._error('productIdArrayNotDefined');
         }
 
-        if ( ! Array.isArray(productIdArray) ) {
+        if ( ! validateHelpers.isArray(productIdArray) ) {
             return _private._error('productIdArrayNotAnArray');
         }
 
         /* eslint-disable */
-        let def = $.Deferred();
+        const def = $.Deferred();
         /* eslint-enable */
 
-        // Product data object to resolve
+        def.then(() => _private._requestProductArrayStartEvent());
+
         let productData = {};
+        let params = {fq: []};
+        const _productCache = _private._getProductCache();
 
-        // Request product params
-        let params = {
-            fq: [],
-        };
-
-        const _productCache = this.session.get(this.productCacheName);
-
-        for ( let i = 0; i < productIdArray.length; i++ ) {
-            // Check if product was already gotten
-            // If not, add productId into the params object
-            // if ( this.productCache[productIdArray[i]] === undefined ) {
-            if ( _productCache[productIdArray[i]] === undefined ) {
+        for ( let i = 0, len = productIdArray.length; i < len; i += 1 ) {
+            if ( validateHelpers.isUndefined(_productCache[productIdArray[i]]) ) {
                 params.fq.push(`productId:${productIdArray[i]}`);
             } else {
-                // If gotten add it into the productData
-                // productData[productIdArray[i]] = this.productCache[productIdArray[i]];
                 productData[productIdArray[i]] = _productCache[productIdArray[i]];
             }
         }
 
         if ( params.fq.length ) {
-            let search = _private._search(params);
+            const search = _private._search(params);
 
             search.done((products) => {
-                // Loop product data
-                for ( let i = 0; i < products.length; i++ ) {
+                for ( let i = 0, len = products.length; i < len; i += 1 ) {
                     productData[products[i].productId] = products[i];
                 }
 
@@ -157,6 +143,8 @@ export default {
         } else {
             def.resolve(productData);
         }
+
+        def.always(() => _private._requestProductArrayEndEvent());
 
         return def.promise();
     },
@@ -167,44 +155,39 @@ export default {
      * @return {Promise}                    Promise with search results
      */
     searchSkuArray(skuIdArray) {
-        if ( ! skuIdArray ) {
+        if ( validateHelpers.isUndefined(skuIdArray) ) {
             return _private._error('skuIdArrayNotDefined');
         }
 
-        if ( ! Array.isArray(skuIdArray) ) {
+        if ( ! validateHelpers.isArray(skuIdArray) ) {
             return _private._error('skuIdArrayNotAnArray');
         }
 
         /* eslint-disable */
-        let def = $.Deferred();
+        const def = $.Deferred();
         /* eslint-enable */
 
-        // Product data object to resolve
+        def.then(() => _private._requestSkuArrayStartEvent());
+
         let productData = {};
+        let params = {fq: []};
+        const _productCache = _private._getProductCache();
+        const _skuCache = _private._getSkuCache();
 
-        // Request product params
-        let params = {
-            fq: [],
-        };
-
-        for ( let i = 0; i < skuIdArray.length; i++ ) {
-            // Check if sku was already gotten
-            // If not add skuId into the params object
-            if ( ! this.skusProductIds[skuIdArray[i]] ) {
+        for ( let i = 0, len = skuIdArray.length; i < len; i += 1 ) {
+            if ( ! _skuCache[skuIdArray[i]] ) {
                 params.fq.push(`skuId:${skuIdArray[i]}`);
             } else {
-                let productId = this.skusProductIds[skuIdArray[i]];
-
-                productData[productId] = this.productCache[productId];
+                const productId = _skuCache[skuIdArray[i]];
+                productData[productId] = _productCache[productId];
             }
         }
 
         if ( params.fq.length ) {
-            let search = _private._search(params);
+            const search = _private._search(params);
 
             search.done((products) => {
-                // Loop product data
-                for ( let i = 0; i < products.length; i++ ) {
+                for ( let i = 0, len = products.length; i < len; i += 1 ) {
                     productData[products[i].productId] = products[i];
                 }
 
@@ -213,6 +196,8 @@ export default {
         } else {
             def.resolve(productData);
         }
+
+        def.always(() => _private._requestSkuArrayEndEvent());
 
         return def.promise();
     },
@@ -227,25 +212,22 @@ export default {
      *         .fail((err) => window.console.log(err));
      */
     fullSearch(params) {
-        if ( ! params ) {
+        if ( validateHelpers.isUndefined(params) ) {
             return _private._error('searchParamsNotDefined');
         }
 
-        if ( typeof params !== 'object' ) {
+        if ( ! validateHelpers.isObject(params) ) {
             return _private._error('paramsNotAnObject');
         }
 
-        if ( ! params.fq ) {
+        if ( validateHelpers.isUndefined(params.fq) ) {
             return _private._error('fqPropertyNotFound');
         }
 
-        // Generate map parameter
-        let mapParam = {
-            map: [],
-        };
+        let mapParam = {map: []};
 
         // Loop each parameter
-        for ( let i = 0; i < params.fq.length; i++ ) {
+        for ( let i = 0, len = params.fq.length; i < len; i += 1 ) {
             let param = params.fq[i];
 
             // If param is the category one
@@ -253,7 +235,7 @@ export default {
                 // Generate a 'c' param in the 'mapParam' for each category
                 let categoryIds = param.split('/');
 
-                for ( let z = 0; z < categoryIds.length; z++ ) {
+                for ( let z = 0, len = categoryIds.length; z < len; z += 1 ) {
                     // If the 'categoryId' is a number
                     if ( categoryIds[z].match(/\d.+/gi) ) {
                         mapParam.map.push('c');
@@ -278,7 +260,6 @@ export default {
             url: '/api/catalog_system/pub/products/search/',
             data: $.param(params, true),
             beforeSend(xhr) {
-                // Set resources header
                 xhr.setRequestHeader('resources', '0-49');
             },
         });

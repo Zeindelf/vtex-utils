@@ -43,10 +43,10 @@ class VtexUtils {
         this.storage = store;
 
         /**
-         * Vtex Catalog instance
+         * Vtex Catalog
          * @type {VtexCatalog}
          */
-        this.vtexCatalog = new VtexCatalog(this.globalHelpers, this.vtexHelpers, this.storage);
+        this.VtexCatalog = VtexCatalog;
     }
 }
 

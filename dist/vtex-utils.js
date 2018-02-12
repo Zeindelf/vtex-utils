@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-11T22:46:51.063Z
+ * Date: 2018-02-12T20:13:13.321Z
  */
 
 (function (global, factory) {
@@ -361,10 +361,11 @@ var validateHelpers = {
      * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
      */
     isUndefined: function isUndefined(value) {
-        return value === void 0;
+        return value === undefined;
     }
 };
 
+// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1566,6 +1567,11 @@ store.area("session", function () {
     } catch (e) {}
 }());
 
+/**
+ * Create a VtexHelpers class
+ * Vtex utilities methods
+ */
+
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1629,6 +1635,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1882,6 +1893,12 @@ var Private = function () {
             skuIdArrayNotDefined: '\'skuIdArray\' is not an defined',
             fqPropertyNotFound: 'The property \'fq\' was not found'
         };
+
+        this._productCacheName = 'vtexCatalog.productCache';
+        this._skuCacheName = 'vtexCatalog.skuCache';
+
+        this._storage = store;
+        this._session = this._storage.session;
     }
 
     createClass(Private, [{
@@ -1890,9 +1907,37 @@ var Private = function () {
             this._catalog = catalog;
         }
     }, {
+        key: '_setSessionCache',
+        value: function _setSessionCache(catalogCache) {
+            this._catalogCache = catalogCache;
+            this._initStorage(this._catalogCache);
+        }
+    }, {
         key: '_error',
         value: function _error(type) {
             throw new Error(this._errors[type]);
+        }
+
+        /**
+         * Init and validate Session Store Cache
+         * @return {Void}
+         */
+
+    }, {
+        key: '_initStorage',
+        value: function _initStorage(catalogCache) {
+            if (catalogCache) {
+                if (validateHelpers.isNull(this._session.get(this._productCacheName))) {
+                    this._session.set(this._productCacheName, {});
+                }
+
+                if (validateHelpers.isNull(this._session.get(this._skuCacheName))) {
+                    this._session.set(this._skuCacheName, {});
+                }
+            } else {
+                this._session.remove(this._productCacheName);
+                this._session.remove(this._skuCacheName);
+            }
         }
 
         /**
@@ -1902,7 +1947,7 @@ var Private = function () {
     }, {
         key: '_setProductCache',
         value: function _setProductCache(products) {
-            var productCache = this._catalog.session.get(this._catalog.productCacheName);
+            var productCache = this._session.get(this._productCacheName);
 
             for (var id in products) {
                 if (!productCache.hasOwnProperty(id)) {
@@ -1910,7 +1955,7 @@ var Private = function () {
                 }
             }
 
-            this._catalog.session.set(this._catalog.productCacheName, productCache);
+            this._session.set(this._productCacheName, productCache);
         }
 
         /**
@@ -1920,8 +1965,8 @@ var Private = function () {
     }, {
         key: '_setSkuCache',
         value: function _setSkuCache(productsId) {
-            if (this._catalog.sessionCache) {
-                var productIdCache = this._catalog.session.get(this._catalog.skuCacheName);
+            if (this._catalogCache) {
+                var productIdCache = this._session.get(this._skuCacheName);
 
                 for (var id in productsId) {
                     if (!productIdCache.hasOwnProperty(id)) {
@@ -1929,8 +1974,44 @@ var Private = function () {
                     }
                 }
 
-                this._catalog.session.set(this._catalog.skuCacheName, productIdCache);
+                this._session.set(this._skuCacheName, productIdCache);
             }
+        }
+    }, {
+        key: '_getProductCache',
+        value: function _getProductCache() {
+            return this._catalogCache ? this._session.get(this._productCacheName) : this._catalog.productCache;
+        }
+    }, {
+        key: '_getSkuCache',
+        value: function _getSkuCache() {
+            return this._catalogCache ? this._session.get(this._skuCacheName) : this._catalog.skusProductIds;
+        }
+
+        /**
+         * Cache Products/SKUs Id
+         * @param {Object} product Product to cache
+         */
+
+    }, {
+        key: '_setCache',
+        value: function _setCache(product) {
+            var _this = this;
+
+            var productId = product.productId,
+                items = product.items;
+
+            this._catalog.productCache[productId] = product;
+
+            if (this._catalogCache) {
+                this._setProductCache(this._catalog.productCache);
+            }
+
+            items.forEach(function (item) {
+                var itemId = item.itemId;
+
+                _this._catalog.skusProductIds[itemId] = productId;
+            });
         }
 
         /**
@@ -1943,55 +2024,27 @@ var Private = function () {
     }, {
         key: '_search',
         value: function _search(params) {
-            var _this = this,
+            var _this2 = this,
                 _$;
 
             var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
 
-            // HELPER FUNCTIONS
-            var storeInCache = function storeInCache(product) {
-                var productId = product.productId,
-                    items = product.items;
-
-                // Store in cache
-
-                _this._catalog.productCache[productId] = product;
-
-                if (_this._catalog.sessionCache) {
-                    _this._setProductCache(_this._catalog.productCache);
-                }
-
-                // Add skus product IDs map for each item
-                items.forEach(function (item) {
-                    var itemId = item.itemId;
-
-
-                    _this._catalog.skusProductIds[itemId] = productId;
-                });
-            };
-
-            // START HERE
-            if (!params) {
+            if (validateHelpers.isUndefined(params)) {
                 return this._error('searchParamsNotDefined');
             }
 
-            if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') {
+            if (!validateHelpers.isObject(params)) {
                 return this._error('paramsNotAnObject');
             }
 
-            if (!params.fq) {
+            if (validateHelpers.isUndefined(params.fq)) {
                 return this._error('fqPropertyNotFound');
             }
 
             var paramsFormatted = $.extend({}, params);
-
-            // Request array
             var xhrArray = this._pendingFetchArray;
-
-            // Product data object to resolve
             var productData = [];
 
-            // Loop each query type in params
             for (var queryType in params) {
                 if (queryType === 'map') {
                     continue;
@@ -2001,17 +2054,17 @@ var Private = function () {
                 // or are pending
                 paramsFormatted[queryType] = params[queryType].filter(function (query) {
                     // Check if query was already fetched and the response was empty
-                    if (~_this._emptyFetchedParams.indexOf(query)) {
+                    if (~_this2._emptyFetchedParams.indexOf(query)) {
                         return false;
                     }
 
                     // NOTE: Two step validation, the first IF statement checks if the query
                     // was already gotten and if the query is still pending
-                    if (~_this._fetchedParams.indexOf(query)) {
+                    if (~_this2._fetchedParams.indexOf(query)) {
                         return false;
                     } else {
-                        if (!~_this._pendingParamsToFetch.indexOf(query)) {
-                            _this._pendingParamsToFetch.push(query);
+                        if (!~_this2._pendingParamsToFetch.indexOf(query)) {
+                            _this2._pendingParamsToFetch.push(query);
                             return true;
                         } else {
                             return false;
@@ -2023,7 +2076,7 @@ var Private = function () {
             var paramsLength = 1;
 
             // If params fq is an array get the length
-            if (Array.isArray(params.fq)) {
+            if (validateHelpers.isArray(params.fq)) {
                 paramsLength = paramsFormatted.fq.length;
             }
 
@@ -2032,7 +2085,7 @@ var Private = function () {
             // Loop for each requestAmount
 
             var _loop = function _loop(i) {
-                var resources = i * _this._maxParamsPerRequest + '-' + ((i + 1) * _this._maxParamsPerRequest - 1);
+                var resources = i * _this2._maxParamsPerRequest + '-' + ((i + 1) * _this2._maxParamsPerRequest - 1);
 
                 /* eslint-disable */
                 var searchRequest = $.Deferred();
@@ -2047,8 +2100,6 @@ var Private = function () {
                                 xhr.setRequestHeader(header, headers[header]);
                             }
                         }
-
-                        // Set resources header
                         xhr.setRequestHeader('resources', resources);
                     },
                     success: function success(products) {
@@ -2056,17 +2107,20 @@ var Private = function () {
                     }
                 });
 
-                // Push request to request array
                 xhrArray.push(searchRequest.promise());
             };
 
-            for (var i = 0; i < requestAmount; i++) {
+            for (var i = 0; i < requestAmount; i += 1) {
                 _loop(i);
             }
 
             /* eslint-disable */
             var def = $.Deferred();
             /* eslint-enable */
+
+            def.then(function () {
+                return _this2._requestSearchStartEvent();
+            });
 
             (_$ = $).when.apply(_$, toConsumableArray(xhrArray)).done(function () {
                 for (var _len = arguments.length, requests = Array(_len), _key = 0; _key < _len; _key++) {
@@ -2075,9 +2129,9 @@ var Private = function () {
 
                 requests.forEach(function (request, index) {
                     var products = request;
-
-                    // Loop each product and store in cache
-                    products.forEach(storeInCache);
+                    products.forEach(function (product) {
+                        return _this2._setCache(product);
+                    });
 
                     // Remove resolved fetch from array
                     xhrArray.splice(index, 1);
@@ -2094,25 +2148,24 @@ var Private = function () {
                             var product = void 0;
 
                             // Add fetched params
-                            _this._fetchedParams.push(query);
+                            _this2._fetchedParams.push(query);
 
                             switch (queryField) {
                                 case 'skuId':
                                     {
-                                        var productId = _this._catalog.skusProductIds[queryValue];
-                                        product = _this._catalog.productCache[productId];
+                                        var productId = _this2._catalog.skusProductIds[queryValue];
+                                        product = _this2._catalog.productCache[productId];
                                         break;
                                     }
                                 case 'productId':
                                     {
-                                        product = _this._catalog.productCache[queryValue];
+                                        product = _this2._catalog.productCache[queryValue];
                                         break;
                                     }
                             }
 
-                            // Send products to resolve
-                            if (!product) {
-                                _this._emptyFetchedParams.push(query);
+                            if (validateHelpers.isUndefined(product)) {
+                                _this2._emptyFetchedParams.push(query);
                             } else {
                                 productData.push(product);
                             }
@@ -2121,16 +2174,12 @@ var Private = function () {
                 }
 
                 if (productData.length) {
-                    _this._setSkuCache(_this._catalog.skusProductIds);
+                    _this2._setSkuCache(_this2._catalog.skusProductIds);
 
                     def.resolve(productData);
                 } else {
                     def.reject();
                 }
-            });
-
-            def.always(function () {
-                return _this._requestSearchEndEvent();
             });
 
             return def.promise();
@@ -2141,10 +2190,19 @@ var Private = function () {
          */
 
     }, {
-        key: '_requestSearchEndEvent',
-        value: function _requestSearchEndEvent() {
+        key: '_requestSearchStartEvent',
+        value: function _requestSearchStartEvent() {
             /* eslint-disable */
-            var ev = $.Event('vtexCatalog.requestSearchEnd');
+            var ev = $.Event('requestSearchStart.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestProductStartEvent',
+        value: function _requestProductStartEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestProductStart.vtexCatalog');
             /* eslint-enable */
 
             $(document).trigger(ev);
@@ -2153,7 +2211,16 @@ var Private = function () {
         key: '_requestProductEndEvent',
         value: function _requestProductEndEvent() {
             /* eslint-disable */
-            var ev = $.Event('vtexCatalog.requestProductEnd');
+            var ev = $.Event('requestProductEnd.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestSkuStartEvent',
+        value: function _requestSkuStartEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestSkuStart.vtexCatalog');
             /* eslint-enable */
 
             $(document).trigger(ev);
@@ -2162,7 +2229,43 @@ var Private = function () {
         key: '_requestSkuEndEvent',
         value: function _requestSkuEndEvent() {
             /* eslint-disable */
-            var ev = $.Event('vtexCatalog.requestSkuEnd');
+            var ev = $.Event('requestSkuEnd.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestProductArrayStartEvent',
+        value: function _requestProductArrayStartEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestProductArrayStart.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestProductArrayEndEvent',
+        value: function _requestProductArrayEndEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestProductArrayEnd.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestSkuArrayStartEvent',
+        value: function _requestSkuArrayStartEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestSkuArrayStart.vtexCatalog');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestSkuArrayEndEvent',
+        value: function _requestSkuArrayEndEvent() {
+            /* eslint-disable */
+            var ev = $.Event('requestSkuArrayEnd.vtexCatalog');
             /* eslint-enable */
 
             $(document).trigger(ev);
@@ -2178,28 +2281,17 @@ var vtexCatalogMethods = {
      * Sets Catalog instance
      * @return {Void}
      */
-    setInstance: function setInstance() {
+    _setInstance: function _setInstance(catalogCache) {
+        catalogCache = validateHelpers.isUndefined(catalogCache) ? false : catalogCache;
+
         _private._getInstance(this);
+        _private._setSessionCache(catalogCache);
     },
-
-
-    /**
-     * Init and validate Session Store Cache
-     * @return {Void}
-     */
-    initStorage: function initStorage() {
-        if (this.sessionCache) {
-            this.productCacheName = 'PRODUCT_CACHE';
-            this.skuCacheName = 'SKU_CACHE';
-
-            if (this.globalHelpers.isNull(this.session.get(this.productCacheName))) {
-                this.session.set(this.productCacheName, {});
-            }
-
-            if (this.globalHelpers.isNull(this.session.get(this.skuCacheName))) {
-                this.session.set(this.skuCacheName, {});
-            }
-        }
+    getProductCache: function getProductCache() {
+        return _private._getProductCache();
+    },
+    getSkusProductId: function getSkusProductId() {
+        return _private._getSkuCache();
     },
 
 
@@ -2209,7 +2301,7 @@ var vtexCatalogMethods = {
      * @return {Promise}                    Promise with search results
      */
     searchProduct: function searchProduct(productId) {
-        if (!productId) {
+        if (validateHelpers.isUndefined(productId)) {
             return _private._error('productIdNotDefined');
         }
 
@@ -2217,12 +2309,15 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        // Check if productId is in cache
-        var _productCache = this.sessionCache ? this.session.get(this.productCacheName) : this.productCache;
+        def.then(function () {
+            return _private._requestProductStartEvent();
+        });
+
+        var _productCache = _private._getProductCache();
+
         if (_productCache[productId]) {
             def.resolve(_productCache[productId]);
         } else {
-            // Search product
             var params = {
                 fq: ['productId:' + productId]
             };
@@ -2250,7 +2345,7 @@ var vtexCatalogMethods = {
      * @return {Promise}            Promise with search results
      */
     searchSku: function searchSku(skuId) {
-        if (!skuId) {
+        if (validateHelpers.isUndefined(skuId)) {
             return _private._error('skuIdNotDefined');
         }
 
@@ -2258,12 +2353,16 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        // Check if skuId is in skusProductIds map
-        var _productCache = this.sessionCache ? this.session.get(this.productCacheName) : this.productCache;
-        if (this.skusProductIds[skuId]) {
-            def.resolve(_productCache[this.skusProductIds[skuId]]);
+        def.then(function () {
+            return _private._requestSkuStartEvent();
+        });
+
+        var _productCache = _private._getProductCache();
+        var _skuCache = _private._getSkuCache();
+
+        if (_skuCache[skuId]) {
+            def.resolve(_productCache[_skuCache[skuId]]);
         } else {
-            // Search product
             var params = {
                 fq: ['skuId:' + skuId]
             };
@@ -2290,11 +2389,11 @@ var vtexCatalogMethods = {
      * @return {Promise}                            Promise with search results
      */
     searchProductArray: function searchProductArray(productIdArray) {
-        if (!productIdArray) {
+        if (validateHelpers.isUndefined(productIdArray)) {
             return _private._error('productIdArrayNotDefined');
         }
 
-        if (!Array.isArray(productIdArray)) {
+        if (!validateHelpers.isArray(productIdArray)) {
             return _private._error('productIdArrayNotAnArray');
         }
 
@@ -2302,25 +2401,18 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        // Product data object to resolve
+        def.then(function () {
+            return _private._requestProductArrayStartEvent();
+        });
+
         var productData = {};
+        var params = { fq: [] };
+        var _productCache = _private._getProductCache();
 
-        // Request product params
-        var params = {
-            fq: []
-        };
-
-        var _productCache = this.session.get(this.productCacheName);
-
-        for (var i = 0; i < productIdArray.length; i++) {
-            // Check if product was already gotten
-            // If not, add productId into the params object
-            // if ( this.productCache[productIdArray[i]] === undefined ) {
-            if (_productCache[productIdArray[i]] === undefined) {
+        for (var i = 0, len = productIdArray.length; i < len; i += 1) {
+            if (validateHelpers.isUndefined(_productCache[productIdArray[i]])) {
                 params.fq.push('productId:' + productIdArray[i]);
             } else {
-                // If gotten add it into the productData
-                // productData[productIdArray[i]] = this.productCache[productIdArray[i]];
                 productData[productIdArray[i]] = _productCache[productIdArray[i]];
             }
         }
@@ -2329,8 +2421,7 @@ var vtexCatalogMethods = {
             var search = _private._search(params);
 
             search.done(function (products) {
-                // Loop product data
-                for (var _i = 0; _i < products.length; _i++) {
+                for (var _i = 0, _len = products.length; _i < _len; _i += 1) {
                     productData[products[_i].productId] = products[_i];
                 }
 
@@ -2339,6 +2430,10 @@ var vtexCatalogMethods = {
         } else {
             def.resolve(productData);
         }
+
+        def.always(function () {
+            return _private._requestProductArrayEndEvent();
+        });
 
         return def.promise();
     },
@@ -2350,11 +2445,11 @@ var vtexCatalogMethods = {
      * @return {Promise}                    Promise with search results
      */
     searchSkuArray: function searchSkuArray(skuIdArray) {
-        if (!skuIdArray) {
+        if (validateHelpers.isUndefined(skuIdArray)) {
             return _private._error('skuIdArrayNotDefined');
         }
 
-        if (!Array.isArray(skuIdArray)) {
+        if (!validateHelpers.isArray(skuIdArray)) {
             return _private._error('skuIdArrayNotAnArray');
         }
 
@@ -2362,23 +2457,21 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        // Product data object to resolve
+        def.then(function () {
+            return _private._requestSkuArrayStartEvent();
+        });
+
         var productData = {};
+        var params = { fq: [] };
+        var _productCache = _private._getProductCache();
+        var _skuCache = _private._getSkuCache();
 
-        // Request product params
-        var params = {
-            fq: []
-        };
-
-        for (var i = 0; i < skuIdArray.length; i++) {
-            // Check if sku was already gotten
-            // If not add skuId into the params object
-            if (!this.skusProductIds[skuIdArray[i]]) {
+        for (var i = 0, len = skuIdArray.length; i < len; i += 1) {
+            if (!_skuCache[skuIdArray[i]]) {
                 params.fq.push('skuId:' + skuIdArray[i]);
             } else {
-                var productId = this.skusProductIds[skuIdArray[i]];
-
-                productData[productId] = this.productCache[productId];
+                var productId = _skuCache[skuIdArray[i]];
+                productData[productId] = _productCache[productId];
             }
         }
 
@@ -2386,8 +2479,7 @@ var vtexCatalogMethods = {
             var search = _private._search(params);
 
             search.done(function (products) {
-                // Loop product data
-                for (var _i2 = 0; _i2 < products.length; _i2++) {
+                for (var _i2 = 0, _len2 = products.length; _i2 < _len2; _i2 += 1) {
                     productData[products[_i2].productId] = products[_i2];
                 }
 
@@ -2396,6 +2488,10 @@ var vtexCatalogMethods = {
         } else {
             def.resolve(productData);
         }
+
+        def.always(function () {
+            return _private._requestSkuArrayEndEvent();
+        });
 
         return def.promise();
     },
@@ -2411,25 +2507,22 @@ var vtexCatalogMethods = {
      *         .fail((err) => window.console.log(err));
      */
     fullSearch: function fullSearch(params) {
-        if (!params) {
+        if (validateHelpers.isUndefined(params)) {
             return _private._error('searchParamsNotDefined');
         }
 
-        if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') {
+        if (!validateHelpers.isObject(params)) {
             return _private._error('paramsNotAnObject');
         }
 
-        if (!params.fq) {
+        if (validateHelpers.isUndefined(params.fq)) {
             return _private._error('fqPropertyNotFound');
         }
 
-        // Generate map parameter
-        var mapParam = {
-            map: []
-        };
+        var mapParam = { map: [] };
 
         // Loop each parameter
-        for (var i = 0; i < params.fq.length; i++) {
+        for (var i = 0, len = params.fq.length; i < len; i += 1) {
             var param = params.fq[i];
 
             // If param is the category one
@@ -2437,7 +2530,7 @@ var vtexCatalogMethods = {
                 // Generate a 'c' param in the 'mapParam' for each category
                 var categoryIds = param.split('/');
 
-                for (var z = 0; z < categoryIds.length; z++) {
+                for (var z = 0, _len3 = categoryIds.length; z < _len3; z += 1) {
                     // If the 'categoryId' is a number
                     if (categoryIds[z].match(/\d.+/gi)) {
                         mapParam.map.push('c');
@@ -2462,7 +2555,6 @@ var vtexCatalogMethods = {
             url: '/api/catalog_system/pub/products/search/',
             data: $.param(params, true),
             beforeSend: function beforeSend(xhr) {
-                // Set resources header
                 xhr.setRequestHeader('resources', '0-49');
             }
         });
@@ -2471,24 +2563,13 @@ var vtexCatalogMethods = {
     }
 };
 
-var VtexCatalog = function VtexCatalog(globalHelpers, vtexHelpers, storage) {
+/**
+ * Create a VtexCatalog class
+ * Vtex utilities methods
+ */
+
+var VtexCatalog = function VtexCatalog(catalogCache) {
   classCallCheck(this, VtexCatalog);
-
-  /**
-   * Set Helpers
-   */
-  this.globalHelpers = globalHelpers;
-  this.vtexHelpers = vtexHelpers;
-  this.storage = storage;
-
-  // Session Cache
-  this.sessionCache = true;
-
-  /**
-   * Cache products on Session Storage
-   * @type {Object}
-   */
-  this.session = this.storage.session;
 
   /**
    * Object with data of the products searched
@@ -2508,20 +2589,19 @@ var VtexCatalog = function VtexCatalog(globalHelpers, vtexHelpers, storage) {
    * Extend public methods
    * @type {Method}
    */
-  this.globalHelpers.extend(VtexCatalog.prototype, vtexCatalogMethods);
+  globalHelpers.extend(VtexCatalog.prototype, vtexCatalogMethods);
 
   /**
    * Sets instance for private Methods
    * @type {Method}
    */
-  this.setInstance();
-
-  /**
-   * Init Session Sorage AJAX Cache
-   * @type {Method}
-   */
-  this.initStorage();
+  this._setInstance(catalogCache);
 };
+
+/**
+ * Create a VtexUtils class
+ * Main class
+ */
 
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
@@ -2557,10 +2637,10 @@ var VtexUtils = function VtexUtils() {
   this.storage = store;
 
   /**
-   * Vtex Catalog instance
+   * Vtex Catalog
    * @type {VtexCatalog}
    */
-  this.vtexCatalog = new VtexCatalog(this.globalHelpers, this.vtexHelpers, this.storage);
+  this.VtexCatalog = VtexCatalog;
 };
 
 return VtexUtils;

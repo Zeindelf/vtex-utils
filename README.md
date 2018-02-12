@@ -15,7 +15,6 @@ A collection of utilities methods for Vtex stores.
 - [Tests](#tests)
 - [License](#license)
 - [Dependencies](#dependencies)
-- [Todo](#todo)
 
 ## Main
 
@@ -292,6 +291,7 @@ vtexHelpers.addToCart(items).then(function(res) {
 ### vtexHelpers.clearCart()
 
 Remove all items from cart.
+Require `vtexjs`.
 
 #### Example
 

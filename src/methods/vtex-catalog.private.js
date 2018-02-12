@@ -1,4 +1,7 @@
 
+import validateHelpers from './../utils/validate-helpers.js';
+import {store} from './../utils/vendor.store.js';
+
 class Private {
     constructor() {
         /**
@@ -42,10 +45,21 @@ class Private {
             skuIdArrayNotDefined: `'skuIdArray' is not an defined`,
             fqPropertyNotFound: `The property 'fq' was not found`,
         };
+
+        this._productCacheName = 'vtexCatalog.productCache';
+        this._skuCacheName = 'vtexCatalog.skuCache';
+
+        this._storage = store;
+        this._session = this._storage.session;
     }
 
     _getInstance(catalog) {
         this._catalog = catalog;
+    }
+
+    _setSessionCache(catalogCache) {
+        this._catalogCache = catalogCache;
+        this._initStorage(this._catalogCache);
     }
 
     _error(type) {
@@ -53,10 +67,29 @@ class Private {
     }
 
     /**
+     * Init and validate Session Store Cache
+     * @return {Void}
+     */
+    _initStorage(catalogCache) {
+        if ( catalogCache ) {
+            if ( validateHelpers.isNull(this._session.get(this._productCacheName)) ) {
+                this._session.set(this._productCacheName, {});
+            }
+
+            if ( validateHelpers.isNull(this._session.get(this._skuCacheName)) ) {
+                this._session.set(this._skuCacheName, {});
+            }
+        } else {
+            this._session.remove(this._productCacheName);
+            this._session.remove(this._skuCacheName);
+        }
+    }
+
+    /**
      * Store products into Session Storage
      */
     _setProductCache(products) {
-        let productCache = this._catalog.session.get(this._catalog.productCacheName);
+        let productCache = this._session.get(this._productCacheName);
 
         for ( let id in products ) {
             if ( ! productCache.hasOwnProperty(id) ) {
@@ -64,15 +97,15 @@ class Private {
             }
         }
 
-        this._catalog.session.set(this._catalog.productCacheName, productCache);
+        this._session.set(this._productCacheName, productCache);
     }
 
     /**
      * Store SKUs ID into Session Storage
      */
     _setSkuCache(productsId) {
-        if ( this._catalog.sessionCache ) {
-            let productIdCache = this._catalog.session.get(this._catalog.skuCacheName);
+        if ( this._catalogCache ) {
+            let productIdCache = this._session.get(this._skuCacheName);
 
             for ( let id in productsId ) {
                 if ( ! productIdCache.hasOwnProperty(id) ) {
@@ -80,8 +113,34 @@ class Private {
                 }
             }
 
-            this._catalog.session.set(this._catalog.skuCacheName, productIdCache);
+            this._session.set(this._skuCacheName, productIdCache);
         }
+    }
+
+    _getProductCache() {
+        return ( this._catalogCache ) ? this._session.get(this._productCacheName) : this._catalog.productCache;
+    }
+
+    _getSkuCache() {
+        return ( this._catalogCache ) ? this._session.get(this._skuCacheName) : this._catalog.skusProductIds;
+    }
+
+    /**
+     * Cache Products/SKUs Id
+     * @param {Object} product Product to cache
+     */
+    _setCache(product) {
+        const {productId, items} = product;
+        this._catalog.productCache[productId] = product;
+
+        if ( this._catalogCache ) {
+            this._setProductCache(this._catalog.productCache);
+        }
+
+        items.forEach((item) => {
+            const {itemId} = item;
+            this._catalog.skusProductIds[itemId] = productId;
+        });
     }
 
     /**
@@ -91,47 +150,22 @@ class Private {
      * @return {Promise}             Promise with search results
      */
     _search(params, headers = {}) {
-        // HELPER FUNCTIONS
-        const storeInCache = (product) => {
-            const { productId, items } = product;
-
-            // Store in cache
-            this._catalog.productCache[productId] = product;
-
-            if ( this._catalog.sessionCache ) {
-                this._setProductCache(this._catalog.productCache);
-            }
-
-            // Add skus product IDs map for each item
-            items.forEach((item) => {
-                const { itemId } = item;
-
-                this._catalog.skusProductIds[itemId] = productId;
-            });
-        };
-
-        // START HERE
-        if ( ! params ) {
+        if ( validateHelpers.isUndefined(params) ) {
             return this._error('searchParamsNotDefined');
         }
 
-        if ( typeof params !== 'object' ) {
+        if ( ! validateHelpers.isObject(params) ) {
             return this._error('paramsNotAnObject');
         }
 
-        if ( ! params.fq ) {
+        if ( validateHelpers.isUndefined(params.fq) ) {
             return this._error('fqPropertyNotFound');
         }
 
         let paramsFormatted = $.extend({}, params);
-
-        // Request array
         let xhrArray = this._pendingFetchArray;
-
-        // Product data object to resolve
         let productData = [];
 
-        // Loop each query type in params
         for ( let queryType in params ) {
             if ( queryType === 'map' ) {
                 continue;
@@ -163,14 +197,14 @@ class Private {
         let paramsLength = 1;
 
         // If params fq is an array get the length
-        if ( Array.isArray(params.fq) ) {
+        if ( validateHelpers.isArray(params.fq) ) {
             paramsLength = paramsFormatted.fq.length;
         }
 
         let requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
 
         // Loop for each requestAmount
-        for ( let i = 0; i < requestAmount; i++ ) {
+        for ( let i = 0; i < requestAmount; i += 1 ) {
             let resources = `${i * this._maxParamsPerRequest}-${((i + 1) * this._maxParamsPerRequest) - 1}`;
 
             /* eslint-disable */
@@ -186,8 +220,6 @@ class Private {
                             xhr.setRequestHeader(header, headers[header]);
                         }
                     }
-
-                    // Set resources header
                     xhr.setRequestHeader('resources', resources);
                 },
                 success(products) {
@@ -195,7 +227,6 @@ class Private {
                 },
             });
 
-            // Push request to request array
             xhrArray.push(searchRequest.promise());
         }
 
@@ -203,59 +234,55 @@ class Private {
         const def = $.Deferred();
         /* eslint-enable */
 
-        $.when(...xhrArray)
-            .done((...requests) => {
-                requests.forEach((request, index) => {
-                    const products = request;
+        def.then(() => this._requestSearchStartEvent());
 
-                    // Loop each product and store in cache
-                    products.forEach(storeInCache);
+        $.when(...xhrArray).done((...requests) => {
+            requests.forEach((request, index) => {
+                const products = request;
+                products.forEach((product) => this._setCache(product));
 
-                    // Remove resolved fetch from array
-                    xhrArray.splice(index, 1);
-                });
-
-                for ( let queryType in params ) {
-                    if ( {}.hasOwnProperty.call(params, queryType) ) {
-                        params[queryType].forEach((query) => {
-                            const [queryField, queryValue] = query.split(':');
-                            let product;
-
-                            // Add fetched params
-                            this._fetchedParams.push(query);
-
-                            switch (queryField) {
-                                case 'skuId': {
-                                    const productId = this._catalog.skusProductIds[queryValue];
-                                    product = this._catalog.productCache[productId];
-                                    break;
-                                }
-                                case 'productId': {
-                                    product = this._catalog.productCache[queryValue];
-                                    break;
-                                }
-                            }
-
-                            // Send products to resolve
-                            if ( ! product ) {
-                                this._emptyFetchedParams.push(query);
-                            } else {
-                                productData.push(product);
-                            }
-                        });
-                    }
-                }
-
-                if ( productData.length ) {
-                    this._setSkuCache(this._catalog.skusProductIds);
-
-                    def.resolve(productData);
-                } else {
-                    def.reject();
-                }
+                // Remove resolved fetch from array
+                xhrArray.splice(index, 1);
             });
 
-        def.always(() => this._requestSearchEndEvent());
+            for ( let queryType in params ) {
+                if ( {}.hasOwnProperty.call(params, queryType) ) {
+                    params[queryType].forEach((query) => {
+                        const [queryField, queryValue] = query.split(':');
+                        let product;
+
+                        // Add fetched params
+                        this._fetchedParams.push(query);
+
+                        switch (queryField) {
+                            case 'skuId': {
+                                const productId = this._catalog.skusProductIds[queryValue];
+                                product = this._catalog.productCache[productId];
+                                break;
+                            }
+                            case 'productId': {
+                                product = this._catalog.productCache[queryValue];
+                                break;
+                            }
+                        }
+
+                        if ( validateHelpers.isUndefined(product) ) {
+                            this._emptyFetchedParams.push(query);
+                        } else {
+                            productData.push(product);
+                        }
+                    });
+                }
+            }
+
+            if ( productData.length ) {
+                this._setSkuCache(this._catalog.skusProductIds);
+
+                def.resolve(productData);
+            } else {
+                def.reject();
+            }
+        });
 
         return def.promise();
     }
@@ -263,9 +290,17 @@ class Private {
     /**
      * Events
      */
-    _requestSearchEndEvent() {
+    _requestSearchStartEvent() {
         /* eslint-disable */
-        const ev = $.Event('vtexCatalog.requestSearchEnd');
+        const ev = $.Event('requestSearchStart.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestProductStartEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestProductStart.vtexCatalog');
         /* eslint-enable */
 
         $(document).trigger(ev);
@@ -273,7 +308,15 @@ class Private {
 
     _requestProductEndEvent() {
         /* eslint-disable */
-        const ev = $.Event('vtexCatalog.requestProductEnd');
+        const ev = $.Event('requestProductEnd.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestSkuStartEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestSkuStart.vtexCatalog');
         /* eslint-enable */
 
         $(document).trigger(ev);
@@ -281,7 +324,39 @@ class Private {
 
     _requestSkuEndEvent() {
         /* eslint-disable */
-        const ev = $.Event('vtexCatalog.requestSkuEnd');
+        const ev = $.Event('requestSkuEnd.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestProductArrayStartEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestProductArrayStart.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestProductArrayEndEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestProductArrayEnd.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestSkuArrayStartEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestSkuArrayStart.vtexCatalog');
+        /* eslint-enable */
+
+        $(document).trigger(ev);
+    }
+
+    _requestSkuArrayEndEvent() {
+        /* eslint-disable */
+        const ev = $.Event('requestSkuArrayEnd.vtexCatalog');
         /* eslint-enable */
 
         $(document).trigger(ev);

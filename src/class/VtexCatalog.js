@@ -1,4 +1,5 @@
 
+import globalHelpers from './../utils/global-helpers.js';
 import vtexCatalogMethods from './../methods/vtex-catalog.methods.js';
 
 /**
@@ -6,23 +7,7 @@ import vtexCatalogMethods from './../methods/vtex-catalog.methods.js';
  * Vtex utilities methods
  */
 class VtexCatalog {
-    constructor(globalHelpers, vtexHelpers, storage) {
-        /**
-         * Set Helpers
-         */
-        this.globalHelpers = globalHelpers;
-        this.vtexHelpers = vtexHelpers;
-        this.storage = storage;
-
-        // Session Cache
-        this.sessionCache = true;
-
-        /**
-         * Cache products on Session Storage
-         * @type {Object}
-         */
-        this.session = this.storage.session;
-
+    constructor(catalogCache) {
         /**
          * Object with data of the products searched
          * @type {Object}
@@ -41,19 +26,13 @@ class VtexCatalog {
          * Extend public methods
          * @type {Method}
          */
-        this.globalHelpers.extend(VtexCatalog.prototype, vtexCatalogMethods);
+        globalHelpers.extend(VtexCatalog.prototype, vtexCatalogMethods);
 
         /**
          * Sets instance for private Methods
          * @type {Method}
          */
-        this.setInstance();
-
-        /**
-         * Init Session Sorage AJAX Cache
-         * @type {Method}
-         */
-        this.initStorage();
+        this._setInstance(catalogCache);
     }
 }
 

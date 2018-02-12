@@ -198,6 +198,6 @@ export default {
      * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
      */
     isUndefined(value) {
-        return value === void 0;
+        return value === undefined;
     },
 };
