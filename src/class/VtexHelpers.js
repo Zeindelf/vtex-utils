@@ -45,6 +45,10 @@ class VtexHelpers {
     addToCart(items, expectedOrderFormSections, salesChannel) {
         return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
     }
+
+    clearCart() {
+        return vtexHelpers.clearCart();
+    }
 }
 
 export default VtexHelpers;

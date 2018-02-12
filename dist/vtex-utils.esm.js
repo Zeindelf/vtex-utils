@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-10T18:33:24.570Z
+ * Date: 2018-02-11T22:46:51.063Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -75,7 +75,43 @@ var createClass = function () {
 
 
 
+var slicedToArray = function () {
+  function sliceIterator(arr, i) {
+    var _arr = [];
+    var _n = true;
+    var _d = false;
+    var _e = undefined;
 
+    try {
+      for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) {
+        _arr.push(_s.value);
+
+        if (i && _arr.length === i) break;
+      }
+    } catch (err) {
+      _d = true;
+      _e = err;
+    } finally {
+      try {
+        if (!_n && _i["return"]) _i["return"]();
+      } finally {
+        if (_d) throw _e;
+      }
+    }
+
+    return _arr;
+  }
+
+  return function (arr, i) {
+    if (Array.isArray(arr)) {
+      return arr;
+    } else if (Symbol.iterator in Object(arr)) {
+      return sliceIterator(arr, i);
+    } else {
+      throw new TypeError("Invalid attempt to destructure non-iterable instance");
+    }
+  };
+}();
 
 
 
@@ -323,7 +359,6 @@ var validateHelpers = {
     }
 };
 
-// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -880,7 +915,7 @@ var vtexHelpers = {
                     contentType: 'application/json; charset=utf-8'
                 }
             }).done(function (res) {
-                if (!globalHelper.isUndefined(categoryId)) {
+                if (!validateHelpers.isUndefined(categoryId)) {
                     def.resolve(globalHelpers.objectSearch(res, {
                         id: categoryId
                     }));
@@ -888,7 +923,7 @@ var vtexHelpers = {
                     def.resolve(res);
                 }
             }).fail(function (err) {
-                def.reject();
+                return def.reject(err);
             });
         }).promise();
     },
@@ -934,7 +969,7 @@ var vtexHelpers = {
                     def.resolve(res);
                 }
             }).fail(function (err) {
-                def.reject();
+                return def.reject(err);
             });
         }).promise();
     },
@@ -981,21 +1016,549 @@ var vtexHelpers = {
             /* eslint-enable */
             return vtexjs.checkout.getOrderForm().done(function () {
                 return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done(function (orderForm) {
-                    def.resolve(orderForm);
+                    return def.resolve(orderForm);
                 }).fail(function (err) {
-                    def.reject();
+                    return def.reject();
                 });
             }).fail(function (err) {
-                def.reject();
+                return def.reject(err);
+            });
+        }).promise();
+    },
+
+
+    /**
+     * Empty the cart
+     *
+     * @return {promise} Order Form
+     */
+    clearCart: function clearCart() {
+        /* eslint-disable */
+        return $.Deferred(function (def) {
+            /* eslint-enable */
+            vtexjs.checkout.getOrderForm().done(function (orderForm) {
+                if (orderForm.items.length) {
+                    return vtexjs.checkout.removeAllItems(orderForm.items).done(function (orderForm) {
+                        return def.resolve(orderForm);
+                    });
+                }
+
+                return def.resolve(orderForm);
+            }).fail(function (err) {
+                return def.reject(err);
             });
         }).promise();
     }
 };
 
-/**
- * Create a VtexHelpers class
- * Vtex utilities methods
- */
+var _arguments = arguments;
+
+if ('rivets' in window) {
+    rivets.formatters['!'] = function (value) {
+        return !value;
+    };
+
+    rivets.formatters.eq = function (value, args) {
+        return value === args;
+    };
+
+    rivets.formatters.neq = function (value, args) {
+        return value !== args;
+    };
+
+    rivets.formatters.gt = function (value, args) {
+        return value > args;
+    };
+
+    rivets.formatters.gte = function (value, args) {
+        return value >= args;
+    };
+
+    rivets.formatters.lt = function (value, args) {
+        return value < args;
+    };
+
+    rivets.formatters.lte = function (value, args) {
+        return value <= args;
+    };
+
+    rivets.formatters.or = function (value, args) {
+        return value || args;
+    };
+
+    rivets.formatters.isEmpty = function (value) {
+        return typeof value === 'undefined' || value === null || typeof value === 'string' && value.length === 0;
+    };
+
+    rivets.formatters.isNotEmpty = function (value) {
+        return !rivets.formatters.isEmpty(value);
+    };
+
+    rivets.formatters.pass = function (value, args) {
+        return args;
+    };
+
+    rivets.formatters.json = function (value, intendation) {
+        return JSON.stringify(value, null, intendation || 0);
+    };
+
+    rivets.formatters.prefix = function (value, prefix) {
+        return '' + prefix + value;
+    };
+
+    rivets.formatters.suffix = function (value, suffix) {
+        return '' + value + suffix;
+    };
+
+    rivets.formatters.ucFirst = function (value) {
+        return value.substr(0, 1).toUpperCase() + value.substr(1);
+    };
+
+    rivets.formatters['+'] = function (value, args) {
+        return value + args;
+    };
+
+    rivets.formatters['-'] = function (value, args) {
+        return value - args;
+    };
+
+    rivets.formatters['*'] = function (value, args) {
+        return value * args;
+    };
+
+    rivets.formatters['/'] = function (value, args) {
+        return value / args;
+    };
+
+    rivets.formatters.round = function (value, decimals) {
+        if (decimals) {
+            var exp = Math.pow(10, decimals);
+            value = Math.round(value * exp) / exp;
+        } else {
+            value = Math.round(value);
+        }
+
+        return value;
+    };
+
+    rivets.formatters.get = function (obj, key) {
+        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+            return obj[key];
+        }
+
+        return null;
+    };
+
+    rivets.formatters.set = function (obj, key, value) {
+        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+            obj[key] = value;
+        }
+
+        return obj;
+    };
+
+    rivets.formatters['.'] = rivets.formatters.get;
+
+    rivets.formatters.keys = function (obj) {
+        if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
+            return Object.keys(obj);
+        }
+
+        return [];
+    };
+
+    rivets.formatters.length = function (value) {
+        return value ? value.length || 0 : 0;
+    };
+
+    rivets.formatters.sort = function () /* value[, by][, direction]*/{
+        var args = Array.from(_arguments);
+        var value = args.shift();
+        var by = args.shift();
+        var direction = args.shift();
+
+        if (!direction && (by == 'asc' || by == 'desc')) {
+            direction = by;
+            by = null;
+        }
+
+        if (!by) {
+            value.sort();
+        } else {
+            value.sort(function (a, b) {
+                if (a[by] === b[by]) {
+                    return 0;
+                }
+
+                return a[by] < b[by] ? -1 : 1;
+            });
+        }
+
+        if (direction == 'desc') {
+            value.reverse();
+        }
+
+        return value;
+    };
+
+    rivets.formatters.default = function (value, args) {
+        return typeof value !== 'undefined' && value !== null ? value : args;
+    };
+
+    rivets.formatters.contains = function (value, search) {
+        if (Array.isArray(value)) {
+            return value.indexOf(search) !== -1;
+        }
+
+        return false;
+    };
+
+    rivets.formatters.percent = function (value, decimals) {
+        return number_format(value * 100, decimals || 0, ',') + '%';
+    };
+
+    rivets.formatters.bind = function () /* fn, thisArg[, arg1, arg2, ..., argN]*/{
+        var args = Array.from(_arguments);
+        var fn = args.shift();
+        var self = args.shift();
+
+        if (typeof fn === 'function') {
+            return function () {
+                fn.apply(self, args);
+            };
+        }
+
+        return fn;
+    };
+
+    rivets.formatters.with = function () /* fn, arg1, arg2, ..., argN*/{
+        var args = Array.from(_arguments);
+        var fn = args.shift();
+
+        if (typeof fn === 'function') {
+            return fn.bind(null, args);
+        }
+
+        return fn;
+    };
+
+    rivets.formatters.slice = function () {
+        var args = Array.from(_arguments);
+        var arr = args.shift();
+        return Array.prototype.slice.apply(arr, args);
+    };
+
+    rivets.formatters.formatPrice = function (val) {
+        return vtexHelpers.formatPrice(val);
+    };
+
+    rivets.formatters.productImgSize = function (val, arg1, arg2) {
+        return vtexHelpers.getResizedImage(val, arg1, arg2);
+    };
+}
+
+/* ! store2 - v2.7.0 - 2018-02-08
+* Copyright (c) 2018 Nathan Bubna; Licensed (MIT OR GPL-3.0) */
+/* eslint-disable */
+var _ = {
+    version: "2.7.0",
+    areas: {},
+    apis: {},
+
+    // utilities
+    inherit: function inherit(api, o) {
+        for (var p in api) {
+            if (!o.hasOwnProperty(p)) {
+                o[p] = api[p];
+            }
+        }
+        return o;
+    },
+    stringify: function stringify(d) {
+        return d === undefined || typeof d === "function" ? d + '' : JSON.stringify(d);
+    },
+    parse: function parse(s) {
+        // if it doesn't parse, return as is
+        try {
+            return JSON.parse(s);
+        } catch (e) {
+            return s;
+        }
+    },
+
+    // extension hooks
+    fn: function fn(name, _fn) {
+        _.storeAPI[name] = _fn;
+        for (var api in _.apis) {
+            _.apis[api][name] = _fn;
+        }
+    },
+    get: function get$$1(area, key) {
+        return area.getItem(key);
+    },
+    set: function set$$1(area, key, string) {
+        area.setItem(key, string);
+    },
+    remove: function remove(area, key) {
+        area.removeItem(key);
+    },
+    key: function key(area, i) {
+        return area.key(i);
+    },
+    length: function length(area) {
+        return area.length;
+    },
+    clear: function clear(area) {
+        area.clear();
+    },
+
+    // core functions
+    Store: function Store(id, area, namespace) {
+        var store = _.inherit(_.storeAPI, function (key, data, overwrite) {
+            if (arguments.length === 0) {
+                return store.getAll();
+            }
+            if (typeof data === "function") {
+                return store.transact(key, data, overwrite);
+            } // fn=data, alt=overwrite
+            if (data !== undefined) {
+                return store.set(key, data, overwrite);
+            }
+            if (typeof key === "string" || typeof key === "number") {
+                return store.get(key);
+            }
+            if (!key) {
+                return store.clear();
+            }
+            return store.setAll(key, data); // overwrite=data, data=key
+        });
+        store._id = id;
+        try {
+            var testKey = '_safariPrivate_';
+            area.setItem(testKey, 'sucks');
+            store._area = area;
+            area.removeItem(testKey);
+        } catch (e) {}
+        if (!store._area) {
+            store._area = _.inherit(_.storageAPI, { items: {}, name: 'fake' });
+        }
+        store._ns = namespace || '';
+        if (!_.areas[id]) {
+            _.areas[id] = store._area;
+        }
+        if (!_.apis[store._ns + store._id]) {
+            _.apis[store._ns + store._id] = store;
+        }
+        return store;
+    },
+    storeAPI: {
+        // admin functions
+        area: function area(id, _area) {
+            var store = this[id];
+            if (!store || !store.area) {
+                store = _.Store(id, _area, this._ns); //new area-specific api in this namespace
+                if (!this[id]) {
+                    this[id] = store;
+                }
+            }
+            return store;
+        },
+        namespace: function namespace(_namespace, noSession) {
+            if (!_namespace) {
+                return this._ns ? this._ns.substring(0, this._ns.length - 1) : '';
+            }
+            var ns = _namespace,
+                store = this[ns];
+            if (!store || !store.namespace) {
+                store = _.Store(this._id, this._area, this._ns + ns + '.'); //new namespaced api
+                if (!this[ns]) {
+                    this[ns] = store;
+                }
+                if (!noSession) {
+                    store.area('session', _.areas.session);
+                }
+            }
+            return store;
+        },
+        isFake: function isFake() {
+            return this._area.name === 'fake';
+        },
+        toString: function toString() {
+            return 'store' + (this._ns ? '.' + this.namespace() : '') + '[' + this._id + ']';
+        },
+
+        // storage functions
+        has: function has(key) {
+            if (this._area.has) {
+                return this._area.has(this._in(key)); //extension hook
+            }
+            return !!(this._in(key) in this._area);
+        },
+        size: function size() {
+            return this.keys().length;
+        },
+        each: function each(fn, value) {
+            // value is used by keys(fillList) and getAll(fillList))
+            for (var i = 0, m = _.length(this._area); i < m; i++) {
+                var key = this._out(_.key(this._area, i));
+                if (key !== undefined) {
+                    if (fn.call(this, key, value || this.get(key)) === false) {
+                        break;
+                    }
+                }
+                if (m > _.length(this._area)) {
+                    m--;i--;
+                } // in case of removeItem
+            }
+            return value || this;
+        },
+        keys: function keys(fillList) {
+            return this.each(function (k, list) {
+                list.push(k);
+            }, fillList || []);
+        },
+        get: function get$$1(key, alt) {
+            var s = _.get(this._area, this._in(key));
+            return s !== null ? _.parse(s) : alt || s; // support alt for easy default mgmt
+        },
+        getAll: function getAll(fillObj) {
+            return this.each(function (k, all) {
+                all[k] = this.get(k);
+            }, fillObj || {});
+        },
+        transact: function transact(key, fn, alt) {
+            var val = this.get(key, alt),
+                ret = fn(val);
+            this.set(key, ret === undefined ? val : ret);
+            return this;
+        },
+        set: function set$$1(key, data, overwrite) {
+            var d = this.get(key);
+            if (d != null && overwrite === false) {
+                return data;
+            }
+            return _.set(this._area, this._in(key), _.stringify(data), overwrite) || d;
+        },
+        setAll: function setAll(data, overwrite) {
+            var changed, val;
+            for (var key in data) {
+                val = data[key];
+                if (this.set(key, val, overwrite) !== val) {
+                    changed = true;
+                }
+            }
+            return changed;
+        },
+        add: function add(key, data) {
+            var d = this.get(key);
+            if (d instanceof Array) {
+                data = d.concat(data);
+            } else if (d !== null) {
+                var type = typeof d === "undefined" ? "undefined" : _typeof(d);
+                if (type === (typeof data === "undefined" ? "undefined" : _typeof(data)) && type === 'object') {
+                    for (var k in data) {
+                        d[k] = data[k];
+                    }
+                    data = d;
+                } else {
+                    data = d + data;
+                }
+            }
+            _.set(this._area, this._in(key), _.stringify(data));
+            return data;
+        },
+        remove: function remove(key) {
+            var d = this.get(key);
+            _.remove(this._area, this._in(key));
+            return d;
+        },
+        clear: function clear() {
+            if (!this._ns) {
+                _.clear(this._area);
+            } else {
+                this.each(function (k) {
+                    _.remove(this._area, this._in(k));
+                }, 1);
+            }
+            return this;
+        },
+        clearAll: function clearAll() {
+            var area = this._area;
+            for (var id in _.areas) {
+                if (_.areas.hasOwnProperty(id)) {
+                    this._area = _.areas[id];
+                    this.clear();
+                }
+            }
+            this._area = area;
+            return this;
+        },
+
+        // internal use functions
+        _in: function _in(k) {
+            if (typeof k !== "string") {
+                k = _.stringify(k);
+            }
+            return this._ns ? this._ns + k : k;
+        },
+        _out: function _out(k) {
+            return this._ns ? k && k.indexOf(this._ns) === 0 ? k.substring(this._ns.length) : undefined : // so each() knows to skip it
+            k;
+        }
+    }, // end _.storeAPI
+    storageAPI: {
+        length: 0,
+        has: function has(k) {
+            return this.items.hasOwnProperty(k);
+        },
+        key: function key(i) {
+            var c = 0;
+            for (var k in this.items) {
+                if (this.has(k) && i === c++) {
+                    return k;
+                }
+            }
+        },
+        setItem: function setItem(k, v) {
+            if (!this.has(k)) {
+                this.length++;
+            }
+            this.items[k] = v;
+        },
+        removeItem: function removeItem(k) {
+            if (this.has(k)) {
+                delete this.items[k];
+                this.length--;
+            }
+        },
+        getItem: function getItem(k) {
+            return this.has(k) ? this.items[k] : null;
+        },
+        clear: function clear() {
+            for (var k in this.items) {
+                this.removeItem(k);
+            }
+        },
+        toString: function toString() {
+            return this.length + ' items in ' + this.name + 'Storage';
+        } // end _.storageAPI
+    } };
+
+var store =
+// safely set this up (throws error in IE10/32bit mode for local files)
+_.Store("local", function () {
+    try {
+        return localStorage;
+    } catch (e) {}
+}());
+store.local = store; // for completeness
+store._ = _; // for extenders and debuggers...
+// safely setup store.session (throws exception in FF for file:/// urls)
+store.area("session", function () {
+    try {
+        return sessionStorage;
+    } catch (e) {}
+}());
 
 var VtexHelpers = function () {
     function VtexHelpers() {
@@ -1052,14 +1615,14 @@ var VtexHelpers = function () {
         value: function addToCart(items, expectedOrderFormSections, salesChannel) {
             return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
         }
+    }, {
+        key: 'clearCart',
+        value: function clearCart() {
+            return vtexHelpers.clearCart();
+        }
     }]);
     return VtexHelpers;
 }();
-
-/**
- * Create a GlobalHelpers class
- * Javascript utilities methods
- */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1268,216 +1831,691 @@ var GlobalHelpers = function () {
     return GlobalHelpers;
 }();
 
-var _arguments = arguments;
+var Private = function () {
+    function Private() {
+        classCallCheck(this, Private);
 
-if ('rivets' in window) {
-    rivets.formatters['!'] = function (value) {
-        return !value;
-    };
+        /**
+         * API limits request
+         * @type {Number}
+         */
+        this._maxParamsPerRequest = 50;
 
-    rivets.formatters.eq = function (value, args) {
-        return value === args;
-    };
+        /**
+         * Array to store the empty params
+         * @type {Array}
+         */
+        this._emptyFetchedParams = [];
 
-    rivets.formatters.neq = function (value, args) {
-        return value !== args;
-    };
+        /**
+         * Array to store the pending params to fetch
+         * @type {Array}
+         */
+        this._pendingParamsToFetch = [];
 
-    rivets.formatters.gt = function (value, args) {
-        return value > args;
-    };
+        /**
+         * Array to store the fetched params
+         * @type {Array}
+         */
+        this._fetchedParams = [];
 
-    rivets.formatters.gte = function (value, args) {
-        return value >= args;
-    };
+        /**
+         * Array to store the XHR requests
+         * @type {Array}
+         */
+        this._pendingFetchArray = [];
 
-    rivets.formatters.lt = function (value, args) {
-        return value < args;
-    };
+        this._errors = {
+            searchParamsNotDefined: 'Search parameters is not defined',
+            paramsNotAnObject: 'Param is not a valid Object',
+            productIdNotDefined: 'Product ID is not defined',
+            skuIdNotDefined: 'Sku ID is not defined',
+            productIdArrayNotAnArray: '\'productIdArray\' is not an array',
+            skuIdArrayNotAnArray: '\'skuIdArray\' is not an array',
+            productIdArrayNotDefined: '\'productIdArray\' is not an defined',
+            skuIdArrayNotDefined: '\'skuIdArray\' is not an defined',
+            fqPropertyNotFound: 'The property \'fq\' was not found'
+        };
+    }
 
-    rivets.formatters.lte = function (value, args) {
-        return value <= args;
-    };
-
-    rivets.formatters.or = function (value, args) {
-        return value || args;
-    };
-
-    rivets.formatters.isEmpty = function (value) {
-        return typeof value === 'undefined' || value === null || typeof value === 'string' && value.length === 0;
-    };
-
-    rivets.formatters.isNotEmpty = function (value) {
-        return !rivets.formatters.isEmpty(value);
-    };
-
-    rivets.formatters.pass = function (value, args) {
-        return args;
-    };
-
-    rivets.formatters.json = function (value, intendation) {
-        return JSON.stringify(value, null, intendation || 0);
-    };
-
-    rivets.formatters.prefix = function (value, prefix) {
-        return '' + prefix + value;
-    };
-
-    rivets.formatters.suffix = function (value, suffix) {
-        return '' + value + suffix;
-    };
-
-    rivets.formatters.ucFirst = function (value) {
-        return value.substr(0, 1).toUpperCase() + value.substr(1);
-    };
-
-    rivets.formatters['+'] = function (value, args) {
-        return value + args;
-    };
-
-    rivets.formatters['-'] = function (value, args) {
-        return value - args;
-    };
-
-    rivets.formatters['*'] = function (value, args) {
-        return value * args;
-    };
-
-    rivets.formatters['/'] = function (value, args) {
-        return value / args;
-    };
-
-    rivets.formatters.round = function (value, decimals) {
-        if (decimals) {
-            var exp = Math.pow(10, decimals);
-            value = Math.round(value * exp) / exp;
-        } else {
-            value = Math.round(value);
+    createClass(Private, [{
+        key: '_getInstance',
+        value: function _getInstance(catalog) {
+            this._catalog = catalog;
+        }
+    }, {
+        key: '_error',
+        value: function _error(type) {
+            throw new Error(this._errors[type]);
         }
 
-        return value;
-    };
+        /**
+         * Store products into Session Storage
+         */
 
-    rivets.formatters.get = function (obj, key) {
-        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            return obj[key];
+    }, {
+        key: '_setProductCache',
+        value: function _setProductCache(products) {
+            var productCache = this._catalog.session.get(this._catalog.productCacheName);
+
+            for (var id in products) {
+                if (!productCache.hasOwnProperty(id)) {
+                    productCache[id] = products[id];
+                }
+            }
+
+            this._catalog.session.set(this._catalog.productCacheName, productCache);
         }
 
-        return null;
-    };
+        /**
+         * Store SKUs ID into Session Storage
+         */
 
-    rivets.formatters.set = function (obj, key, value) {
-        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            obj[key] = value;
-        }
+    }, {
+        key: '_setSkuCache',
+        value: function _setSkuCache(productsId) {
+            if (this._catalog.sessionCache) {
+                var productIdCache = this._catalog.session.get(this._catalog.skuCacheName);
 
-        return obj;
-    };
-
-    rivets.formatters['.'] = rivets.formatters.get;
-
-    rivets.formatters.keys = function (obj) {
-        if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            return Object.keys(obj);
-        }
-
-        return [];
-    };
-
-    rivets.formatters.length = function (value) {
-        return value ? value.length || 0 : 0;
-    };
-
-    rivets.formatters.sort = function () /* value[, by][, direction]*/{
-        var args = Array.from(_arguments);
-        var value = args.shift();
-        var by = args.shift();
-        var direction = args.shift();
-
-        if (!direction && (by == 'asc' || by == 'desc')) {
-            direction = by;
-            by = null;
-        }
-
-        if (!by) {
-            value.sort();
-        } else {
-            value.sort(function (a, b) {
-                if (a[by] === b[by]) {
-                    return 0;
+                for (var id in productsId) {
+                    if (!productIdCache.hasOwnProperty(id)) {
+                        productIdCache[id] = productsId[id];
+                    }
                 }
 
-                return a[by] < b[by] ? -1 : 1;
+                this._catalog.session.set(this._catalog.skuCacheName, productIdCache);
+            }
+        }
+
+        /**
+         * Search products in Catalog
+         * @param  {Object} params       Object with search parameters. Valid params: C:/{a}/{b} (Category), fq=specificationFilter_{a}:{b} (Filter), fq=P:[{a} TO {b}] (Price)
+         * @param  {Object} [headers={}] Request headers
+         * @return {Promise}             Promise with search results
+         */
+
+    }, {
+        key: '_search',
+        value: function _search(params) {
+            var _this = this,
+                _$;
+
+            var headers = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+            // HELPER FUNCTIONS
+            var storeInCache = function storeInCache(product) {
+                var productId = product.productId,
+                    items = product.items;
+
+                // Store in cache
+
+                _this._catalog.productCache[productId] = product;
+
+                if (_this._catalog.sessionCache) {
+                    _this._setProductCache(_this._catalog.productCache);
+                }
+
+                // Add skus product IDs map for each item
+                items.forEach(function (item) {
+                    var itemId = item.itemId;
+
+
+                    _this._catalog.skusProductIds[itemId] = productId;
+                });
+            };
+
+            // START HERE
+            if (!params) {
+                return this._error('searchParamsNotDefined');
+            }
+
+            if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') {
+                return this._error('paramsNotAnObject');
+            }
+
+            if (!params.fq) {
+                return this._error('fqPropertyNotFound');
+            }
+
+            var paramsFormatted = $.extend({}, params);
+
+            // Request array
+            var xhrArray = this._pendingFetchArray;
+
+            // Product data object to resolve
+            var productData = [];
+
+            // Loop each query type in params
+            for (var queryType in params) {
+                if (queryType === 'map') {
+                    continue;
+                }
+
+                // Loop each query and filter the ones that are already fetched
+                // or are pending
+                paramsFormatted[queryType] = params[queryType].filter(function (query) {
+                    // Check if query was already fetched and the response was empty
+                    if (~_this._emptyFetchedParams.indexOf(query)) {
+                        return false;
+                    }
+
+                    // NOTE: Two step validation, the first IF statement checks if the query
+                    // was already gotten and if the query is still pending
+                    if (~_this._fetchedParams.indexOf(query)) {
+                        return false;
+                    } else {
+                        if (!~_this._pendingParamsToFetch.indexOf(query)) {
+                            _this._pendingParamsToFetch.push(query);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                });
+            }
+
+            var paramsLength = 1;
+
+            // If params fq is an array get the length
+            if (Array.isArray(params.fq)) {
+                paramsLength = paramsFormatted.fq.length;
+            }
+
+            var requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
+
+            // Loop for each requestAmount
+
+            var _loop = function _loop(i) {
+                var resources = i * _this._maxParamsPerRequest + '-' + ((i + 1) * _this._maxParamsPerRequest - 1);
+
+                /* eslint-disable */
+                var searchRequest = $.Deferred();
+                /* eslint-enable */
+
+                $.ajax({
+                    url: '/api/catalog_system/pub/products/search/',
+                    data: $.param(paramsFormatted, true),
+                    beforeSend: function beforeSend(xhr) {
+                        for (var header in headers) {
+                            if ({}.hasOwnProperty.call(headers, header)) {
+                                xhr.setRequestHeader(header, headers[header]);
+                            }
+                        }
+
+                        // Set resources header
+                        xhr.setRequestHeader('resources', resources);
+                    },
+                    success: function success(products) {
+                        searchRequest.resolve(products);
+                    }
+                });
+
+                // Push request to request array
+                xhrArray.push(searchRequest.promise());
+            };
+
+            for (var i = 0; i < requestAmount; i++) {
+                _loop(i);
+            }
+
+            /* eslint-disable */
+            var def = $.Deferred();
+            /* eslint-enable */
+
+            (_$ = $).when.apply(_$, toConsumableArray(xhrArray)).done(function () {
+                for (var _len = arguments.length, requests = Array(_len), _key = 0; _key < _len; _key++) {
+                    requests[_key] = arguments[_key];
+                }
+
+                requests.forEach(function (request, index) {
+                    var products = request;
+
+                    // Loop each product and store in cache
+                    products.forEach(storeInCache);
+
+                    // Remove resolved fetch from array
+                    xhrArray.splice(index, 1);
+                });
+
+                for (var _queryType in params) {
+                    if ({}.hasOwnProperty.call(params, _queryType)) {
+                        params[_queryType].forEach(function (query) {
+                            var _query$split = query.split(':'),
+                                _query$split2 = slicedToArray(_query$split, 2),
+                                queryField = _query$split2[0],
+                                queryValue = _query$split2[1];
+
+                            var product = void 0;
+
+                            // Add fetched params
+                            _this._fetchedParams.push(query);
+
+                            switch (queryField) {
+                                case 'skuId':
+                                    {
+                                        var productId = _this._catalog.skusProductIds[queryValue];
+                                        product = _this._catalog.productCache[productId];
+                                        break;
+                                    }
+                                case 'productId':
+                                    {
+                                        product = _this._catalog.productCache[queryValue];
+                                        break;
+                                    }
+                            }
+
+                            // Send products to resolve
+                            if (!product) {
+                                _this._emptyFetchedParams.push(query);
+                            } else {
+                                productData.push(product);
+                            }
+                        });
+                    }
+                }
+
+                if (productData.length) {
+                    _this._setSkuCache(_this._catalog.skusProductIds);
+
+                    def.resolve(productData);
+                } else {
+                    def.reject();
+                }
+            });
+
+            def.always(function () {
+                return _this._requestSearchEndEvent();
+            });
+
+            return def.promise();
+        }
+
+        /**
+         * Events
+         */
+
+    }, {
+        key: '_requestSearchEndEvent',
+        value: function _requestSearchEndEvent() {
+            /* eslint-disable */
+            var ev = $.Event('vtexCatalog.requestSearchEnd');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestProductEndEvent',
+        value: function _requestProductEndEvent() {
+            /* eslint-disable */
+            var ev = $.Event('vtexCatalog.requestProductEnd');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }, {
+        key: '_requestSkuEndEvent',
+        value: function _requestSkuEndEvent() {
+            /* eslint-disable */
+            var ev = $.Event('vtexCatalog.requestSkuEnd');
+            /* eslint-enable */
+
+            $(document).trigger(ev);
+        }
+    }]);
+    return Private;
+}();
+
+var _private = new Private();
+
+var vtexCatalogMethods = {
+    /**
+     * Sets Catalog instance
+     * @return {Void}
+     */
+    setInstance: function setInstance() {
+        _private._getInstance(this);
+    },
+
+
+    /**
+     * Init and validate Session Store Cache
+     * @return {Void}
+     */
+    initStorage: function initStorage() {
+        if (this.sessionCache) {
+            this.productCacheName = 'PRODUCT_CACHE';
+            this.skuCacheName = 'SKU_CACHE';
+
+            if (this.globalHelpers.isNull(this.session.get(this.productCacheName))) {
+                this.session.set(this.productCacheName, {});
+            }
+
+            if (this.globalHelpers.isNull(this.session.get(this.skuCacheName))) {
+                this.session.set(this.skuCacheName, {});
+            }
+        }
+    },
+
+
+    /**
+     * Search by product ID
+     * @param  {Number} productId ID of the product to search
+     * @return {Promise}                    Promise with search results
+     */
+    searchProduct: function searchProduct(productId) {
+        if (!productId) {
+            return _private._error('productIdNotDefined');
+        }
+
+        /* eslint-disable */
+        var def = $.Deferred();
+        /* eslint-enable */
+
+        // Check if productId is in cache
+        var _productCache = this.sessionCache ? this.session.get(this.productCacheName) : this.productCache;
+        if (_productCache[productId]) {
+            def.resolve(_productCache[productId]);
+        } else {
+            // Search product
+            var params = {
+                fq: ['productId:' + productId]
+            };
+
+            var search = _private._search(params);
+
+            // Since it should be only 1 item set index is 0
+            search.done(function (products) {
+                return def.resolve(products[0]);
             });
         }
 
-        if (direction == 'desc') {
-            value.reverse();
+        def.always(function () {
+            return _private._requestProductEndEvent();
+        });
+
+        return def.promise();
+    },
+
+
+    /**
+     * Search by sku ID
+     * Sku methods stores in
+     * @param  {Number} skuId ID of the sku to search
+     * @return {Promise}            Promise with search results
+     */
+    searchSku: function searchSku(skuId) {
+        if (!skuId) {
+            return _private._error('skuIdNotDefined');
         }
 
-        return value;
-    };
+        /* eslint-disable */
+        var def = $.Deferred();
+        /* eslint-enable */
 
-    rivets.formatters.default = function (value, args) {
-        return typeof value !== 'undefined' && value !== null ? value : args;
-    };
-
-    rivets.formatters.contains = function (value, search) {
-        if (Array.isArray(value)) {
-            return value.indexOf(search) !== -1;
-        }
-
-        return false;
-    };
-
-    rivets.formatters.percent = function (value, decimals) {
-        return number_format(value * 100, decimals || 0, ',') + '%';
-    };
-
-    rivets.formatters.bind = function () /* fn, thisArg[, arg1, arg2, ..., argN]*/{
-        var args = Array.from(_arguments);
-        var fn = args.shift();
-        var self = args.shift();
-
-        if (typeof fn === 'function') {
-            return function () {
-                fn.apply(self, args);
+        // Check if skuId is in skusProductIds map
+        var _productCache = this.sessionCache ? this.session.get(this.productCacheName) : this.productCache;
+        if (this.skusProductIds[skuId]) {
+            def.resolve(_productCache[this.skusProductIds[skuId]]);
+        } else {
+            // Search product
+            var params = {
+                fq: ['skuId:' + skuId]
             };
+
+            var search = _private._search(params);
+
+            // Since it should be only 1 item set index is 0
+            search.done(function (products) {
+                return def.resolve(products[0]);
+            });
         }
 
-        return fn;
-    };
+        def.always(function () {
+            return _private._requestSkuEndEvent();
+        });
 
-    rivets.formatters.with = function () /* fn, arg1, arg2, ..., argN*/{
-        var args = Array.from(_arguments);
-        var fn = args.shift();
+        return def.promise();
+    },
 
-        if (typeof fn === 'function') {
-            return fn.bind(null, args);
+
+    /**
+     * Search by product ID array
+     * @param  {Array} productIdArray Array IDs of the prodcuts to search
+     * @return {Promise}                            Promise with search results
+     */
+    searchProductArray: function searchProductArray(productIdArray) {
+        if (!productIdArray) {
+            return _private._error('productIdArrayNotDefined');
         }
 
-        return fn;
-    };
+        if (!Array.isArray(productIdArray)) {
+            return _private._error('productIdArrayNotAnArray');
+        }
 
-    rivets.formatters.slice = function () {
-        var args = Array.from(_arguments);
-        var arr = args.shift();
-        return Array.prototype.slice.apply(arr, args);
-    };
+        /* eslint-disable */
+        var def = $.Deferred();
+        /* eslint-enable */
 
-    rivets.formatters.formatPrice = function (val) {
-        return vtexHelpers.formatPrice(val);
-    };
+        // Product data object to resolve
+        var productData = {};
 
-    rivets.formatters.productImgSize = function (val, arg1, arg2) {
-        return vtexHelpers.getResizedImage(val, arg1, arg2);
-    };
-}
+        // Request product params
+        var params = {
+            fq: []
+        };
 
-/**
- * Create a VtexUtils class
- * Main class
- */
+        var _productCache = this.session.get(this.productCacheName);
+
+        for (var i = 0; i < productIdArray.length; i++) {
+            // Check if product was already gotten
+            // If not, add productId into the params object
+            // if ( this.productCache[productIdArray[i]] === undefined ) {
+            if (_productCache[productIdArray[i]] === undefined) {
+                params.fq.push('productId:' + productIdArray[i]);
+            } else {
+                // If gotten add it into the productData
+                // productData[productIdArray[i]] = this.productCache[productIdArray[i]];
+                productData[productIdArray[i]] = _productCache[productIdArray[i]];
+            }
+        }
+
+        if (params.fq.length) {
+            var search = _private._search(params);
+
+            search.done(function (products) {
+                // Loop product data
+                for (var _i = 0; _i < products.length; _i++) {
+                    productData[products[_i].productId] = products[_i];
+                }
+
+                def.resolve(productData);
+            });
+        } else {
+            def.resolve(productData);
+        }
+
+        return def.promise();
+    },
+
+
+    /**
+     * Search by sku ID array
+     * @param  {Array} skuIdArray Array IDs of the skus to search
+     * @return {Promise}                    Promise with search results
+     */
+    searchSkuArray: function searchSkuArray(skuIdArray) {
+        if (!skuIdArray) {
+            return _private._error('skuIdArrayNotDefined');
+        }
+
+        if (!Array.isArray(skuIdArray)) {
+            return _private._error('skuIdArrayNotAnArray');
+        }
+
+        /* eslint-disable */
+        var def = $.Deferred();
+        /* eslint-enable */
+
+        // Product data object to resolve
+        var productData = {};
+
+        // Request product params
+        var params = {
+            fq: []
+        };
+
+        for (var i = 0; i < skuIdArray.length; i++) {
+            // Check if sku was already gotten
+            // If not add skuId into the params object
+            if (!this.skusProductIds[skuIdArray[i]]) {
+                params.fq.push('skuId:' + skuIdArray[i]);
+            } else {
+                var productId = this.skusProductIds[skuIdArray[i]];
+
+                productData[productId] = this.productCache[productId];
+            }
+        }
+
+        if (params.fq.length) {
+            var search = _private._search(params);
+
+            search.done(function (products) {
+                // Loop product data
+                for (var _i2 = 0; _i2 < products.length; _i2++) {
+                    productData[products[_i2].productId] = products[_i2];
+                }
+
+                def.resolve(productData);
+            });
+        } else {
+            def.resolve(productData);
+        }
+
+        return def.promise();
+    },
+
+
+    /**
+     * Perform a full search
+     * @param  {Object} params   An Object with the category search param and pricerRange if necessary
+     * @return {Promise}         Promise with search results
+     * @example
+     *     vtexCatalog.fullSearch({fq: ['H:143', 'C:8/81/84', 'P:[0 TO 500]']})
+     *         .then((res) => window.console.log(res))
+     *         .fail((err) => window.console.log(err));
+     */
+    fullSearch: function fullSearch(params) {
+        if (!params) {
+            return _private._error('searchParamsNotDefined');
+        }
+
+        if ((typeof params === 'undefined' ? 'undefined' : _typeof(params)) !== 'object') {
+            return _private._error('paramsNotAnObject');
+        }
+
+        if (!params.fq) {
+            return _private._error('fqPropertyNotFound');
+        }
+
+        // Generate map parameter
+        var mapParam = {
+            map: []
+        };
+
+        // Loop each parameter
+        for (var i = 0; i < params.fq.length; i++) {
+            var param = params.fq[i];
+
+            // If param is the category one
+            if (param.match('C:')) {
+                // Generate a 'c' param in the 'mapParam' for each category
+                var categoryIds = param.split('/');
+
+                for (var z = 0; z < categoryIds.length; z++) {
+                    // If the 'categoryId' is a number
+                    if (categoryIds[z].match(/\d.+/gi)) {
+                        mapParam.map.push('c');
+                    }
+                }
+            }
+
+            // If param is priceFrom
+            if (param.match(/P\[.+[\d\w\s]?\]/g)) {
+                mapParam.map.push('priceFrom');
+            }
+        }
+
+        // Join mapParam map to generate a string and push it into the params object
+        mapParam.map = mapParam.map.join(',');
+
+        // Join params and mapParam
+        $.extend(params, mapParam);
+
+        // Search
+        var search = $.ajax({
+            url: '/api/catalog_system/pub/products/search/',
+            data: $.param(params, true),
+            beforeSend: function beforeSend(xhr) {
+                // Set resources header
+                xhr.setRequestHeader('resources', '0-49');
+            }
+        });
+
+        return search;
+    }
+};
+
+var VtexCatalog = function VtexCatalog(globalHelpers, vtexHelpers, storage) {
+  classCallCheck(this, VtexCatalog);
+
+  /**
+   * Set Helpers
+   */
+  this.globalHelpers = globalHelpers;
+  this.vtexHelpers = vtexHelpers;
+  this.storage = storage;
+
+  // Session Cache
+  this.sessionCache = true;
+
+  /**
+   * Cache products on Session Storage
+   * @type {Object}
+   */
+  this.session = this.storage.session;
+
+  /**
+   * Object with data of the products searched
+   * @type {Object}
+   */
+  this.productCache = {};
+
+  /**
+   * Sku ID map to productId
+   * To avoid looping the products in cache in order to find the
+   * needed sku, use this object to store the product ID of each sku ID
+   * @type {Object}
+   */
+  this.skusProductIds = {};
+
+  /**
+   * Extend public methods
+   * @type {Method}
+   */
+  this.globalHelpers.extend(VtexCatalog.prototype, vtexCatalogMethods);
+
+  /**
+   * Sets instance for private Methods
+   * @type {Method}
+   */
+  this.setInstance();
+
+  /**
+   * Init Session Sorage AJAX Cache
+   * @type {Method}
+   */
+  this.initStorage();
+};
 
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
@@ -1505,6 +2543,18 @@ var VtexUtils = function VtexUtils() {
    * @type {VtexHelpers}
    */
   this.vtexHelpers = new VtexHelpers();
+
+  /**
+   * Local/Session Storage
+   * @type {Object}
+   */
+  this.storage = store;
+
+  /**
+   * Vtex Catalog instance
+   * @type {VtexCatalog}
+   */
+  this.vtexCatalog = new VtexCatalog(this.globalHelpers, this.vtexHelpers, this.storage);
 };
 
 export default VtexUtils;

@@ -229,7 +229,8 @@ vtexHelpers.checkLogin().then(function(res) {
 
 ### vtexHelpers.openPopupLogin([noReload])
 
-Open default Vtex popup login
+Open default Vtex popup login.
+Before use, don't forget to import Vtex Controller `<vtex.cmc:welcomeMessage/>`
 
 - **noReload** (optional):
   - Type: `Boolean`
@@ -249,7 +250,8 @@ Use `$(window).on('closed.vtexid', callback)` event to set any property if `noRe
 
 ### vtexHelpers.addToCart(items[, expectedOrderFormSections[, salesChannel]])
 
-Open default Vtex popup login
+Open default Vtex popup login.
+Require `vtexjs`.
 
 - **items**:
   - Type: `Array`
@@ -284,6 +286,23 @@ vtexHelpers.addToCart(items).then(function(res) {
 .fail(function(err) {
   window.console.log(err);
 });
+
+```
+
+### vtexHelpers.clearCart()
+
+Remove all items from cart.
+
+#### Example
+
+```js
+vtexHelpers.clearCart()
+  .then(function(res) {
+    window.console.log(res)
+  })
+  .fail(function(err) {
+    window.console.log(err)
+  });
 
 ```
 

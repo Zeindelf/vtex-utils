@@ -117,17 +117,17 @@ export default {
                     accept: 'application/json',
                     contentType: 'application/json; charset=utf-8',
                 },
-            }).done((res) => {
-                if ( ! globalHelper.isUndefined(categoryId) ) {
+            })
+            .done((res) => {
+                if ( ! validateHelpers.isUndefined(categoryId) ) {
                     def.resolve(globalHelpers.objectSearch(res, {
                         id: categoryId,
                     }));
                 } else {
                     def.resolve(res);
                 }
-            }).fail((err) => {
-                def.reject();
-            });
+            })
+            .fail((err) => def.reject(err));
         }).promise();
     },
 
@@ -163,15 +163,15 @@ export default {
             return $.ajax({
                 type: 'get',
                 url: '/no-cache/profileSystem/getProfile',
-            }).done((res) => {
+            })
+            .done((res) => {
                 if ( validateHelpers.isUndefined(res.IsUserDefined) || ! res.IsUserDefined ) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
                 }
-            }).fail((err) => {
-                def.reject();
-            });
+            })
+            .fail((err) => def.reject(err));
         }).promise();
     },
 
@@ -214,14 +214,30 @@ export default {
         return $.Deferred((def) => {
             /* eslint-enable */
             return vtexjs.checkout.getOrderForm().done(() => {
-                return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done((orderForm) => {
-                    def.resolve(orderForm);
-                }).fail((err) => {
-                    def.reject();
-                });
-            }).fail((err) => {
-                def.reject();
-            });
+                return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel)
+                    .done((orderForm) => def.resolve(orderForm))
+                    .fail((err) => def.reject());
+            }).fail((err) => def.reject(err));
+        }).promise();
+    },
+
+    /**
+     * Empty the cart
+     *
+     * @return {promise} Order Form
+     */
+    clearCart() {
+        /* eslint-disable */
+        return $.Deferred((def) => {
+            /* eslint-enable */
+            vtexjs.checkout.getOrderForm().done((orderForm) => {
+                if ( orderForm.items.length ) {
+                    return vtexjs.checkout.removeAllItems(orderForm.items)
+                        .done((orderForm) => def.resolve(orderForm));
+                }
+
+                return def.resolve(orderForm);
+            }).fail((err) => def.reject(err));
         }).promise();
     },
 };
