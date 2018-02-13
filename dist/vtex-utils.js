@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-12T20:23:53.259Z
+ * Date: 2018-02-13T02:11:08.792Z
  */
 
 (function (global, factory) {
@@ -365,7 +365,6 @@ var validateHelpers = {
     }
 };
 
-// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1567,11 +1566,6 @@ store.area("session", function () {
     } catch (e) {}
 }());
 
-/**
- * Create a VtexHelpers class
- * Vtex utilities methods
- */
-
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1635,11 +1629,6 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
-
-/**
- * Create a GlobalHelpers class
- * Javascript utilities methods
- */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -2081,9 +2070,6 @@ var Private = function () {
             }
 
             var requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
-
-            // Loop for each requestAmount
-
             var _loop = function _loop(i) {
                 var resources = i * _this2._maxParamsPerRequest + '-' + ((i + 1) * _this2._maxParamsPerRequest - 1);
 
@@ -2117,10 +2103,6 @@ var Private = function () {
             /* eslint-disable */
             var def = $.Deferred();
             /* eslint-enable */
-
-            def.then(function () {
-                return _this2._requestSearchStartEvent();
-            });
 
             (_$ = $).when.apply(_$, toConsumableArray(xhrArray)).done(function () {
                 for (var _len = arguments.length, requests = Array(_len), _key = 0; _key < _len; _key++) {
@@ -2186,89 +2168,20 @@ var Private = function () {
         }
 
         /**
-         * Events
+         * Request End Events
+         * @param  {String} type  Register specific event type
          */
 
     }, {
-        key: '_requestSearchStartEvent',
-        value: function _requestSearchStartEvent() {
+        key: '_requestEndEvent',
+        value: function _requestEndEvent(type) {
             /* eslint-disable */
-            var ev = $.Event('requestSearchStart.vtexCatalog');
+            var ev = $.Event('request' + type + 'End.vtexCatalog');
             /* eslint-enable */
 
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestProductStartEvent',
-        value: function _requestProductStartEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestProductStart.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestProductEndEvent',
-        value: function _requestProductEndEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestProductEnd.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestSkuStartEvent',
-        value: function _requestSkuStartEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestSkuStart.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestSkuEndEvent',
-        value: function _requestSkuEndEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestSkuEnd.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestProductArrayStartEvent',
-        value: function _requestProductArrayStartEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestProductArrayStart.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestProductArrayEndEvent',
-        value: function _requestProductArrayEndEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestProductArrayEnd.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestSkuArrayStartEvent',
-        value: function _requestSkuArrayStartEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestSkuArrayStart.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
-        }
-    }, {
-        key: '_requestSkuArrayEndEvent',
-        value: function _requestSkuArrayEndEvent() {
-            /* eslint-disable */
-            var ev = $.Event('requestSkuArrayEnd.vtexCatalog');
-            /* eslint-enable */
-
-            $(document).trigger(ev);
+            setTimeout(function () {
+                $(document).trigger(ev);
+            }, 0);
         }
     }]);
     return Private;
@@ -2309,10 +2222,6 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        def.then(function () {
-            return _private._requestProductStartEvent();
-        });
-
         var _productCache = _private._getProductCache();
 
         if (_productCache[productId]) {
@@ -2330,8 +2239,8 @@ var vtexCatalogMethods = {
             });
         }
 
-        def.always(function () {
-            return _private._requestProductEndEvent();
+        def.then(function () {
+            return _private._requestEndEvent('Product');
         });
 
         return def.promise();
@@ -2353,10 +2262,6 @@ var vtexCatalogMethods = {
         var def = $.Deferred();
         /* eslint-enable */
 
-        def.then(function () {
-            return _private._requestSkuStartEvent();
-        });
-
         var _productCache = _private._getProductCache();
         var _skuCache = _private._getSkuCache();
 
@@ -2375,8 +2280,8 @@ var vtexCatalogMethods = {
             });
         }
 
-        def.always(function () {
-            return _private._requestSkuEndEvent();
+        def.then(function () {
+            return _private._requestEndEvent('Sku');
         });
 
         return def.promise();
@@ -2400,10 +2305,6 @@ var vtexCatalogMethods = {
         /* eslint-disable */
         var def = $.Deferred();
         /* eslint-enable */
-
-        def.then(function () {
-            return _private._requestProductArrayStartEvent();
-        });
 
         var productData = {};
         var params = { fq: [] };
@@ -2431,8 +2332,8 @@ var vtexCatalogMethods = {
             def.resolve(productData);
         }
 
-        def.always(function () {
-            return _private._requestProductArrayEndEvent();
+        def.then(function () {
+            return _private._requestEndEvent('ProductArray');
         });
 
         return def.promise();
@@ -2456,10 +2357,6 @@ var vtexCatalogMethods = {
         /* eslint-disable */
         var def = $.Deferred();
         /* eslint-enable */
-
-        def.then(function () {
-            return _private._requestSkuArrayStartEvent();
-        });
 
         var productData = {};
         var params = { fq: [] };
@@ -2489,8 +2386,8 @@ var vtexCatalogMethods = {
             def.resolve(productData);
         }
 
-        def.always(function () {
-            return _private._requestSkuArrayEndEvent();
+        def.then(function () {
+            return _private._requestEndEvent('SkuArray');
         });
 
         return def.promise();
@@ -2563,11 +2460,6 @@ var vtexCatalogMethods = {
     }
 };
 
-/**
- * Create a VtexCatalog class
- * Vtex utilities methods
- */
-
 var VtexCatalog = function VtexCatalog(catalogCache) {
   classCallCheck(this, VtexCatalog);
 
@@ -2597,11 +2489,6 @@ var VtexCatalog = function VtexCatalog(catalogCache) {
    */
   this._setInstance(catalogCache);
 };
-
-/**
- * Create a VtexUtils class
- * Main class
- */
 
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);

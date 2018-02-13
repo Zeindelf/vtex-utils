@@ -38,8 +38,6 @@ export default {
         const def = $.Deferred();
         /* eslint-enable */
 
-        def.then(() => _private._requestProductStartEvent());
-
         const _productCache = _private._getProductCache();
 
         if ( _productCache[productId] ) {
@@ -55,7 +53,7 @@ export default {
             search.done((products) => def.resolve(products[0]));
         }
 
-        def.always(() => _private._requestProductEndEvent());
+        def.then(() => _private._requestEndEvent('Product'));
 
         return def.promise();
     },
@@ -75,8 +73,6 @@ export default {
         const def = $.Deferred();
         /* eslint-enable */
 
-        def.then(() => _private._requestSkuStartEvent());
-
         const _productCache = _private._getProductCache();
         const _skuCache = _private._getSkuCache();
 
@@ -93,7 +89,7 @@ export default {
             search.done((products) => def.resolve(products[0]));
         }
 
-        def.always(() => _private._requestSkuEndEvent());
+        def.then(() => _private._requestEndEvent('Sku'));
 
         return def.promise();
     },
@@ -115,8 +111,6 @@ export default {
         /* eslint-disable */
         const def = $.Deferred();
         /* eslint-enable */
-
-        def.then(() => _private._requestProductArrayStartEvent());
 
         let productData = {};
         let params = {fq: []};
@@ -144,7 +138,7 @@ export default {
             def.resolve(productData);
         }
 
-        def.always(() => _private._requestProductArrayEndEvent());
+        def.then(() => _private._requestEndEvent('ProductArray'));
 
         return def.promise();
     },
@@ -166,8 +160,6 @@ export default {
         /* eslint-disable */
         const def = $.Deferred();
         /* eslint-enable */
-
-        def.then(() => _private._requestSkuArrayStartEvent());
 
         let productData = {};
         let params = {fq: []};
@@ -197,7 +189,7 @@ export default {
             def.resolve(productData);
         }
 
-        def.always(() => _private._requestSkuArrayEndEvent());
+        def.then(() => _private._requestEndEvent('SkuArray'));
 
         return def.promise();
     },

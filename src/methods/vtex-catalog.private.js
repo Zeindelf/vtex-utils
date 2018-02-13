@@ -57,13 +57,13 @@ class Private {
         this._catalog = catalog;
     }
 
+    _error(type) {
+        throw new Error(this._errors[type]);
+    }
+
     _setSessionCache(catalogCache) {
         this._catalogCache = catalogCache;
         this._initStorage(this._catalogCache);
-    }
-
-    _error(type) {
-        throw new Error(this._errors[type]);
     }
 
     /**
@@ -89,15 +89,17 @@ class Private {
      * Store products into Session Storage
      */
     _setProductCache(products) {
-        let productCache = this._session.get(this._productCacheName);
+        if ( this._catalogCache ) {
+            let productCache = this._session.get(this._productCacheName);
 
-        for ( let id in products ) {
-            if ( ! productCache.hasOwnProperty(id) ) {
-                productCache[id] = products[id];
+            for ( let id in products ) {
+                if ( ! productCache.hasOwnProperty(id) ) {
+                    productCache[id] = products[id];
+                }
             }
-        }
 
-        this._session.set(this._productCacheName, productCache);
+            this._session.set(this._productCacheName, productCache);
+        }
     }
 
     /**
@@ -202,6 +204,7 @@ class Private {
         }
 
         let requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
+        const self = this;
 
         // Loop for each requestAmount
         for ( let i = 0; i < requestAmount; i += 1 ) {
@@ -233,8 +236,6 @@ class Private {
         /* eslint-disable */
         const def = $.Deferred();
         /* eslint-enable */
-
-        def.then(() => this._requestSearchStartEvent());
 
         $.when(...xhrArray).done((...requests) => {
             requests.forEach((request, index) => {
@@ -288,78 +289,17 @@ class Private {
     }
 
     /**
-     * Events
+     * Request End Events
+     * @param  {String} type  Register specific event type
      */
-    _requestSearchStartEvent() {
+    _requestEndEvent(type) {
         /* eslint-disable */
-        const ev = $.Event('requestSearchStart.vtexCatalog');
+        const ev = $.Event(`request${type}End.vtexCatalog`);
         /* eslint-enable */
 
-        $(document).trigger(ev);
-    }
-
-    _requestProductStartEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestProductStart.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestProductEndEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestProductEnd.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestSkuStartEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestSkuStart.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestSkuEndEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestSkuEnd.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestProductArrayStartEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestProductArrayStart.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestProductArrayEndEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestProductArrayEnd.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestSkuArrayStartEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestSkuArrayStart.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
-    }
-
-    _requestSkuArrayEndEvent() {
-        /* eslint-disable */
-        const ev = $.Event('requestSkuArrayEnd.vtexCatalog');
-        /* eslint-enable */
-
-        $(document).trigger(ev);
+        setTimeout(() => {
+            $(document).trigger(ev)
+        }, 0);
     }
 }
 
