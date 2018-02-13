@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.8.5
+ * VtexUtils.js v0.9.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-13T02:11:08.792Z
+ * Date: 2018-02-13T04:03:00.257Z
  */
 
 'use strict';
@@ -361,6 +361,7 @@ var validateHelpers = {
     }
 };
 
+// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1562,6 +1563,11 @@ store.area("session", function () {
     } catch (e) {}
 }());
 
+/**
+ * Create a VtexHelpers class
+ * Vtex utilities methods
+ */
+
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1625,6 +1631,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1892,15 +1903,15 @@ var Private = function () {
             this._catalog = catalog;
         }
     }, {
+        key: '_error',
+        value: function _error(type) {
+            throw new Error(this._errors[type]);
+        }
+    }, {
         key: '_setSessionCache',
         value: function _setSessionCache(catalogCache) {
             this._catalogCache = catalogCache;
             this._initStorage(this._catalogCache);
-        }
-    }, {
-        key: '_error',
-        value: function _error(type) {
-            throw new Error(this._errors[type]);
         }
 
         /**
@@ -1932,15 +1943,17 @@ var Private = function () {
     }, {
         key: '_setProductCache',
         value: function _setProductCache(products) {
-            var productCache = this._session.get(this._productCacheName);
+            if (this._catalogCache) {
+                var productCache = this._session.get(this._productCacheName);
 
-            for (var id in products) {
-                if (!productCache.hasOwnProperty(id)) {
-                    productCache[id] = products[id];
+                for (var id in products) {
+                    if (!productCache.hasOwnProperty(id)) {
+                        productCache[id] = products[id];
+                    }
                 }
-            }
 
-            this._session.set(this._productCacheName, productCache);
+                this._session.set(this._productCacheName, productCache);
+            }
         }
 
         /**
@@ -2066,6 +2079,9 @@ var Private = function () {
             }
 
             var requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
+
+            // Loop for each requestAmount
+
             var _loop = function _loop(i) {
                 var resources = i * _this2._maxParamsPerRequest + '-' + ((i + 1) * _this2._maxParamsPerRequest - 1);
 
@@ -2456,6 +2472,11 @@ var vtexCatalogMethods = {
     }
 };
 
+/**
+ * Create a VtexCatalog class
+ * Vtex utilities methods
+ */
+
 var VtexCatalog = function VtexCatalog(catalogCache) {
   classCallCheck(this, VtexCatalog);
 
@@ -2486,6 +2507,11 @@ var VtexCatalog = function VtexCatalog(catalogCache) {
   this._setInstance(catalogCache);
 };
 
+/**
+ * Create a VtexUtils class
+ * Main class
+ */
+
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
 
@@ -2493,7 +2519,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.8.5';
+  this.version = '0.9.0';
 
   /**
    * Package name

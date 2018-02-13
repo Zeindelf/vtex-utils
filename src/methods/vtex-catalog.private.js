@@ -204,7 +204,6 @@ class Private {
         }
 
         let requestAmount = Math.ceil(paramsLength / this._maxParamsPerRequest);
-        const self = this;
 
         // Loop for each requestAmount
         for ( let i = 0; i < requestAmount; i += 1 ) {
@@ -298,7 +297,7 @@ class Private {
         /* eslint-enable */
 
         setTimeout(() => {
-            $(document).trigger(ev)
+            $(document).trigger(ev);
         }, 0);
     }
 }
