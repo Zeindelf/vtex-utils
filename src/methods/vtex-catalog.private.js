@@ -63,25 +63,20 @@ class Private {
 
     _setSessionCache(catalogCache) {
         this._catalogCache = catalogCache;
-        this._initStorage(this._catalogCache);
+        this._initStorage();
     }
 
     /**
      * Init and validate Session Store Cache
      * @return {Void}
      */
-    _initStorage(catalogCache) {
-        if ( catalogCache ) {
-            if ( validateHelpers.isNull(this._session.get(this._productCacheName)) ) {
-                this._session.set(this._productCacheName, {});
-            }
+    _initStorage() {
+        if ( validateHelpers.isNull(this._session.get(this._productCacheName)) ) {
+            this._session.set(this._productCacheName, {});
+        }
 
-            if ( validateHelpers.isNull(this._session.get(this._skuCacheName)) ) {
-                this._session.set(this._skuCacheName, {});
-            }
-        } else {
-            this._session.remove(this._productCacheName);
-            this._session.remove(this._skuCacheName);
+        if ( validateHelpers.isNull(this._session.get(this._skuCacheName)) ) {
+            this._session.set(this._skuCacheName, {});
         }
     }
 

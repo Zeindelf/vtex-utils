@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-13T04:03:00.257Z
+ * Date: 2018-02-14T01:24:02.213Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -359,7 +359,6 @@ var validateHelpers = {
     }
 };
 
-// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1561,11 +1560,6 @@ store.area("session", function () {
     } catch (e) {}
 }());
 
-/**
- * Create a VtexHelpers class
- * Vtex utilities methods
- */
-
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1629,11 +1623,6 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
-
-/**
- * Create a GlobalHelpers class
- * Javascript utilities methods
- */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1909,7 +1898,7 @@ var Private = function () {
         key: '_setSessionCache',
         value: function _setSessionCache(catalogCache) {
             this._catalogCache = catalogCache;
-            this._initStorage(this._catalogCache);
+            this._initStorage();
         }
 
         /**
@@ -1919,18 +1908,13 @@ var Private = function () {
 
     }, {
         key: '_initStorage',
-        value: function _initStorage(catalogCache) {
-            if (catalogCache) {
-                if (validateHelpers.isNull(this._session.get(this._productCacheName))) {
-                    this._session.set(this._productCacheName, {});
-                }
+        value: function _initStorage() {
+            if (validateHelpers.isNull(this._session.get(this._productCacheName))) {
+                this._session.set(this._productCacheName, {});
+            }
 
-                if (validateHelpers.isNull(this._session.get(this._skuCacheName))) {
-                    this._session.set(this._skuCacheName, {});
-                }
-            } else {
-                this._session.remove(this._productCacheName);
-                this._session.remove(this._skuCacheName);
+            if (validateHelpers.isNull(this._session.get(this._skuCacheName))) {
+                this._session.set(this._skuCacheName, {});
             }
         }
 
@@ -2470,11 +2454,6 @@ var vtexCatalogMethods = {
     }
 };
 
-/**
- * Create a VtexCatalog class
- * Vtex utilities methods
- */
-
 var VtexCatalog = function VtexCatalog(catalogCache) {
   classCallCheck(this, VtexCatalog);
 
@@ -2504,11 +2483,6 @@ var VtexCatalog = function VtexCatalog(catalogCache) {
    */
   this._setInstance(catalogCache);
 };
-
-/**
- * Create a VtexUtils class
- * Main class
- */
 
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
