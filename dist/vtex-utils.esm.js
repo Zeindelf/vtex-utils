@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.9.0
+ * VtexUtils.js v0.9.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-14T01:24:02.213Z
+ * Date: 2018-02-14T06:06:13.962Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -359,6 +359,7 @@ var validateHelpers = {
     }
 };
 
+// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1560,6 +1561,11 @@ store.area("session", function () {
     } catch (e) {}
 }());
 
+/**
+ * Create a VtexHelpers class
+ * Vtex utilities methods
+ */
+
 var VtexHelpers = function () {
     function VtexHelpers() {
         classCallCheck(this, VtexHelpers);
@@ -1623,6 +1629,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -2454,6 +2465,11 @@ var vtexCatalogMethods = {
     }
 };
 
+/**
+ * Create a VtexCatalog class
+ * Vtex utilities methods
+ */
+
 var VtexCatalog = function VtexCatalog(catalogCache) {
   classCallCheck(this, VtexCatalog);
 
@@ -2484,6 +2500,11 @@ var VtexCatalog = function VtexCatalog(catalogCache) {
   this._setInstance(catalogCache);
 };
 
+/**
+ * Create a VtexUtils class
+ * Main class
+ */
+
 var VtexUtils = function VtexUtils() {
   classCallCheck(this, VtexUtils);
 
@@ -2491,7 +2512,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.9.0';
+  this.version = '0.9.1';
 
   /**
    * Package name
