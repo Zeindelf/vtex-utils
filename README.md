@@ -226,7 +226,7 @@ vtexHelpers.checkLogin().then(function(res) {
 });
 ```
 
-### vtexHelpers.openPopupLogin([noReload])
+### vtexHelpers.openPopupLogin([noReload[, url]])
 
 Open default Vtex popup login.
 Before use, don't forget to import Vtex Controller `<vtex.cmc:welcomeMessage/>`
@@ -236,16 +236,23 @@ Before use, don't forget to import Vtex Controller `<vtex.cmc:welcomeMessage/>`
   - Default: `false`
   - Reload page after login
 
+- **url** (optional):
+  - Type: `Boolean`
+  - Default: `'/'`
+  - Url to rdirect
+
 #### Example
 
 ```js
 vtexHelpers.openPopupLogin(); // Open popup and reload page after success login
 vtexHelpers.openPopupLogin(true); // Open popup and don't reload page after success login
+vtexHelpers.openPopupLogin(false, '/account'); // Open popup and don't reload page after success login and redirect to Account page
 
 ```
 #### TIP
-Use `$(window).on('closed.vtexid', callback)` event to set any property if `noReload` is `true
-`
+Use `$(window).on('closed.vtexid', callback)` event to set any property if `noReload` is `true`
+
+If `noReload` is `true`, it'll ignore `url` param
 
 ### vtexHelpers.addToCart(items[, expectedOrderFormSections[, salesChannel]])
 

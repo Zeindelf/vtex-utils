@@ -181,9 +181,10 @@ export default {
      * @param  {boolean}  [noReload = false]  Reload page after login
      * @return {void}
      */
-    openPopupLogin(noReload) {
+    openPopupLogin(noReload, _url) {
         noReload = validateHelpers.isBoolean(noReload) ? noReload : false;
-        const _url = ( noReload ) ? window.location.href : '/';
+        _url = validateHelpers.isString(_url) ? _url : '/';
+        _url = ( noReload ) ? window.location.href : _url;
 
         vtexid.start({
             returnUrl: _url,

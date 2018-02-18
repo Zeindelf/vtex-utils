@@ -203,4 +203,8 @@ if ( 'rivets' in window ) {
     rivets.formatters.productImgSize = (val, arg1, arg2) => {
         return vtexHelpers.getResizedImage(val, arg1, arg2);
     };
+
+    rivets.formatters.replaceBreakLines = (val) => {
+        return vtexHelpers.replaceBreakLines(val);
+    };
 }

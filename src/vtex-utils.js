@@ -1,10 +1,9 @@
 
 import './utils/rivets-formatters.js';
-import {store} from './utils/vendor.store.js';
+import store from './utils/vendor.store.js';
 
 import VtexHelpers from './class/VtexHelpers.js';
 import GlobalHelpers from './class/GlobalHelpers.js';
-import VtexCatalog from './class/VtexCatalog.js';
 
 /**
  * Create a VtexUtils class
@@ -41,12 +40,6 @@ class VtexUtils {
          * @type {Object}
          */
         this.storage = store;
-
-        /**
-         * Vtex Catalog
-         * @type {VtexCatalog}
-         */
-        this.VtexCatalog = VtexCatalog;
     }
 }
 
