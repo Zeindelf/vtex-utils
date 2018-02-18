@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.9.1
+ * VtexUtils.js v0.9.5
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-18T17:14:16.288Z
+ * Date: 2018-02-18T18:03:58.262Z
  */
 
 (function (global, factory) {
@@ -20,16 +20,6 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
-
-
-
-
-
-
-
-
-
-
 
 var classCallCheck = function (instance, Constructor) {
   if (!(instance instanceof Constructor)) {
@@ -54,46 +44,6 @@ var createClass = function () {
     return Constructor;
   };
 }();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
@@ -329,6 +279,7 @@ var validateHelpers = {
     }
 };
 
+// cache some methods to call later on
 var slice = Array.prototype.slice;
 
 var globalHelpers = {
@@ -1533,26 +1484,6 @@ store.area("session", function () {
         return sessionStorage;
     } catch (e) {}
 }());
-
-/**
- * Copyright (c) 2013 ESHA Research
- * Dual licensed under the MIT and GPL licenses:
- *   http://www.opensource.org/licenses/mit-license.php
- *   http://www.gnu.org/licenses/gpl.html
- *
- * store.overflow.js - Fall back to fake storage on quota errors (e.g. very useful for Safari private mode)
- *
- * When quota is reached on a storage area, this shifts incoming values to
- * fake storage, so they last only as long as the page does. This is useful
- * because it is more burdensome for localStorage to recover from quota errors
- * than incomplete caches. In other words, it is wiser to rely on store.js
- * never complaining than never missing data. You should already be checking
- * the integrity of cached data on every page load. Also note that quota errors
- * are thrown by Safari for *every* setItem when user is in private browsing mode.
- * http://spin.atomicobject.com/2013/01/23/ios-private-browsing-localstorage/
- *
- * Status: BETA
- */
 (function (store, _) {
     var _set = _.set,
         _get = _.get,
@@ -1622,20 +1553,6 @@ store.area("session", function () {
         _clear.apply(this, arguments);
     };
 })(store, store._, undefined);
-
-/**
- * Copyright (c) 2013 ESHA Research
- * Dual licensed under the MIT and GPL licenses:
- *   http://www.opensource.org/licenses/mit-license.php
- *   http://www.gnu.org/licenses/gpl.html
- *
- * store.cache.js - To make data expire, pass a number of seconds as the overwrite (third) param on set() calls
- *
- * Allows use of the 'overwrite' param on set calls to give an enforced expiration date
- * without breaking existing 'overwrite' functionality.
- *
- * Status: BETA - useful, needs testing
- */
 (function (store, _) {
     var prefix = 'exp@',
         suffix = ';',
@@ -1693,6 +1610,11 @@ store.area("session", function () {
         }
     };
 })(store, store._, undefined);
+
+/**
+ * Create a VtexHelpers class
+ * Vtex utilities methods
+ */
 
 var VtexHelpers = function () {
     function VtexHelpers() {
@@ -1757,6 +1679,11 @@ var VtexHelpers = function () {
     }]);
     return VtexHelpers;
 }();
+
+/**
+ * Create a GlobalHelpers class
+ * Javascript utilities methods
+ */
 
 var GlobalHelpers = function () {
     function GlobalHelpers() {
@@ -1977,7 +1904,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.9.1';
+  this.version = '0.9.5';
 
   /**
    * Package name
