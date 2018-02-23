@@ -10,7 +10,7 @@ const globalHelpers = vtexUtils.globalHelpers;
 describe('String Methods', () => {
     const strToCapitalize = 'foo for bar to baz';
     const strToRemoveAccents = 'àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ';
-    const strToSlugifyText = 'fòÖ bâr bàz';
+    const strToSlugifyText = 'fòÖ fôö bâr bàz';
     const strToReplace = 'Foo to bar into baz foo';
 
     const strCapitalize = globalHelpers.capitalize(strToCapitalize);
@@ -29,7 +29,7 @@ describe('String Methods', () => {
     });
 
     it('string slugify text', (done) => {
-        expect(strSlugifyText).to.equal('foo-bar-baz');
+        expect(strSlugifyText).to.equal('foo-foo-bar-baz');
         done();
     });
 

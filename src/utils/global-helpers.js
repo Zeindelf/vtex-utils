@@ -313,8 +313,8 @@ export default {
             .replace(/\+/g, '-'); // Replace a + for a -
 
         // Remove accents, swap ñ for n, etc
-        const from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
-        const to = 'aaaaeeeeiiiioooouuuunc------';
+        const from = 'àáäâãèéëêìíïîòóöôõùúüûýÿñç·/_,:;';
+        const to = 'aaaaaeeeeiiiiooooouuuuyync------';
 
         for ( let i = 0, len = from.length; i < len; i += 1 ) {
             str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
