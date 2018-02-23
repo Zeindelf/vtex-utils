@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.9.5
+ * VtexUtils.js v0.9.6
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-18T18:03:58.262Z
+ * Date: 2018-02-23T04:22:50.100Z
  */
 
 'use strict';
@@ -596,8 +596,8 @@ var globalHelpers = {
         .replace(/\+/g, '-'); // Replace a + for a -
 
         // Remove accents, swap ñ for n, etc
-        var from = 'àáäâèéëêìíïîòóöôùúüûñç·/_,:;';
-        var to = 'aaaaeeeeiiiioooouuuunc------';
+        var from = 'àáäâãèéëêìíïîòóöôõùúüûýÿñç·/_,:;';
+        var to = 'aaaaaeeeeiiiiooooouuuuyync------';
 
         for (var i = 0, len = from.length; i < len; i += 1) {
             str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
@@ -1900,7 +1900,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.9.5';
+  this.version = '0.9.6';
 
   /**
    * Package name
