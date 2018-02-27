@@ -784,6 +784,34 @@ globalHelpers.unescape(markup);
 // <p>"Lorem ipsum"</p>
 ```
 
+### globalHelpers.throttle(callback, wait[, context])
+
+Throttling to enforces a maximum number of times a function can be called over time
+
+- **callback**:
+  - Type: `Function`
+  - Function to excecute
+
+- **wait**:
+  - Type: `Integer`
+  - Time in miliseconds to excecute function
+
+- **context** (optional):
+  - Type: `Mix`
+  - Default: `this`
+  - Context
+
+#### Example
+
+```js
+var handleKeydown = throttle(function(e) {
+    console.log(e.target.value)
+  }, 300);
+
+input.addEventListener('keydown', handleKeydown);
+```
+
+
 ### globalHelpers.unserialize(str)
 
 Unserialize a query string into an object

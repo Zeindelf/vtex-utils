@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v0.9.6
+ * VtexUtils.js v0.10.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-02-23T04:22:50.100Z
+ * Date: 2018-02-27T21:14:06.622Z
  */
 
 'use strict';
@@ -668,6 +668,41 @@ var globalHelpers = {
         }
 
         return subject;
+    },
+
+
+    /**
+     * Throttling enforces a maximum number of times a
+     * function can be called over time.
+     * As in 'execute this function at most once every 100 milliseconds.'
+     * CSS-Tricks (https://css-tricks.com/the-difference-between-throttling-and-debouncing/)
+     *
+     * @example
+     *   const handleKeydown = throttle((e) => {
+     *     console.log(e.target.value)
+     *   }, 300);
+     *
+     *   input.addEventListener('keydown', handleKeydown);
+     */
+    _throttle: function _throttle(callback, wait, context) {
+        var timeout = null;
+        var callbackArgs = null;
+
+        var later = function later() {
+            callback.apply(context, callbackArgs);
+            timeout = null;
+        };
+
+        return function () {
+            if (!timeout) {
+                for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+                    args[_key2] = arguments[_key2];
+                }
+
+                callbackArgs = args;
+                timeout = setTimeout(later, wait);
+            }
+        };
     },
 
 
@@ -1875,6 +1910,13 @@ var GlobalHelpers = function () {
             return globalHelpers.strReplace(search, replace, subject);
         }
     }, {
+        key: 'throttle',
+        value: function throttle(callback, wait) {
+            var context = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this;
+
+            return globalHelpers._throttle(callback, wait, context);
+        }
+    }, {
         key: 'unescape',
         value: function unescape(str) {
             return globalHelpers.unescape(str);
@@ -1900,7 +1942,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '0.9.6';
+  this.version = '0.10.0';
 
   /**
    * Package name

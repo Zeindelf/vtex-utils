@@ -153,6 +153,10 @@ class GlobalHelpers {
         return globalHelpers.strReplace(search, replace, subject);
     }
 
+    throttle(callback, wait, context = this) {
+        return globalHelpers._throttle(callback, wait, context);
+    }
+
     unescape(str) {
         return globalHelpers.unescape(str);
     }

@@ -385,6 +385,36 @@ export default {
     },
 
     /**
+     * Throttling enforces a maximum number of times a
+     * function can be called over time.
+     * As in 'execute this function at most once every 100 milliseconds.'
+     * CSS-Tricks (https://css-tricks.com/the-difference-between-throttling-and-debouncing/)
+     *
+     * @example
+     *   const handleKeydown = throttle((e) => {
+     *     console.log(e.target.value)
+     *   }, 300);
+     *
+     *   input.addEventListener('keydown', handleKeydown);
+     */
+    _throttle(callback, wait, context) {
+        let timeout = null;
+        let callbackArgs = null;
+
+        const later = () => {
+            callback.apply(context, callbackArgs);
+            timeout = null;
+        };
+
+        return function(...args) {
+            if ( ! timeout ) {
+                callbackArgs = args;
+                timeout = setTimeout(later, wait);
+            }
+        };
+    },
+
+    /**
      * Replaces HTML encoded entities with <, >, &, ', " and /.
      * @param {string} str - The string to check
      * @return {boolean}
