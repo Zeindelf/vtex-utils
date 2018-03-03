@@ -101,8 +101,20 @@ class GlobalHelpers {
         return globalHelpers.capitalize(str);
     }
 
+    chunk(array, size) {
+        return globalHelpers.chunk(array, size);
+    }
+
     cleanArray(array) {
         return globalHelpers.cleanArray(array);
+    }
+
+    contains(value, elem) {
+        return globalHelpers.contains(value, elem);
+    }
+
+    debounce(func, wait, options) {
+        return globalHelpers.debounce(func, wait, options);
     }
 
     escape(str) {
@@ -129,6 +141,10 @@ class GlobalHelpers {
         return globalHelpers.objectSearch(object, needle);
     }
 
+    pad(number, size) {
+        return globalHelpers.pad(number, size);
+    }
+
     removeAccent(str) {
         return globalHelpers.removeAccent(str);
     }
@@ -153,8 +169,12 @@ class GlobalHelpers {
         return globalHelpers.strReplace(search, replace, subject);
     }
 
-    throttle(callback, wait, context = this) {
-        return globalHelpers._throttle(callback, wait, context);
+    throttle(func, wait, options) {
+        return globalHelpers.throttle(func, wait, options);
+    }
+
+    times(n, iteratee) {
+        return globalHelpers.times(n, iteratee);
     }
 
     unescape(str) {
