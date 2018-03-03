@@ -1,9 +1,6 @@
 
 import validateHelpers from './validate-helpers.js';
 
-// cache some methods to call later on
-const slice = Array.prototype.slice;
-
 export default {
     /**
      * Return an array with unique values
@@ -50,9 +47,9 @@ export default {
             return [];
         }
 
-        let index = 0
-        let resIndex = 0
-        const result = new Array(Math.ceil(length / size))
+        let index = 0;
+        let resIndex = 0;
+        const result = new Array(Math.ceil(length / size));
 
         while ( index < length ) {
             result[resIndex++] = this.slice(array, index, (index += size));
@@ -163,10 +160,10 @@ export default {
         let timerId;
         let lastCallTime;
 
-        let lastInvokeTime = 0
-        let leading = false
-        let maxing = false
-        let trailing = true
+        let lastInvokeTime = 0;
+        let leading = false;
+        let maxing = false;
+        let trailing = true;
 
         // Bypass `requestAnimationFrame` by explicitly setting `wait=0`.
         const useRAF = ( ! wait && wait !== 0 && typeof window.requestAnimationFrame === 'function' );
@@ -175,7 +172,7 @@ export default {
             throw new TypeError('Expected a function');
         }
 
-        wait = +wait || 0
+        wait = +wait || 0;
         if ( validateHelpers.isObject(options) ) {
             leading = !! options.leading;
             maxing = 'maxWait' in options;
@@ -281,7 +278,9 @@ export default {
             const isInvoking = shouldInvoke(time);
 
             lastArgs = args;
+            /* eslint-disable */
             lastThis = this;
+            /* eslint-enable */
             lastCallTime = time;
 
             if ( isInvoking ) {
@@ -570,7 +569,7 @@ export default {
         length = start > end ? 0 : ((end - start) >>> 0);
         start >>>= 0;
 
-        let index = -1
+        let index = -1;
         const result = new Array(length);
 
         while ( ++index < length ) {
@@ -710,8 +709,8 @@ export default {
      *     $(window).on('popstate', throttled.cancel)
      */
     throttle(func, wait, options) {
-        let leading = true
-        let trailing = true
+        let leading = true;
+        let trailing = true;
 
         if ( typeof func !== 'function' ) {
             throw new TypeError('Expected a function');
