@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-03T18:57:00.401Z
+ * Date: 2018-03-08T19:07:04.814Z
  */
 
 (function (global, factory) {
@@ -1370,6 +1370,11 @@ var vtexHelpers = {
 };
 
 var _arguments = arguments;
+
+if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object') {
+    global.window = global;
+    global.window.navigator = {};
+}
 
 if ('rivets' in window) {
     rivets.formatters['!'] = function (value) {

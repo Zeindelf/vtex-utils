@@ -1,6 +1,11 @@
 
 import vtexHelpers from './vtex-helpers.js';
 
+if ( typeof window !== 'object' ) {
+    global.window = global;
+    global.window.navigator = {};
+}
+
 if ( 'rivets' in window ) {
     rivets.formatters['!'] = (value) => {
         return ! value;
