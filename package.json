@@ -1,6 +1,6 @@
 {
   "name": "vtex-utils",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "A collection of utilities methods for Vtex stores",
   "main": "dist/vtex-utils.common.js",
   "module": "dist/vtex-utils.esm.js",
