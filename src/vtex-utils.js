@@ -4,6 +4,7 @@ import store from './utils/vendor.store.js';
 
 import VtexHelpers from './class/VtexHelpers.js';
 import GlobalHelpers from './class/GlobalHelpers.js';
+import LocationHelpers from './class/LocationHelpers.js';
 
 /**
  * Create a VtexUtils class
@@ -24,16 +25,22 @@ class VtexUtils {
         this.name = '@VtexUtils';
 
         /**
+         * Vtex Helpers instance
+         * @type {VtexHelpers}
+         */
+        this.vtexHelpers = new VtexHelpers();
+
+        /**
          * Global Helpers instance
          * @type {GlobalHelpers}
          */
         this.globalHelpers = new GlobalHelpers();
 
         /**
-         * Vtex Helpers instance
-         * @type {VtexHelpers}
+         * Location Helpers instance
+         * @type {LocationHelpers}
          */
-        this.vtexHelpers = new VtexHelpers();
+        this.locationHelpers = new LocationHelpers();
 
         /**
          * Local/Session Storage

@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-08T19:18:40.976Z
+ * Date: 2018-03-25T01:28:17.520Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -38,6 +38,21 @@ var createClass = function () {
     return Constructor;
   };
 }();
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
 
 var toConsumableArray = function (arr) {
   if (Array.isArray(arr)) {
@@ -2317,6 +2332,182 @@ var GlobalHelpers = function () {
     return GlobalHelpers;
 }();
 
+var _regionMap;
+
+var locationHelpers = {
+    /**
+     * Get user location by HTML5 Geolocate API and translate coordinates to
+     * Brazilian State, City and Region
+     *
+     * @return {Promise}  When success, response are an object with State, City, Region and user Coordinates
+     * @example
+     *     locationHelpers.getCityState()
+     *         .then(function(res) {
+     *             return window.console.log(res);
+     *         })
+     *         .fail(function(err) {
+     *             return window.console.log(err);
+     *         });
+     */
+    getUserLocation: function getUserLocation() {
+        var _this = this;
+
+        return $.Deferred(function (def) {
+            if (window.navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+
+                    if (!window.google) {
+                        return def.reject('Google Maps Javascript API not found. Follow tutorial: https://developers.google.com/maps/documentation/javascript');
+                    }
+
+                    var latlng = new google.maps.LatLng(lat, lng);
+                    var geocoder = new google.maps.Geocoder();
+
+                    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+                        if (status === google.maps.GeocoderStatus.OK) {
+                            if (results[1]) {
+                                for (var i = 0, len = results.length; i < len; i += 1) {
+                                    if (results[i].types[0] === 'locality') {
+                                        var city = results[i].address_components[0].short_name;
+                                        var state = results[i].address_components[2].short_name;
+
+                                        def.resolve({
+                                            coords: { lat: lat, lng: lng },
+                                            city: city,
+                                            state: state,
+                                            region: _this.filteredRegion(state)
+                                        });
+                                    }
+                                }
+                            } else {
+                                def.reject('No reverse geocode results.');
+                            }
+                        } else {
+                            def.reject('Geocoder failed: ' + status);
+                        }
+                    });
+                }, function (err) {
+                    def.reject('Geolocation not available.');
+                });
+            } else {
+                def.reject('Geolocation isn\'t available');
+            }
+        }).promise();
+    },
+
+
+    /**
+     * Get Brazilian region for an state initials given
+     *
+     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @return {String}         Region (Norte, Sul, etc.)
+     * @example
+     *     locationHelpers.filteredRegion('SP'); // Sudeste
+     */
+    filteredRegion: function filteredRegion(state) {
+        var _this2 = this;
+
+        this._validateStateInitials(state);
+
+        var filteredRegion = '';
+
+        var _loop = function _loop(region) {
+            if ({}.hasOwnProperty.call(_this2._regionMap, region)) {
+                _this2._regionMap[region].some(function (el, i, arr) {
+                    if (globalHelpers.removeAccent(el.toLowerCase()) === globalHelpers.removeAccent(state.toLowerCase())) {
+                        filteredRegion = region;
+                    }
+                });
+            }
+        };
+
+        for (var region in this._regionMap) {
+            _loop(region);
+        }
+
+        return filteredRegion;
+    },
+
+
+    /**
+     * Get Brazilian name state and region for an state initials given
+     *
+     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @return {Object}         Object with state name, state initials and state region
+     * @example
+     *     locationHelpers.filteredState('SP') // {initials: 'SP', name: 'São Paulo', region: 'Sudeste'}
+     */
+    filteredState: function filteredState(state) {
+        this._validateStateInitials(state);
+
+        return globalHelpers.objectSearch(this._stateMap, { initials: state.toUpperCase() });
+    },
+    getStates: function getStates() {
+        return this._stateMap;
+    },
+    getRegions: function getRegions() {
+        return this._regionMap;
+    },
+
+
+    /**
+     * Validate if state is an initials
+     *
+     * @param  {String} state State to validate
+     * @return {Error}        Return an error if state not an initials
+     */
+    _validateStateInitials: function _validateStateInitials(state) {
+        if (state.length !== 2) {
+            throw new Error('\'state\' must be to letters. e.g. \'SP\'');
+        }
+    },
+
+
+    _stateMap: [{ name: 'Acre', initials: 'AC', region: 'Norte' }, { name: 'Alagoas', initials: 'AL', region: 'Nordeste' }, { name: 'Amapá', initials: 'AP', region: 'Norte' }, { name: 'Amazonas', initials: 'AM', region: 'Norte' }, { name: 'Bahia', initials: 'BA', region: 'Nordeste' }, { name: 'Ceará', initials: 'CE', region: 'Nordeste' }, { name: 'Distrito Federal', initials: 'DF', region: 'Centro Oeste' }, { name: 'Espírito Santo', initials: 'ES', region: 'Sudeste' }, { name: 'Goiás', initials: 'GO', region: 'Centro Oeste' }, { name: 'Maranhão', initials: 'MA', region: 'Nordeste' }, { name: 'Mato Grosso', initials: 'MT', region: 'Centro Oeste' }, { name: 'Mato Grosso do Sul', initials: 'MS', region: 'Centro Oeste' }, { name: 'Minas Gerais', initials: 'MG', region: 'Sudeste' }, { name: 'Pará', initials: 'PA', region: 'Norte' }, { name: 'Paraíba', initials: 'PB', region: 'Nordeste' }, { name: 'Paraná', initials: 'PR', region: 'Sul' }, { name: 'Pernambuco', initials: 'PE', region: 'Nordeste' }, { name: 'Piauí', initials: 'PI', region: 'Nordeste' }, { name: 'Rio de Janeiro', initials: 'RJ', region: 'Sudeste' }, { name: 'Rio Grande do Norte', initials: 'RN', region: 'Nordeste' }, { name: 'Rio Grande do Sul', initials: 'RS', region: 'Sul' }, { name: 'Rondônia', initials: 'RO', region: 'Norte' }, { name: 'Roraima', initials: 'RR', region: 'Norte' }, { name: 'Santa Catarina', initials: 'SC', region: 'Sul' }, { name: 'São Paulo', initials: 'SP', region: 'Sudeste' }, { name: 'Sergipe', initials: 'SE', region: 'Nordeste' }, { name: 'Tocantins', initials: 'TO', region: 'Norte' }],
+
+    _regionMap: (_regionMap = {}, defineProperty(_regionMap, 'Norte', ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO']), defineProperty(_regionMap, 'Nordeste', ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE']), defineProperty(_regionMap, 'Centro Oeste', ['DF', 'GO', 'MT', 'MS']), defineProperty(_regionMap, 'Sudeste', ['ES', 'MG', 'RJ', 'SP']), defineProperty(_regionMap, 'Sul', ['PR', 'RS', 'SC']), _regionMap)
+};
+
+/**
+ * Create a LocationHelpers class
+ */
+
+var LocationHelpers = function () {
+    function LocationHelpers() {
+        classCallCheck(this, LocationHelpers);
+    }
+
+    createClass(LocationHelpers, [{
+        key: 'getUserLocation',
+        value: function getUserLocation() {
+            return locationHelpers.getUserLocation();
+        }
+    }, {
+        key: 'getStates',
+        value: function getStates() {
+            return locationHelpers.getStates();
+        }
+    }, {
+        key: 'getRegions',
+        value: function getRegions() {
+            return locationHelpers.getRegions();
+        }
+    }, {
+        key: 'filteredState',
+        value: function filteredState(state) {
+            return locationHelpers.filteredState(state);
+        }
+    }, {
+        key: 'filteredRegion',
+        value: function filteredRegion(state) {
+            return locationHelpers.filteredRegion(state);
+        }
+    }]);
+    return LocationHelpers;
+}();
+
 /**
  * Create a VtexUtils class
  * Main class
@@ -2338,16 +2529,22 @@ var VtexUtils = function VtexUtils() {
   this.name = '@VtexUtils';
 
   /**
+   * Vtex Helpers instance
+   * @type {VtexHelpers}
+   */
+  this.vtexHelpers = new VtexHelpers();
+
+  /**
    * Global Helpers instance
    * @type {GlobalHelpers}
    */
   this.globalHelpers = new GlobalHelpers();
 
   /**
-   * Vtex Helpers instance
-   * @type {VtexHelpers}
+   * Location Helpers instance
+   * @type {LocationHelpers}
    */
-  this.vtexHelpers = new VtexHelpers();
+  this.locationHelpers = new LocationHelpers();
 
   /**
    * Local/Session Storage
