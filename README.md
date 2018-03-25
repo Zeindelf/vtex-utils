@@ -12,6 +12,7 @@ A collection of utilities methods for Vtex stores.
 - [Getting started](#getting-started)
 - [Vtex Methods](#vtex-methods)
 - [Global Methods](#global-methods)
+- [Location Methods](#location-methods)
 - [Tests](#tests)
 - [License](#license)
 - [Dependencies](#dependencies)
@@ -69,6 +70,9 @@ var vtexHelpers = vtexUtils.vtexHelpers;
 
 // GlobalHelpers
 var globalHelpers = vtexUtils.globalHelpers;
+
+// LocationHelpers
+var locationHelpers = vtexUtils.locationHelpers;
 ```
 
 ## Vtex Methods
@@ -970,6 +974,53 @@ Unserialize a query string into an object
 // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
 var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
 globalHelpers.unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+```
+
+
+## Location Methods
+
+### locationHelpers.getUserLocation()
+
+Get user location by HTML5 Geolocate API and translate coordinates to Brazilian State, City and Region
+
+#### Example
+
+```js
+locationHelpers.getCityState()
+  .then(function(res) {
+    window.console.log(res); // When success, response are an object with State, City, Region and user Coordinates
+  })
+  .fail(function(err) {
+    window.console.log(err);
+  });
+```
+
+### locationHelpers.filteredRegion(state)
+
+Get Brazilian region for an state initials given
+
+- **state**:
+  - Type: `String`
+  - Initials state (e.g. 'SP')
+
+#### Example
+
+```js
+locationHelpers.filteredRegion('SP'); // Sudeste
+```
+
+### locationHelpers.filteredState(state)
+
+Get Brazilian name state and region for an state initials given
+
+- **state**:
+  - Type: `String`
+  - Initials state (e.g. 'SP')
+
+#### Example
+
+```js
+locationHelpers.filteredState('SP') // {initials: 'SP', name: 'São Paulo', region: 'Sudeste'}
 ```
 
 

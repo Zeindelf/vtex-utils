@@ -10,10 +10,10 @@ export default {
      * @example
      *     locationHelpers.getCityState()
      *         .then(function(res) {
-     *             return window.console.log(res);
+     *             window.console.log(res);
      *         })
      *         .fail(function(err) {
-     *             return window.console.log(err);
+     *             window.console.log(err);
      *         });
      */
     getUserLocation() {
@@ -65,7 +65,7 @@ export default {
     /**
      * Get Brazilian region for an state initials given
      *
-     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @param  {String}  state  Initials state (e.g. 'SP')
      * @return {String}         Region (Norte, Sul, etc.)
      * @example
      *     locationHelpers.filteredRegion('SP'); // Sudeste
@@ -91,7 +91,7 @@ export default {
     /**
      * Get Brazilian name state and region for an state initials given
      *
-     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @param  {String}  state  Initials state (e.g. 'SP')
      * @return {Object}         Object with state name, state initials and state region
      * @example
      *     locationHelpers.filteredState('SP') // {initials: 'SP', name: 'São Paulo', region: 'Sudeste'}

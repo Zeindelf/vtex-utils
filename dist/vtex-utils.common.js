@@ -2345,10 +2345,10 @@ var locationHelpers = {
      * @example
      *     locationHelpers.getCityState()
      *         .then(function(res) {
-     *             return window.console.log(res);
+     *             window.console.log(res);
      *         })
      *         .fail(function(err) {
-     *             return window.console.log(err);
+     *             window.console.log(err);
      *         });
      */
     getUserLocation: function getUserLocation() {
@@ -2403,7 +2403,7 @@ var locationHelpers = {
     /**
      * Get Brazilian region for an state initials given
      *
-     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @param  {String}  state  Initials state (e.g. 'SP')
      * @return {String}         Region (Norte, Sul, etc.)
      * @example
      *     locationHelpers.filteredRegion('SP'); // Sudeste
@@ -2436,7 +2436,7 @@ var locationHelpers = {
     /**
      * Get Brazilian name state and region for an state initials given
      *
-     * @param  {String}  state  Initial state (e.g. 'SP')
+     * @param  {String}  state  Initials state (e.g. 'SP')
      * @return {Object}         Object with state name, state initials and state region
      * @example
      *     locationHelpers.filteredState('SP') // {initials: 'SP', name: 'São Paulo', region: 'Sudeste'}
