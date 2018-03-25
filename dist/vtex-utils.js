@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.2.0
+ * VtexUtils.js v1.3.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-25T01:28:17.520Z
+ * Date: 2018-03-25T02:23:13.727Z
  */
 
 (function (global, factory) {
@@ -2358,7 +2358,9 @@ var locationHelpers = {
     getUserLocation: function getUserLocation() {
         var _this = this;
 
+        /* eslint-disable */
         return $.Deferred(function (def) {
+            /* eslint-enable */
             if (window.navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     var lat = position.coords.latitude;
@@ -2526,7 +2528,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.2.0';
+  this.version = '1.3.0';
 
   /**
    * Package name

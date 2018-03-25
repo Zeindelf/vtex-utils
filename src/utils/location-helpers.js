@@ -17,7 +17,9 @@ export default {
      *         });
      */
     getUserLocation() {
+        /* eslint-disable */
         return $.Deferred((def) => {
+            /* eslint-enable */
             if ( window.navigator.geolocation ) {
                 navigator.geolocation.getCurrentPosition((position) => {
                     const lat = position.coords.latitude;
