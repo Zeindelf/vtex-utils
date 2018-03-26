@@ -40,7 +40,7 @@ class VtexUtils {
          * Location Helpers instance
          * @type {LocationHelpers}
          */
-        this.locationHelpers = new LocationHelpers();
+        this.locationHelpers = new LocationHelpers(store);
 
         /**
          * Local/Session Storage

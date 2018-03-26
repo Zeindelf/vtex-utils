@@ -5,8 +5,12 @@ import locationHelpers from './../utils/location-helpers.js';
  * Create a LocationHelpers class
  */
 class LocationHelpers {
-    getUserLocation() {
-        return locationHelpers.getUserLocation();
+    constructor(store) {
+        this._storage = store;
+    }
+
+    getUserLocation(cache) {
+        return locationHelpers.getUserLocation(cache, this._storage);
     }
 
     getStates() {

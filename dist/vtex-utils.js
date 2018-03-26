@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-25T02:23:13.727Z
+ * Date: 2018-03-26T03:22:04.518Z
  */
 
 (function (global, factory) {
@@ -2340,6 +2340,11 @@ var GlobalHelpers = function () {
 
 var _regionMap;
 
+var CONSTANTS = {
+    STORAGE_NAME: '__location',
+    EXPIRE_TIME: 60 * 60 * 4 // Seconds * Minutes * Hours (default: 4h)
+};
+
 var locationHelpers = {
     /**
      * Get user location by HTML5 Geolocate API and translate coordinates to
@@ -2355,52 +2360,67 @@ var locationHelpers = {
      *             window.console.log(err);
      *         });
      */
-    getUserLocation: function getUserLocation() {
+    getUserLocation: function getUserLocation(cache, storage) {
         var _this = this;
+
+        if (cache) {
+            this._initLocationStorage(storage);
+        }
+
+        var store = storage.session.get(CONSTANTS.STORAGE_NAME);
 
         /* eslint-disable */
         return $.Deferred(function (def) {
             /* eslint-enable */
-            if (window.navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    var lat = position.coords.latitude;
-                    var lng = position.coords.longitude;
+            if (!validateHelpers.isObjectEmpty(store)) {
+                def.resolve(store);
+            } else {
+                if (window.navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        var lat = position.coords.latitude;
+                        var lng = position.coords.longitude;
 
-                    if (!window.google) {
-                        return def.reject('Google Maps Javascript API not found. Follow tutorial: https://developers.google.com/maps/documentation/javascript');
-                    }
+                        if (!window.google) {
+                            return def.reject('Google Maps Javascript API not found. Follow tutorial: https://developers.google.com/maps/documentation/javascript');
+                        }
 
-                    var latlng = new google.maps.LatLng(lat, lng);
-                    var geocoder = new google.maps.Geocoder();
+                        var latlng = new google.maps.LatLng(lat, lng);
+                        var geocoder = new google.maps.Geocoder();
 
-                    geocoder.geocode({ 'latLng': latlng }, function (results, status) {
-                        if (status === google.maps.GeocoderStatus.OK) {
-                            if (results[1]) {
-                                for (var i = 0, len = results.length; i < len; i += 1) {
-                                    if (results[i].types[0] === 'locality') {
-                                        var city = results[i].address_components[0].short_name;
-                                        var state = results[i].address_components[2].short_name;
+                        geocoder.geocode({ 'latLng': latlng }, function (results, status) {
+                            if (status === google.maps.GeocoderStatus.OK) {
+                                if (results[1]) {
+                                    for (var i = 0, len = results.length; i < len; i += 1) {
+                                        if (results[i].types[0] === 'locality') {
+                                            var city = results[i].address_components[0].short_name;
+                                            var state = results[i].address_components[2].short_name;
+                                            var storeLocation = {
+                                                coords: { lat: lat, lng: lng },
+                                                city: city,
+                                                state: state,
+                                                region: _this.filteredRegion(state)
+                                            };
 
-                                        def.resolve({
-                                            coords: { lat: lat, lng: lng },
-                                            city: city,
-                                            state: state,
-                                            region: _this.filteredRegion(state)
-                                        });
+                                            if (cache) {
+                                                storage.session.set(CONSTANTS.STORAGE_NAME, storeLocation, CONSTANTS.EXPIRE_TIME);
+                                            }
+
+                                            def.resolve(storeLocation);
+                                        }
                                     }
+                                } else {
+                                    def.reject('No reverse geocode results.');
                                 }
                             } else {
-                                def.reject('No reverse geocode results.');
+                                def.reject('Geocoder failed: ' + status);
                             }
-                        } else {
-                            def.reject('Geocoder failed: ' + status);
-                        }
+                        });
+                    }, function (err) {
+                        def.reject('Geolocation not available.');
                     });
-                }, function (err) {
-                    def.reject('Geolocation not available.');
-                });
-            } else {
-                def.reject('Geolocation isn\'t available');
+                } else {
+                    def.reject('Geolocation isn\'t available');
+                }
             }
         }).promise();
     },
@@ -2475,7 +2495,13 @@ var locationHelpers = {
 
     _stateMap: [{ name: 'Acre', initials: 'AC', region: 'Norte' }, { name: 'Alagoas', initials: 'AL', region: 'Nordeste' }, { name: 'Amapá', initials: 'AP', region: 'Norte' }, { name: 'Amazonas', initials: 'AM', region: 'Norte' }, { name: 'Bahia', initials: 'BA', region: 'Nordeste' }, { name: 'Ceará', initials: 'CE', region: 'Nordeste' }, { name: 'Distrito Federal', initials: 'DF', region: 'Centro Oeste' }, { name: 'Espírito Santo', initials: 'ES', region: 'Sudeste' }, { name: 'Goiás', initials: 'GO', region: 'Centro Oeste' }, { name: 'Maranhão', initials: 'MA', region: 'Nordeste' }, { name: 'Mato Grosso', initials: 'MT', region: 'Centro Oeste' }, { name: 'Mato Grosso do Sul', initials: 'MS', region: 'Centro Oeste' }, { name: 'Minas Gerais', initials: 'MG', region: 'Sudeste' }, { name: 'Pará', initials: 'PA', region: 'Norte' }, { name: 'Paraíba', initials: 'PB', region: 'Nordeste' }, { name: 'Paraná', initials: 'PR', region: 'Sul' }, { name: 'Pernambuco', initials: 'PE', region: 'Nordeste' }, { name: 'Piauí', initials: 'PI', region: 'Nordeste' }, { name: 'Rio de Janeiro', initials: 'RJ', region: 'Sudeste' }, { name: 'Rio Grande do Norte', initials: 'RN', region: 'Nordeste' }, { name: 'Rio Grande do Sul', initials: 'RS', region: 'Sul' }, { name: 'Rondônia', initials: 'RO', region: 'Norte' }, { name: 'Roraima', initials: 'RR', region: 'Norte' }, { name: 'Santa Catarina', initials: 'SC', region: 'Sul' }, { name: 'São Paulo', initials: 'SP', region: 'Sudeste' }, { name: 'Sergipe', initials: 'SE', region: 'Nordeste' }, { name: 'Tocantins', initials: 'TO', region: 'Norte' }],
 
-    _regionMap: (_regionMap = {}, defineProperty(_regionMap, 'Norte', ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO']), defineProperty(_regionMap, 'Nordeste', ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE']), defineProperty(_regionMap, 'Centro Oeste', ['DF', 'GO', 'MT', 'MS']), defineProperty(_regionMap, 'Sudeste', ['ES', 'MG', 'RJ', 'SP']), defineProperty(_regionMap, 'Sul', ['PR', 'RS', 'SC']), _regionMap)
+    _regionMap: (_regionMap = {}, defineProperty(_regionMap, 'Norte', ['AC', 'AP', 'AM', 'PA', 'RO', 'RR', 'TO']), defineProperty(_regionMap, 'Nordeste', ['AL', 'BA', 'CE', 'MA', 'PB', 'PE', 'PI', 'RN', 'SE']), defineProperty(_regionMap, 'Centro Oeste', ['DF', 'GO', 'MT', 'MS']), defineProperty(_regionMap, 'Sudeste', ['ES', 'MG', 'RJ', 'SP']), defineProperty(_regionMap, 'Sul', ['PR', 'RS', 'SC']), _regionMap),
+
+    _initLocationStorage: function _initLocationStorage(storage) {
+        if (validateHelpers.isNull(storage.session.get(CONSTANTS.STORAGE_NAME))) {
+            storage.session.set(CONSTANTS.STORAGE_NAME, {});
+        }
+    }
 };
 
 /**
@@ -2483,14 +2509,16 @@ var locationHelpers = {
  */
 
 var LocationHelpers = function () {
-    function LocationHelpers() {
+    function LocationHelpers(store) {
         classCallCheck(this, LocationHelpers);
+
+        this._storage = store;
     }
 
     createClass(LocationHelpers, [{
         key: 'getUserLocation',
-        value: function getUserLocation() {
-            return locationHelpers.getUserLocation();
+        value: function getUserLocation(cache) {
+            return locationHelpers.getUserLocation(cache, this._storage);
         }
     }, {
         key: 'getStates',
@@ -2552,7 +2580,7 @@ var VtexUtils = function VtexUtils() {
    * Location Helpers instance
    * @type {LocationHelpers}
    */
-  this.locationHelpers = new LocationHelpers();
+  this.locationHelpers = new LocationHelpers(store);
 
   /**
    * Local/Session Storage

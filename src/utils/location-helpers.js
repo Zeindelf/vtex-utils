@@ -1,5 +1,11 @@
 
 import globalHelpers from './global-helpers.js';
+import validateHelpers from './validate-helpers.js';
+
+const CONSTANTS = {
+    STORAGE_NAME: '__location',
+    EXPIRE_TIME: 60 * 60 * 4, // Seconds * Minutes * Hours (default: 4h)
+};
 
 export default {
     /**
@@ -16,50 +22,65 @@ export default {
      *             window.console.log(err);
      *         });
      */
-    getUserLocation() {
+    getUserLocation(cache, storage) {
+        if ( cache ) {
+            this._initLocationStorage(storage);
+        }
+
+        const store = storage.session.get(CONSTANTS.STORAGE_NAME);
+
         /* eslint-disable */
         return $.Deferred((def) => {
             /* eslint-enable */
-            if ( window.navigator.geolocation ) {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
+            if ( ! validateHelpers.isObjectEmpty(store) ) {
+                def.resolve(store);
+            } else {
+                if ( window.navigator.geolocation ) {
+                    navigator.geolocation.getCurrentPosition((position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
 
-                    if ( ! window.google ) {
-                        return def.reject('Google Maps Javascript API not found. Follow tutorial: https://developers.google.com/maps/documentation/javascript');
-                    }
+                        if ( ! window.google ) {
+                            return def.reject('Google Maps Javascript API not found. Follow tutorial: https://developers.google.com/maps/documentation/javascript');
+                        }
 
-                    const latlng = new google.maps.LatLng(lat, lng);
-                    const geocoder = new google.maps.Geocoder();
+                        const latlng = new google.maps.LatLng(lat, lng);
+                        const geocoder = new google.maps.Geocoder();
 
-                    geocoder.geocode({'latLng': latlng}, (results, status) => {
-                        if ( status === google.maps.GeocoderStatus.OK ) {
-                            if ( results[1] ) {
-                                for ( let i = 0, len = results.length; i < len; i += 1 ) {
-                                    if ( results[i].types[0] === 'locality' ) {
-                                        const city = results[i].address_components[0].short_name;
-                                        const state = results[i].address_components[2].short_name;
+                        geocoder.geocode({'latLng': latlng}, (results, status) => {
+                            if ( status === google.maps.GeocoderStatus.OK ) {
+                                if ( results[1] ) {
+                                    for ( let i = 0, len = results.length; i < len; i += 1 ) {
+                                        if ( results[i].types[0] === 'locality' ) {
+                                            const city = results[i].address_components[0].short_name;
+                                            const state = results[i].address_components[2].short_name;
+                                            const storeLocation = {
+                                                coords: {lat: lat, lng: lng},
+                                                city: city,
+                                                state: state,
+                                                region: this.filteredRegion(state),
+                                            };
 
-                                        def.resolve({
-                                            coords: {lat: lat, lng: lng},
-                                            city: city,
-                                            state: state,
-                                            region: this.filteredRegion(state),
-                                        });
+                                            if ( cache ) {
+                                                storage.session.set(CONSTANTS.STORAGE_NAME, storeLocation, CONSTANTS.EXPIRE_TIME);
+                                            }
+
+                                            def.resolve(storeLocation);
+                                        }
                                     }
+                                } else {
+                                    def.reject('No reverse geocode results.');
                                 }
                             } else {
-                                def.reject('No reverse geocode results.');
+                                def.reject(`Geocoder failed: ${status}`);
                             }
-                        } else {
-                            def.reject(`Geocoder failed: ${status}`);
-                        }
+                        });
+                    }, (err) => {
+                        def.reject('Geolocation not available.');
                     });
-                }, (err) => {
-                    def.reject('Geolocation not available.');
-                });
-            } else {
-                def.reject(`Geolocation isn't available`);
+                } else {
+                    def.reject(`Geolocation isn't available`);
+                }
             }
         }).promise();
     },
@@ -160,5 +181,11 @@ export default {
         ['Centro Oeste']: ['DF', 'GO', 'MT', 'MS'],
         ['Sudeste']: ['ES', 'MG', 'RJ', 'SP'],
         ['Sul']: ['PR', 'RS', 'SC'],
+    },
+
+    _initLocationStorage(storage) {
+        if ( validateHelpers.isNull(storage.session.get(CONSTANTS.STORAGE_NAME)) ) {
+            storage.session.set(CONSTANTS.STORAGE_NAME, {});
+        }
     },
 };
