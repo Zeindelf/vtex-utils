@@ -56,6 +56,9 @@ export default {
             return src;
         }
 
+        width = Math.round(width);
+        height = Math.round(height);
+
         src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, function(match, matchedWidth, matchedHeight) {
             return match.replace('-' + matchedWidth + '-' + matchedHeight, '-' + width + '-' + height);
         });
@@ -80,8 +83,8 @@ export default {
      *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, 2133, 3200);
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
-    getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
-        const newValue = globalHelpers.resizeImageProportionally(type, newSize, originalWidth, originalHeight);
+    getResizeImageByRatio(src, type, newSize, aspectRatio) {
+        const newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
 
         return this.getResizedImage(src, newValue.width, newValue.height);
     },

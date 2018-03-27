@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-27T00:20:35.716Z
+ * Date: 2018-03-27T03:25:30.563Z
  */
 
 'use strict';
@@ -814,48 +814,35 @@ var globalHelpers = {
 
 
     /**
-     * Resize image by width or height given
+     * Resize image by aspect ratio
      *
      * @param  {String} type           Resize by 'width' or 'height'
-     * @param  {Number} newValue       New value to resize
-     * @param  {Number} originalWidth  Image original Width
-     * @param  {Number} originalHeight Image original Height
+     * @param  {Number} newSize       New value to resize
+     * @param  {Number} aspectRatio    Image aspect ratio (calculate by (width / height))
      * @return {Object}                Object with new 'width' and 'height'
      */
-    resizeImageProportionally: function resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
-        if (!(parseFloat(newValue) && parseFloat(originalWidth) && parseFloat(originalHeight))) {
-            throw new Error('\'newValue\', \'originalWidth\' and \'originalHeight\' must de a Number');
+    resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
+        if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
+            throw new Error('\'newSize\' and \'aspectRatio\' must de a Number');
         }
 
-        // Declare new aspect ratio value
-        var aspectRatio = originalWidth / originalHeight;
         var dimensions = {};
 
-        // Choose which formula to use
         switch (type) {
             case 'width':
-                dimensions = {
-                    width: parseInt(newValue, 10),
-                    height: parseInt(Math.floor(newValue / aspectRatio), 10)
-                };
+                dimensions.width = parseFloat(newSize);
+                dimensions.height = parseFloat(newSize / aspectRatio);
 
                 break;
 
             case 'height':
-                dimensions = {
-                    width: parseInt(Math.floor(newValue * aspectRatio), 10),
-                    height: parseInt(newValue, 10)
-                };
+                dimensions.width = parseFloat(newSize * aspectRatio);
+                dimensions.height = parseFloat(newSize);
 
                 break;
 
             default:
-                dimensions = {
-                    width: parseInt(originalWidth, 10),
-                    height: parseInt(originalHeight, 10)
-                };
-
-                break;
+                throw new Error('\'type\' needs to be \'width\' or \'height\'');
         }
 
         return dimensions;
@@ -1228,6 +1215,9 @@ var vtexHelpers = {
             return src;
         }
 
+        width = Math.round(width);
+        height = Math.round(height);
+
         src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, function (match, matchedWidth, matchedHeight) {
             return match.replace('-' + matchedWidth + '-' + matchedHeight, '-' + width + '-' + height);
         });
@@ -1253,8 +1243,8 @@ var vtexHelpers = {
      *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, 2133, 3200);
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
-    getResizeImageProportionally: function getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
-        var newValue = globalHelpers.resizeImageProportionally(type, newSize, originalWidth, originalHeight);
+    getResizeImageByRatio: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
+        var newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
 
         return this.getResizedImage(src, newValue.width, newValue.height);
     },
@@ -1663,8 +1653,12 @@ if ('rivets' in window) {
         return vtexHelpers.getResizedImage(val, arg1, arg2);
     };
 
-    rivets.formatters.getResizeImageProportionally = function (val, type, newSize, originalWidth, originalHeight) {
-        return vtexHelpers.getResizeImageProportionally(val, type, newSize, originalWidth, originalHeight);
+    rivets.formatters.getResizedImage = function (val, arg1, arg2) {
+        return vtexHelpers.getResizedImage(val, arg1, arg2);
+    };
+
+    rivets.formatters.getResizeImageByRatio = function (src, type, newSize, aspectRatio) {
+        return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     };
 
     rivets.formatters.replaceBreakLines = function (val) {
@@ -2131,9 +2125,9 @@ var VtexHelpers = function () {
             return vtexHelpers.getResizedImage(src, width, height);
         }
     }, {
-        key: 'getResizeImageProportionally',
-        value: function getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
-            return vtexHelpers.getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight);
+        key: 'getResizeImageByRatio',
+        value: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
+            return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
         }
     }, {
         key: 'getServerTime',
@@ -2368,9 +2362,9 @@ var GlobalHelpers = function () {
             return globalHelpers.removeAccent(str);
         }
     }, {
-        key: 'resizeImageProportionally',
-        value: function resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
-            return globalHelpers.resizeImageProportionally(type, newValue, originalWidth, originalHeight);
+        key: 'resizeImageByRatio',
+        value: function resizeImageByRatio(type, newValue, aspectRatio) {
+            return globalHelpers.resizeImageByRatio(type, newValue, aspectRatio);
         }
     }, {
         key: 'shuffleArray',

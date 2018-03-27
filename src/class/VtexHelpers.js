@@ -22,8 +22,8 @@ class VtexHelpers {
         return vtexHelpers.getResizedImage(src, width, height);
     }
 
-    getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
-        return vtexHelpers.getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight);
+    getResizeImageByRatio(src, type, newSize, aspectRatio) {
+        return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     }
 
     getServerTime(callback) {

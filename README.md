@@ -986,7 +986,7 @@ Get user location by HTML5 Geolocate API and translate coordinates to Brazilian 
 #### Example
 
 ```js
-locationHelpers.getCityState()
+locationHelpers.getUserLocation()
   .then(function(res) {
     window.console.log(res); // When success, response are an object with State, City, Region and user Coordinates
   })

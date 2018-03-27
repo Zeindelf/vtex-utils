@@ -511,48 +511,35 @@ export default {
     },
 
     /**
-     * Resize image by width or height given
+     * Resize image by aspect ratio
      *
      * @param  {String} type           Resize by 'width' or 'height'
-     * @param  {Number} newValue       New value to resize
-     * @param  {Number} originalWidth  Image original Width
-     * @param  {Number} originalHeight Image original Height
+     * @param  {Number} newSize       New value to resize
+     * @param  {Number} aspectRatio    Image aspect ratio (calculate by (width / height))
      * @return {Object}                Object with new 'width' and 'height'
      */
-    resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
-        if ( ! (parseFloat(newValue) && parseFloat(originalWidth) && parseFloat(originalHeight)) ) {
-            throw new Error(`'newValue', 'originalWidth' and 'originalHeight' must de a Number`);
+    resizeImageByRatio(type, newSize, aspectRatio) {
+        if ( ! validateHelpers.isNumber(newSize) || ! validateHelpers.isNumber(aspectRatio) ) {
+            throw new Error(`'newSize' and 'aspectRatio' must de a Number`);
         }
 
-        // Declare new aspect ratio value
-        const aspectRatio = (originalWidth / originalHeight);
-        let dimensions = {};
+        const dimensions = {};
 
-        // Choose which formula to use
         switch ( type ) {
             case 'width':
-                dimensions = {
-                    width: parseInt(newValue, 10),
-                    height: parseInt(Math.floor((newValue / aspectRatio)), 10),
-                };
+                dimensions.width = parseFloat(newSize);
+                dimensions.height = parseFloat((newSize / aspectRatio));
 
                 break;
 
             case 'height':
-                dimensions = {
-                    width: parseInt(Math.floor((newValue * aspectRatio)), 10),
-                    height: parseInt(newValue, 10),
-                };
+                dimensions.width = parseFloat((newSize * aspectRatio));
+                dimensions.height = parseFloat(newSize);
 
                 break;
 
             default:
-                dimensions = {
-                    width: parseInt(originalWidth, 10),
-                    height: parseInt(originalHeight, 10),
-                };
-
-                break;
+                throw new Error(`'type' needs to be 'width' or 'height'`);
         }
 
         return dimensions;
