@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.3.5
+ * VtexUtils.js v1.4.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-26T23:41:26.527Z
+ * Date: 2018-03-27T00:20:35.716Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -2637,7 +2637,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.3.5';
+  this.version = '1.4.0';
 
   /**
    * Package name
