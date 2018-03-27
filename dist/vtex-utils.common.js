@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.4.0
+ * VtexUtils.js v1.4.5
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-27T03:25:30.563Z
+ * Date: 2018-03-27T04:23:58.974Z
  */
 
 'use strict';
@@ -2632,7 +2632,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.4.0';
+  this.version = '1.4.5';
 
   /**
    * Package name
