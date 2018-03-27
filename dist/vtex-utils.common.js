@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.4.5
+ * VtexUtils.js v1.4.6
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-27T15:04:21.845Z
+ * Date: 2018-03-27T15:26:03.590Z
  */
 
 'use strict';
@@ -826,9 +826,6 @@ var globalHelpers = {
             newSize = parseFloat(newSize);
             aspectRatio = parseFloat(aspectRatio);
         }
-
-        window.console.log(newSize);
-        window.console.log(aspectRatio);
 
         var dimensions = {};
 
@@ -2636,7 +2633,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.4.5';
+  this.version = '1.4.6';
 
   /**
    * Package name

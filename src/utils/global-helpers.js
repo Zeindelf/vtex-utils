@@ -524,9 +524,6 @@ export default {
             aspectRatio = parseFloat(aspectRatio);
         }
 
-        window.console.log(newSize);
-        window.console.log(aspectRatio);
-
         const dimensions = {};
 
         switch ( type ) {
