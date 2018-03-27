@@ -155,6 +155,42 @@ vtexHelpers.getResizedImage('http://domain.vteximg.com.br/arquivos/ids/155242/im
 // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
 ```
 
+
+### vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio)
+
+Resize proportionally an VTEX image by aspect ratio
+
+- **src**:
+  - Type: `String`
+  - The source of the image
+
+- **type**:
+  - Type: `String`
+  - Type to resize (width or height)
+
+- **newSize**:
+  - Type: `Number`
+  - New size to redimensioning
+
+- **aspectRatio**:
+  - Type: `Number`
+  - Image aspect ratio (calculate by (width / height))
+
+#### Example
+
+```js
+var imgSrc = 'http://domain.vteximg.com.br/arquivos/ids/155242-292-292/image.png';
+var newSize = 250;
+var aspectRatio = (10/15);
+
+vtexHelpers.getResizeImageByRatio(imgSrc, 'width', newSize, aspectRatio);
+// http://domain.vteximg.com.br/arquivos/ids/155242-250-375/image.png
+
+vtexHelpers.getResizeImageByRatio(imgSrc, 'height', newSize, aspectRatio);
+// http://domain.vteximg.com.br/arquivos/ids/155242-167-250/image.png
+```
+
+
 ### vtexHelpers.getServerTime(callback)
 
 Get the Vtex server time
@@ -810,6 +846,32 @@ Remove accents from a strin
 ```js
 globalHelpers.removeAccent('Olá Mündô!'); // 'Ola Mundo!'
 ```
+
+### globalHelpers.resizeImageByRatio(type, newSize, aspectRatio)
+
+Resize image by aspect ratio
+
+- **type**:
+  - Type: `String`
+  - Resize by 'width' or 'height'
+
+- **newSize**:
+  - Type: `Number`
+  - New value to resize
+
+- **aspectRatio**:
+  - Type: `Number`
+  - Image aspect ratio (calculate by (originalWidth / originalHeight))
+
+#### Example
+
+```js
+var newSize = 1920;
+var aspectRatio = (16/9);
+
+var resized = globalHelpers.resizeImageByRatio('width', newSize, aspectRatio); // {width: 1920, height: 1080}
+```
+
 
 ### globalHelpers.shuffleArray(array)
 

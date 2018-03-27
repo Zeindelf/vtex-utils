@@ -816,10 +816,10 @@ var globalHelpers = {
     /**
      * Resize image by aspect ratio
      *
-     * @param  {String} type           Resize by 'width' or 'height'
+     * @param  {String} type          Resize by 'width' or 'height'
      * @param  {Number} newSize       New value to resize
-     * @param  {Number} aspectRatio    Image aspect ratio (calculate by (width / height))
-     * @return {Object}                Object with new 'width' and 'height'
+     * @param  {Number} aspectRatio   Image aspect ratio (calculate by (width / height))
+     * @return {Object}               Object with new 'width' and 'height'
      */
     resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
         if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
@@ -1227,20 +1227,19 @@ var vtexHelpers = {
 
 
     /**
-     * Resize proportionally an VTEX image by width or height given
+     * Resize proportionally an VTEX image by aspect ratio
      *
      * @param {string}      [src]               The source of the image
      * @param {String}      [type]              Type to resize (width or height)
      * @param {Number}      [newSize]           New size to redimensioning
-     * @param {int|string}  [originalWidth]     The image original with
-     * @param {int|string}  [originalHeight]    The image original height
-     * @return {string} The resized image source
+     * @param  {Number}     [aspectRatio]       Image aspect ratio (calculate by (width / height))
+     * @return {string}                         The resized image source
      * @example
      *     var imgSrc = 'http://domain.vteximg.com.br/arquivos/ids/155242/image.png';
-     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'width', 150, 2133, 3200);
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'width', 150, (10/15));
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-150-225/image.png
      *
-     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, 2133, 3200);
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, (10/15));
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
     getResizeImageByRatio: function getResizeImageByRatio(src, type, newSize, aspectRatio) {

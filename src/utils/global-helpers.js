@@ -513,10 +513,10 @@ export default {
     /**
      * Resize image by aspect ratio
      *
-     * @param  {String} type           Resize by 'width' or 'height'
+     * @param  {String} type          Resize by 'width' or 'height'
      * @param  {Number} newSize       New value to resize
-     * @param  {Number} aspectRatio    Image aspect ratio (calculate by (width / height))
-     * @return {Object}                Object with new 'width' and 'height'
+     * @param  {Number} aspectRatio   Image aspect ratio (calculate by (width / height))
+     * @return {Object}               Object with new 'width' and 'height'
      */
     resizeImageByRatio(type, newSize, aspectRatio) {
         if ( ! validateHelpers.isNumber(newSize) || ! validateHelpers.isNumber(aspectRatio) ) {
