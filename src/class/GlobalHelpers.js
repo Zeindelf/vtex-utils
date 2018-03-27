@@ -149,6 +149,10 @@ class GlobalHelpers {
         return globalHelpers.removeAccent(str);
     }
 
+    resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
+        return globalHelpers.resizeImageProportionally(type, newValue, originalWidth, originalHeight);
+    }
+
     shuffleArray(array) {
         return globalHelpers.shuffleArray(array);
     }

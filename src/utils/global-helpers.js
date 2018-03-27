@@ -511,6 +511,54 @@ export default {
     },
 
     /**
+     * Resize image by width or height given
+     *
+     * @param  {String} type           Resize by 'width' or 'height'
+     * @param  {Number} newValue       New value to resize
+     * @param  {Number} originalWidth  Image original Width
+     * @param  {Number} originalHeight Image original Height
+     * @return {Object}                Object with new 'width' and 'height'
+     */
+    resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
+        if ( ! (parseFloat(newValue) && parseFloat(originalWidth) && parseFloat(originalHeight)) ) {
+            throw new Error(`'newValue', 'originalWidth' and 'originalHeight' must de a Number`);
+        }
+
+        // Declare new aspect ratio value
+        const aspectRatio = (originalWidth / originalHeight);
+        let dimensions = {};
+
+        // Choose which formula to use
+        switch ( type ) {
+            case 'width':
+                dimensions = {
+                    width: parseInt(newValue, 10),
+                    height: parseInt(Math.floor((newValue / aspectRatio)), 10),
+                };
+
+                break;
+
+            case 'height':
+                dimensions = {
+                    width: parseInt(Math.floor((newValue * aspectRatio)), 10),
+                    height: parseInt(newValue, 10),
+                };
+
+                break;
+
+            default:
+                dimensions = {
+                    width: parseInt(originalWidth, 10),
+                    height: parseInt(originalHeight, 10),
+                };
+
+                break;
+        }
+
+        return dimensions;
+    },
+
+    /**
      * Randomize a array elements with Fisher–Yates shuffle algorithm base
      * @param {array} array - The array to randomize
      * @return {array} The new modified array

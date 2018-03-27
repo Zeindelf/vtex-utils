@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-26T04:00:26.361Z
+ * Date: 2018-03-26T23:41:26.527Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -812,6 +812,55 @@ var globalHelpers = {
 
 
     /**
+     * Resize image by width or height given
+     *
+     * @param  {String} type           Resize by 'width' or 'height'
+     * @param  {Number} newValue       New value to resize
+     * @param  {Number} originalWidth  Image original Width
+     * @param  {Number} originalHeight Image original Height
+     * @return {Object}                Object with new 'width' and 'height'
+     */
+    resizeImageProportionally: function resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
+        if (!(parseFloat(newValue) && parseFloat(originalWidth) && parseFloat(originalHeight))) {
+            throw new Error('\'newValue\', \'originalWidth\' and \'originalHeight\' must de a Number');
+        }
+
+        // Declare new aspect ratio value
+        var aspectRatio = originalWidth / originalHeight;
+        var dimensions = {};
+
+        // Choose which formula to use
+        switch (type) {
+            case 'width':
+                dimensions = {
+                    width: parseInt(newValue, 10),
+                    height: parseInt(Math.floor(newValue / aspectRatio), 10)
+                };
+
+                break;
+
+            case 'height':
+                dimensions = {
+                    width: parseInt(Math.floor(newValue * aspectRatio), 10),
+                    height: parseInt(newValue, 10)
+                };
+
+                break;
+
+            default:
+                dimensions = {
+                    width: parseInt(originalWidth, 10),
+                    height: parseInt(originalHeight, 10)
+                };
+
+                break;
+        }
+
+        return dimensions;
+    },
+
+
+    /**
      * Randomize a array elements with Fisher–Yates shuffle algorithm base
      * @param {array} array - The array to randomize
      * @return {array} The new modified array
@@ -1182,6 +1231,30 @@ var vtexHelpers = {
         });
 
         return src.replace(/(ids\/[0-9]+)\//, '$1-' + width + '-' + height + '/');
+    },
+
+
+    /**
+     * Resize proportionally an VTEX image by width or height given
+     *
+     * @param {string}      [src]               The source of the image
+     * @param {String}      [type]              Type to resize (width or height)
+     * @param {Number}      [newSize]           New size to redimensioning
+     * @param {int|string}  [originalWidth]     The image original with
+     * @param {int|string}  [originalHeight]    The image original height
+     * @return {string} The resized image source
+     * @example
+     *     var imgSrc = 'http://domain.vteximg.com.br/arquivos/ids/155242/image.png';
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'width', 150, 2133, 3200);
+     *     // http://domain.vteximg.com.br/arquivos/ids/155242-150-225/image.png
+     *
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, 2133, 3200);
+     *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
+     */
+    getResizeImageProportionally: function getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
+        var newValue = globalHelpers.resizeImageProportionally(type, newSize, originalWidth, originalHeight);
+
+        return this.getResizedImage(src, newValue.width, newValue.height);
     },
 
 
@@ -1586,6 +1659,10 @@ if ('rivets' in window) {
 
     rivets.formatters.productImgSize = function (val, arg1, arg2) {
         return vtexHelpers.getResizedImage(val, arg1, arg2);
+    };
+
+    rivets.formatters.getResizeImageProportionally = function (val, type, newSize, originalWidth, originalHeight) {
+        return vtexHelpers.getResizeImageProportionally(val, type, newSize, originalWidth, originalHeight);
     };
 
     rivets.formatters.replaceBreakLines = function (val) {
@@ -2052,6 +2129,11 @@ var VtexHelpers = function () {
             return vtexHelpers.getResizedImage(src, width, height);
         }
     }, {
+        key: 'getResizeImageProportionally',
+        value: function getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
+            return vtexHelpers.getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight);
+        }
+    }, {
         key: 'getServerTime',
         value: function getServerTime(callback) {
             return vtexHelpers.getServerTime(callback);
@@ -2282,6 +2364,11 @@ var GlobalHelpers = function () {
         key: 'removeAccent',
         value: function removeAccent(str) {
             return globalHelpers.removeAccent(str);
+        }
+    }, {
+        key: 'resizeImageProportionally',
+        value: function resizeImageProportionally(type, newValue, originalWidth, originalHeight) {
+            return globalHelpers.resizeImageProportionally(type, newValue, originalWidth, originalHeight);
         }
     }, {
         key: 'shuffleArray',

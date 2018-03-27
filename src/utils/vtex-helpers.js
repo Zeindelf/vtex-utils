@@ -64,6 +64,29 @@ export default {
     },
 
     /**
+     * Resize proportionally an VTEX image by width or height given
+     *
+     * @param {string}      [src]               The source of the image
+     * @param {String}      [type]              Type to resize (width or height)
+     * @param {Number}      [newSize]           New size to redimensioning
+     * @param {int|string}  [originalWidth]     The image original with
+     * @param {int|string}  [originalHeight]    The image original height
+     * @return {string} The resized image source
+     * @example
+     *     var imgSrc = 'http://domain.vteximg.com.br/arquivos/ids/155242/image.png';
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'width', 150, 2133, 3200);
+     *     // http://domain.vteximg.com.br/arquivos/ids/155242-150-225/image.png
+     *
+     *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, 2133, 3200);
+     *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
+     */
+    getResizeImageProportionally(src, type, newSize, originalWidth, originalHeight) {
+        const newValue = globalHelpers.resizeImageProportionally(type, newSize, originalWidth, originalHeight);
+
+        return this.getResizedImage(src, newValue.width, newValue.height);
+    },
+
+    /**
      * Get the Vtex server time
      * @param {function} callback - The callback to call when the request finishes. The callback will a javascript Date object.
      * @return {promise} - jquery Ajax promise

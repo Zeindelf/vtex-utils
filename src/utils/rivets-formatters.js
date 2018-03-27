@@ -209,6 +209,10 @@ if ( 'rivets' in window ) {
         return vtexHelpers.getResizedImage(val, arg1, arg2);
     };
 
+    rivets.formatters.getResizeImageProportionally = (val, type, newSize, originalWidth, originalHeight) => {
+        return vtexHelpers.getResizeImageProportionally(val, type, newSize, originalWidth, originalHeight);
+    };
+
     rivets.formatters.replaceBreakLines = (val) => {
         return vtexHelpers.replaceBreakLines(val);
     };
