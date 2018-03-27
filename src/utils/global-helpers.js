@@ -520,8 +520,12 @@ export default {
      */
     resizeImageByRatio(type, newSize, aspectRatio) {
         if ( ! validateHelpers.isNumber(newSize) || ! validateHelpers.isNumber(aspectRatio) ) {
-            throw new Error(`'newSize' and 'aspectRatio' must de a Number`);
+            newSize = parseFloat(newSize);
+            aspectRatio = parseFloat(aspectRatio);
         }
+
+        window.console.log(newSize);
+        window.console.log(aspectRatio);
 
         const dimensions = {};
 

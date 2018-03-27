@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-27T04:23:58.974Z
+ * Date: 2018-03-27T15:04:21.845Z
  */
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
@@ -821,8 +821,12 @@ var globalHelpers = {
      */
     resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
         if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
-            throw new Error('\'newSize\' and \'aspectRatio\' must de a Number');
+            newSize = parseFloat(newSize);
+            aspectRatio = parseFloat(aspectRatio);
         }
+
+        window.console.log(newSize);
+        window.console.log(aspectRatio);
 
         var dimensions = {};
 
