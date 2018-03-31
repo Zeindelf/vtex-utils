@@ -1,5 +1,6 @@
 
 import vtexHelpers from './vtex-helpers.js';
+import globalHelpers from './global-helpers.js';
 
 if ( typeof window !== 'object' ) {
     global.window = global;
@@ -219,5 +220,13 @@ if ( 'rivets' in window ) {
 
     rivets.formatters.replaceBreakLines = (val) => {
         return vtexHelpers.replaceBreakLines(val);
+    };
+
+    rivets.formatters.pad = (val) => {
+        return globalHelpers.pad(val);
+    };
+
+    rivets.formatters.capitalize = (val) => {
+        return globalHelpers.capitalize(val);
     };
 }

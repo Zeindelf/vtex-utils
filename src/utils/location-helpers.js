@@ -141,7 +141,7 @@ export default {
      */
     _validateStateInitials(state) {
         if ( state.length !== 2 ) {
-            throw new Error(`'state' must be to letters. e.g. 'SP'`);
+            throw new Error(`'state' must be two letters. e.g. 'SP'`);
         }
     },
 
