@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.4.6
+ * VtexUtils.js v1.4.7
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-03-27T15:26:03.590Z
+ * Date: 2018-03-31T23:21:37.450Z
  */
 
 'use strict';
@@ -1664,6 +1664,14 @@ if ('rivets' in window) {
     rivets.formatters.replaceBreakLines = function (val) {
         return vtexHelpers.replaceBreakLines(val);
     };
+
+    rivets.formatters.pad = function (val) {
+        return globalHelpers.pad(val);
+    };
+
+    rivets.formatters.capitalize = function (val) {
+        return globalHelpers.capitalize(val);
+    };
 }
 
 /* ! store2 - v2.7.0 - 2018-02-08
@@ -2565,7 +2573,7 @@ var locationHelpers = {
      */
     _validateStateInitials: function _validateStateInitials(state) {
         if (state.length !== 2) {
-            throw new Error('\'state\' must be to letters. e.g. \'SP\'');
+            throw new Error('\'state\' must be two letters. e.g. \'SP\'');
         }
     },
 
@@ -2633,7 +2641,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.4.6';
+  this.version = '1.4.7';
 
   /**
    * Package name
