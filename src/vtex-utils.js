@@ -1,10 +1,9 @@
 
 import './utils/rivets-formatters.js';
-import store from './utils/vendor.store.js';
 
 import VtexHelpers from './class/VtexHelpers.js';
-import GlobalHelpers from './class/GlobalHelpers.js';
-import LocationHelpers from './class/LocationHelpers.js';
+import utilify from './utils/utilify.vendor.js';
+
 
 /**
  * Create a VtexUtils class
@@ -34,19 +33,19 @@ class VtexUtils {
          * Global Helpers instance
          * @type {GlobalHelpers}
          */
-        this.globalHelpers = new GlobalHelpers();
+        this.globalHelpers = utilify.globalHelpers;
 
         /**
          * Location Helpers instance
          * @type {LocationHelpers}
          */
-        this.locationHelpers = new LocationHelpers(store);
+        this.locationHelpers = utilify.locationHelpers;
 
         /**
          * Local/Session Storage
          * @type {Object}
          */
-        this.storage = store;
+        this.storage = utilify.storage;
     }
 }
 

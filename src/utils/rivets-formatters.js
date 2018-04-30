@@ -1,6 +1,6 @@
 
 import vtexHelpers from './vtex-helpers.js';
-import globalHelpers from './global-helpers.js';
+import utilify from './utilify.vendor.js';
 
 if ( typeof window !== 'object' ) {
     global.window = global;
@@ -223,10 +223,10 @@ if ( 'rivets' in window ) {
     };
 
     rivets.formatters.pad = (val) => {
-        return globalHelpers.pad(val);
+        return utilify.globalHelpers.pad(val);
     };
 
     rivets.formatters.capitalize = (val) => {
-        return globalHelpers.capitalize(val);
+        return utilify.globalHelpers.capitalize(val);
     };
 }

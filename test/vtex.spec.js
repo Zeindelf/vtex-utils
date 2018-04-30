@@ -28,6 +28,14 @@ describe('Vtex Methods', () => {
         done();
     });
 
+    it('get resized image by ratio', (done) => {
+        expect(vtexHelpers.getResizeImageByRatio('http://domain.vteximg.com.br/arquivos/ids/155242/image.png', 'width', 360, 10/15))
+            .to.equal('http://domain.vteximg.com.br/arquivos/ids/155242-360-540/image.png');
+        expect(vtexHelpers.getResizeImageByRatio('http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png', 'width', 360, 10/15))
+            .to.equal('http://domain.vteximg.com.br/arquivos/ids/155242-360-540/image.png');
+        done();
+    });
+
     it('replace breakLines', (done) => {
         expect(vtexHelpers.replaceBreakLines('foo\n\nbar\rbaz\n')).to.equal('foo<br /><br />bar<br />baz<br />');
         done();

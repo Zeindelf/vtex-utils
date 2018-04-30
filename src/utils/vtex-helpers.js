@@ -1,6 +1,5 @@
 
-import validateHelpers from './validate-helpers.js';
-import globalHelpers from './global-helpers.js';
+import utilify from './utilify.vendor.js';
 
 export default {
     /**
@@ -14,8 +13,8 @@ export default {
      * @return {string} The formatted price
      */
     formatPrice(number, thousands, decimals, length, currency) {
-        currency = validateHelpers.isString(currency) ? currency : 'R$ ';
-        length = ! validateHelpers.isNumber(length) ? 2 : length;
+        currency = utilify.globalHelpers.isString(currency) ? currency : 'R$ ';
+        length = !utilify.globalHelpers.isNumber(length) ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;
@@ -34,7 +33,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
     getOriginalImage(src) {
-        return validateHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+        return utilify.globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
     },
 
     /**
@@ -52,7 +51,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
     getResizedImage(src, width, height) {
-        if ( validateHelpers.isUndefined(width) || validateHelpers.isUndefined(height) || ! validateHelpers.isString(src) ) {
+        if ( utilify.globalHelpers.isUndefined(width) || utilify.globalHelpers.isUndefined(height) || !utilify.globalHelpers.isString(src) ) {
             return src;
         }
 
@@ -83,7 +82,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
     getResizeImageByRatio(src, type, newSize, aspectRatio) {
-        const newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
+        const newValue = utilify.globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
 
         return this.getResizedImage(src, newValue.width, newValue.height);
     },
@@ -115,7 +114,7 @@ export default {
                 month = `0${month}`;
             }
 
-            if ( validateHelpers.isFunction(callback) ) {
+            if ( utilify.globalHelpers.isFunction(callback) ) {
                 callback.call(null, new Date(`${year}/${month}/${day} ${time}`));
             }
         });
@@ -144,8 +143,8 @@ export default {
                 },
             })
             .done((res) => {
-                if ( ! validateHelpers.isUndefined(categoryId) ) {
-                    def.resolve(globalHelpers.objectSearch(res, {
+                if ( !utilify.globalHelpers.isUndefined(categoryId) ) {
+                    def.resolve(utilify.globalHelpers.objectSearch(res, {
                         id: categoryId,
                     }));
                 } else {
@@ -190,7 +189,7 @@ export default {
                 url: '/no-cache/profileSystem/getProfile',
             })
             .done((res) => {
-                if ( validateHelpers.isUndefined(res.IsUserDefined) || ! res.IsUserDefined ) {
+                if ( utilify.globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined ) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
@@ -207,8 +206,8 @@ export default {
      * @return {void}
      */
     openPopupLogin(noReload, _url) {
-        noReload = validateHelpers.isBoolean(noReload) ? noReload : false;
-        _url = validateHelpers.isString(_url) ? _url : '/';
+        noReload = utilify.globalHelpers.isBoolean(noReload) ? noReload : false;
+        _url = utilify.globalHelpers.isString(_url) ? _url : '/';
         _url = ( noReload ) ? window.location.href : _url;
 
         vtexid.start({
@@ -225,16 +224,16 @@ export default {
      * @return {promise}
      */
     addToCart(items, expectedOrderFormSections, salesChannel) {
-        if ( ! validateHelpers.isArray(items) ) {
+        if ( !utilify.globalHelpers.isArray(items) ) {
             throw new TypeError(`Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: '1'}, {id: 321, quantity: 2, seller: '1'}]`);
         }
 
-        if ( globalHelpers.length(items) < 1 ) {
+        if ( utilify.globalHelpers.length(items) < 1 ) {
             throw new Error(`Items can't be an empty Array.`);
         }
 
-        expectedOrderFormSections = ( validateHelpers.isUndefined(expectedOrderFormSections) ) ? null : expectedOrderFormSections;
-        salesChannel = ( validateHelpers.isUndefined ) ? 1 : salesChannel;
+        expectedOrderFormSections = ( utilify.globalHelpers.isUndefined(expectedOrderFormSections) ) ? null : expectedOrderFormSections;
+        salesChannel = ( utilify.globalHelpers.isUndefined ) ? 1 : salesChannel;
 
         /* eslint-disable */
         return $.Deferred((def) => {
