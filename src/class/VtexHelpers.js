@@ -26,16 +26,16 @@ class VtexHelpers {
         return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     }
 
-    getProductSpec(data, specName, defaultVal = false) {
-        return vtexHelpers.getProductSpec(data, specName, defaultVal);
-    }
-
     getServerTime(callback) {
         return vtexHelpers.getServerTime(callback);
     }
 
     getCategories(depth, categoryId) {
         return vtexHelpers.getCategories(depth, categoryId);
+    }
+
+    getProductSpec(data, specName, defaultVal = false) {
+        return vtexHelpers.getProductSpec(data, specName, defaultVal);
     }
 
     replaceBreakLines(str) {

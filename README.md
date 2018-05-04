@@ -239,6 +239,42 @@ vtexHelpers.getCategories(1000001, 1).then(function(res) {
 }); // Return first level from category id
 ```
 
+### vtexHelpers.getProductSpec(data, specName[, defaultVal])
+
+Get product specification
+
+- **data**:
+  - Type: `Object`
+  - Vtex API data from `/api/catalog_system/pub/products/search/` endpoint
+
+- **specName**:
+  - Type: `String`
+  - Specification name
+
+- **defaultVal** (optional):
+  - Type: `Boolean|String`
+  - Default: `false`
+  - Value to return if spec doesn't exists
+
+#### Example
+
+```js
+// Data from API '/api/catalog_system/pub/products/search/'
+var response = {
+  Características: ["Cor real", "Ocasião", "Composição", "Cor"],
+  Composição: ["Liga Mista, Pedra Natural Pirita"],
+  Cor: ["Dourado"],
+  Cor real: ["Ouro"],
+  Ocasião: ["Weekend"],
+  allSpecifications: ["Cor real", "Ocasião", "Composição", "Cor"],
+  // More data...
+};
+
+vtexHelpers.getProductSpec(response, 'Cor'); // 'Dourado'
+vtexHelpers.getProductSpec(response, 'Cores'); // false
+vtexHelpers.getProductSpec(response, 'Cores', 'Branco'); // 'Branco'
+```
+
 ### vtexHelpers.replaceBreakLines(str)
 
 Replace break lines from product descriptions/more

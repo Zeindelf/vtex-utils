@@ -162,7 +162,7 @@ export default {
      *
      * @param {Object}           [data]              Vtex API data from '/api/catalog_system/pub/products/search/' endpoint
      * @param {String}           [specName]          Specification name
-     * @param {Boolean|String}   [defaultValue]      Default value to return
+     * @param {Boolean|String}   [defaultValue]      Value if spec doesn't exists
      * @returns spec value or false/defaultVal if spec doesn't exists
      */
     getProductSpec(data, specName, defaultVal) {
@@ -170,10 +170,10 @@ export default {
             return defaultVal;
         }
 
-        if ( globalHelpers.contains(specName, data['Características']) ) {
-            const spec = data[specName] && data[specName][0];
+        if ( globalHelpers.contains(specName, data.allSpecifications) ) {
+            const specValue = data[specName] && data[specName][0];
 
-            return ( !globalHelpers.isUndefined(spec) ) ? spec : defaultVal;
+            return ( !globalHelpers.isUndefined(specValue) ) ? specValue : defaultVal;
         }
 
         return defaultVal;
