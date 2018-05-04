@@ -26,6 +26,10 @@ class VtexHelpers {
         return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     }
 
+    getProductSpec(data, specName, defaultVal = false) {
+        return vtexHelpers.getProductSpec(data, specName, defaultVal);
+    }
+
     getServerTime(callback) {
         return vtexHelpers.getServerTime(callback);
     }

@@ -9,7 +9,7 @@ if ( typeof window !== 'object' ) {
 
 if ( 'rivets' in window ) {
     rivets.formatters['!'] = (value) => {
-        return ! value;
+        return !value;
     };
 
     rivets.formatters.eq = (value, args) => {
@@ -45,10 +45,10 @@ if ( 'rivets' in window ) {
     };
 
     rivets.formatters.isNotEmpty = (value) => {
-        return ! rivets.formatters.isEmpty(value);
+        return !rivets.formatters.isEmpty(value);
     };
 
-    rivets.formatters.pass = (value, args) =>{
+    rivets.formatters.pass = (value, args) => {
         return args;
     };
 
@@ -131,12 +131,12 @@ if ( 'rivets' in window ) {
         let by = args.shift();
         let direction = args.shift();
 
-        if ( ! direction && ( by == 'asc' || by == 'desc' ) ) {
+        if ( !direction && ( by == 'asc' || by == 'desc' ) ) {
             direction = by;
             by = null;
         }
 
-        if ( ! by ) {
+        if ( !by ) {
             value.sort();
         } else {
             value.sort((a, b) => {

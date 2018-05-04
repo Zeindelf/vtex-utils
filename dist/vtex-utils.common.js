@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-04-30T07:41:47.047Z
+ * Date: 2018-05-04T18:29:49.910Z
  */
 
 'use strict';
@@ -2414,6 +2414,29 @@ var vtexHelpers = {
 
 
     /**
+     * Get product specification
+     *
+     * @param {Object}           [data]              Vtex API data from '/api/catalog_system/pub/products/search/' endpoint
+     * @param {String}           [specName]          Specification name
+     * @param {Boolean|String}   [defaultValue]      Default value to return
+     * @returns spec value or false/defaultVal if spec doesn't exists
+     */
+    getProductSpec: function getProductSpec(data, specName, defaultVal) {
+        if (utilify$1.globalHelpers.isUndefined(data[specName])) {
+            return defaultVal;
+        }
+
+        if (utilify$1.globalHelpers.contains(specName, data['Características'])) {
+            var spec = data[specName] && data[specName][0];
+
+            return !utilify$1.globalHelpers.isUndefined(spec) ? spec : defaultVal;
+        }
+
+        return defaultVal;
+    },
+
+
+    /**
      * Replace break lines from product descriptions/more
      *
      * @param  {string}  str  String to replace
@@ -2831,6 +2854,13 @@ var VtexHelpers = function () {
         key: 'getResizeImageByRatio',
         value: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
             return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
+        }
+    }, {
+        key: 'getProductSpec',
+        value: function getProductSpec(data, specName) {
+            var defaultVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+            return vtexHelpers.getProductSpec(data, specName, defaultVal);
         }
     }, {
         key: 'getServerTime',

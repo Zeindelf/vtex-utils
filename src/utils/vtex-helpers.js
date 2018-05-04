@@ -1,6 +1,8 @@
 
 import utilify from './utilify.vendor.js';
 
+const globalHelpers = utilify.globalHelpers;
+
 export default {
     /**
      * Formats Vtex price
@@ -13,8 +15,8 @@ export default {
      * @return {string} The formatted price
      */
     formatPrice(number, thousands, decimals, length, currency) {
-        currency = utilify.globalHelpers.isString(currency) ? currency : 'R$ ';
-        length = !utilify.globalHelpers.isNumber(length) ? 2 : length;
+        currency = globalHelpers.isString(currency) ? currency : 'R$ ';
+        length = !globalHelpers.isNumber(length) ? 2 : length;
 
         const re = '\\d(?=(\\d{' + (3) + '})+' + (length > 0 ? '\\D' : '$') + ')';
         number = number / 100;
@@ -33,7 +35,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
     getOriginalImage(src) {
-        return utilify.globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+        return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
     },
 
     /**
@@ -51,7 +53,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
     getResizedImage(src, width, height) {
-        if ( utilify.globalHelpers.isUndefined(width) || utilify.globalHelpers.isUndefined(height) || !utilify.globalHelpers.isString(src) ) {
+        if ( globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || !globalHelpers.isString(src) ) {
             return src;
         }
 
@@ -82,7 +84,7 @@ export default {
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
     getResizeImageByRatio(src, type, newSize, aspectRatio) {
-        const newValue = utilify.globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
+        const newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
 
         return this.getResizedImage(src, newValue.width, newValue.height);
     },
@@ -114,7 +116,7 @@ export default {
                 month = `0${month}`;
             }
 
-            if ( utilify.globalHelpers.isFunction(callback) ) {
+            if ( globalHelpers.isFunction(callback) ) {
                 callback.call(null, new Date(`${year}/${month}/${day} ${time}`));
             }
         });
@@ -143,8 +145,8 @@ export default {
                 },
             })
             .done((res) => {
-                if ( !utilify.globalHelpers.isUndefined(categoryId) ) {
-                    def.resolve(utilify.globalHelpers.objectSearch(res, {
+                if ( !globalHelpers.isUndefined(categoryId) ) {
+                    def.resolve(globalHelpers.objectSearch(res, {
                         id: categoryId,
                     }));
                 } else {
@@ -153,6 +155,28 @@ export default {
             })
             .fail((err) => def.reject(err));
         }).promise();
+    },
+
+    /**
+     * Get product specification
+     *
+     * @param {Object}           [data]              Vtex API data from '/api/catalog_system/pub/products/search/' endpoint
+     * @param {String}           [specName]          Specification name
+     * @param {Boolean|String}   [defaultValue]      Default value to return
+     * @returns spec value or false/defaultVal if spec doesn't exists
+     */
+    getProductSpec(data, specName, defaultVal) {
+        if ( globalHelpers.isUndefined(data[specName]) ) {
+            return defaultVal;
+        }
+
+        if ( globalHelpers.contains(specName, data['Características']) ) {
+            const spec = data[specName] && data[specName][0];
+
+            return ( !globalHelpers.isUndefined(spec) ) ? spec : defaultVal;
+        }
+
+        return defaultVal;
     },
 
     /**
@@ -189,7 +213,7 @@ export default {
                 url: '/no-cache/profileSystem/getProfile',
             })
             .done((res) => {
-                if ( utilify.globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined ) {
+                if ( globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined ) {
                     def.reject(res);
                 } else {
                     def.resolve(res);
@@ -206,8 +230,8 @@ export default {
      * @return {void}
      */
     openPopupLogin(noReload, _url) {
-        noReload = utilify.globalHelpers.isBoolean(noReload) ? noReload : false;
-        _url = utilify.globalHelpers.isString(_url) ? _url : '/';
+        noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
+        _url = globalHelpers.isString(_url) ? _url : '/';
         _url = ( noReload ) ? window.location.href : _url;
 
         vtexid.start({
@@ -224,16 +248,16 @@ export default {
      * @return {promise}
      */
     addToCart(items, expectedOrderFormSections, salesChannel) {
-        if ( !utilify.globalHelpers.isArray(items) ) {
+        if ( !globalHelpers.isArray(items) ) {
             throw new TypeError(`Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: '1'}, {id: 321, quantity: 2, seller: '1'}]`);
         }
 
-        if ( utilify.globalHelpers.length(items) < 1 ) {
+        if ( globalHelpers.length(items) < 1 ) {
             throw new Error(`Items can't be an empty Array.`);
         }
 
-        expectedOrderFormSections = ( utilify.globalHelpers.isUndefined(expectedOrderFormSections) ) ? null : expectedOrderFormSections;
-        salesChannel = ( utilify.globalHelpers.isUndefined ) ? 1 : salesChannel;
+        expectedOrderFormSections = ( globalHelpers.isUndefined(expectedOrderFormSections) ) ? null : expectedOrderFormSections;
+        salesChannel = ( globalHelpers.isUndefined ) ? 1 : salesChannel;
 
         /* eslint-disable */
         return $.Deferred((def) => {
