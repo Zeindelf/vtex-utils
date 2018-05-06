@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.6.0
+ * VtexUtils.js v1.6.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-04T19:02:06.675Z
+ * Date: 2018-05-06T00:32:37.102Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -17,13 +17,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.1.0
+ * Utilify.js v0.1.1
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-04-30T05:14:15.285Z
+ * Date: 2018-05-05T23:15:13.418Z
  */
 
 (function (global, factory) {
@@ -514,116 +514,9 @@ store.area("session", function () {
 
 var globalHelpers = {
     /**
-     * Remove all falsey values from an array.
-     *
-     * @param {Array} arr - Array to filter
-     * @example
-     *     arrayCompact([null, a, undefined, 0, false, b, c, '', true]); // [a, b, c, true]
-     */
-    arrayCompact: function arrayCompact(arr) {
-        if (!Array.isArray(arr)) {
-            throw new TypeError('arrayCompact() expects an array.');
-        }
-
-        return arr.filter(Boolean);
-    },
-
-
-    /**
-     * Returns a new array containing the intersection between two arrays given.
-     *
-     * @param {Array} arr1 First array
-     * @param {Array} arr2 Second array
-     * @return {Array} The intersection
-     * @example
-     *     arrayIntersection([1, 2, 3], [2, 3, 4]) // [2, 3]
-     */
-    arrayIntersection: function arrayIntersection(arr1, arr2) {
-        return arr1.filter(function (val) {
-            return arr2.indexOf(val) !== -1;
-        });
-    },
-
-
-    /**
-     * Return an array with unique values
-     * @param {Array} arr - The array
-     * @return {Array}
-     */
-    arrayUnique: function arrayUnique(arr) {
-        return arr.filter(function (value, index, self) {
-            return self.indexOf(value) === index;
-        });
-    },
-
-
-    /**
-     * Capitalize a string
-     * @param {string} str - The String
-     * @return {string} The modified string
-     * @example
-     *     capitalize('foo bar'); // 'Foo Bar'
-     */
-    capitalize: function capitalize(str) {
-        return str.replace(/(?:^|\s)\S/g, function (match) {
-            return match.toUpperCase();
-        });
-    },
-
-
-    /**
-     * Creates an array of elements split into groups the length of size.
-     * If array can't be split evenly, the final chunk will be the remaining elements.
-     * @param  {Array}    array      The array to proccess.
-     * @param  {Integer}  [size=1]   The length of each chunk.
-     * @return {Array}               Returns the new array of chunks.
-     * @example
-     *     chunk(['a', 'b', 'c', 'd'], 2)
-     *     // => [['a', 'b'], ['c', 'd']]
-     *
-     *     chunk(['a', 'b', 'c', 'd'], 3)
-     *     // => [['a', 'b', 'c'], ['d']]
-     */
-    chunk: function chunk(array, size) {
-        size = Math.max(size, 0);
-        var length = array === null ? 0 : array.length;
-
-        if (!length || size < 1) {
-            return [];
-        }
-
-        var index = 0;
-        var resIndex = 0;
-        var result = new Array(Math.ceil(length / size));
-
-        while (index < length) {
-            result[resIndex++] = this.slice(array, index, index += size);
-        }
-
-        return result;
-    },
-
-
-    /**
-     * Removes empty index from a array
-     * @param {Array} arr - The array
-     * @return {Array}
-     */
-    cleanArray: function cleanArray(array) {
-        var newArray = [];
-
-        for (var i = 0, len = array.length; i < len; i += 1) {
-            if (array[i]) {
-                newArray.push(array[i]);
-            }
-        }
-
-        return newArray;
-    },
-
-
-    /**
      * Check if value contains in an element
+     *
+     * @category Global
      * @param {String} value - Value to check
      * @param {String|Array} elem - String or array
      * @return {Boolean} - Return true if element contains a value
@@ -670,8 +563,9 @@ var globalHelpers = {
      * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
      * for details over the differences between `debounce` and `throttle`.
      *
-     * From Lodash
+     * @from Lodash
      *
+     * @category Global
      * @param {Function} func The function to debounce.
      * @param {number} [wait=0] The number of milliseconds to delay; if omitted, `requestAnimationFrame` is used (if available).
      * @param {Object} [options={}] The options object.
@@ -862,46 +756,9 @@ var globalHelpers = {
 
 
     /**
-     * Replace <, >, &, ', " and / with HTML entities.
-     * @param {string} str - The string to check
-     * @return {boolean}
-     */
-    escape: function escape(str) {
-        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
-    },
-
-
-    /**
-     * Extend the given object
-     * @param {object} obj - The object to be extended
-     * @param {*} args - The rest objects which will be merged to the first object
-     * @return {object} The extended object
-     */
-    extend: function extend(obj) {
-        for (var _len2 = arguments.length, args = Array(_len2 > 1 ? _len2 - 1 : 0), _key2 = 1; _key2 < _len2; _key2++) {
-            args[_key2 - 1] = arguments[_key2];
-        }
-
-        if (validateHelpers.isObject(obj) && args.length > 0) {
-            if (Object.assign) {
-                return Object.assign.apply(Object, [obj].concat(toConsumableArray(args)));
-            }
-
-            args.forEach(function (arg) {
-                if (validateHelpers.isObject(arg)) {
-                    Object.keys(arg).forEach(function (key) {
-                        obj[key] = arg[key];
-                    });
-                }
-            });
-        }
-
-        return obj;
-    },
-
-
-    /**
      * Get variable type
+     *
+     * @category Global
      * @param {Mix} variable - Variable to check type
      * @return {string} Name of variable type
      * @example
@@ -929,6 +786,8 @@ var globalHelpers = {
 
     /**
      * Get url params from a query string
+     *
+     * @category Global
      * @param {string} name - Param name
      * @param {string} entryPoint - Full url or query string
      * @return {string} Value query string param
@@ -953,7 +812,650 @@ var globalHelpers = {
 
 
     /**
+     * Resize image by aspect ratio
+     *
+     * @category Global
+     * @param  {String} type          Resize by 'width' or 'height'
+     * @param  {Number} newSize       New value to resize
+     * @param  {Number} aspectRatio   Image aspect ratio (calculate by (width / height))
+     * @return {Object}               Object with new 'width' and 'height'
+     */
+    resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
+        if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
+            newSize = parseFloat(newSize);
+            aspectRatio = parseFloat(aspectRatio);
+        }
+
+        var dimensions = {};
+
+        switch (type) {
+            case 'width':
+                dimensions.width = parseFloat(newSize);
+                dimensions.height = parseFloat(newSize / aspectRatio);
+
+                break;
+
+            case 'height':
+                dimensions.width = parseFloat(newSize * aspectRatio);
+                dimensions.height = parseFloat(newSize);
+
+                break;
+
+            default:
+                throw new Error('\'type\' needs to be \'width\' or \'height\'');
+        }
+
+        return dimensions;
+    },
+
+
+    /**
+     * Removes the host from an url
+     *
+     * @category Global
+     * @param {string} url - The url
+     * @return {string} The modified string
+     * @example
+     *     stripHost("http://test.com.br/contact/test"); //  "/contact/test"
+     */
+    stripHost: function stripHost(url) {
+        var newUrl = url;
+        return newUrl.toString().replace(/https?:\/\/.*?\//i, '/');
+    },
+
+
+    /**
+     * Removes the protocol from an url
+     *
+     * @category Global
+     * @param {string} url - The url
+     * @return {string} The modified string
+     * @example
+     *     stripHttp('http://test.com.br/contact/test'); // '//test.com.br/contact/test'
+     */
+    stripHttp: function stripHttp(url) {
+        var newUrl = url;
+        return newUrl.replace(/^https?:/, '');
+    },
+
+
+    /**
+     * Creates a throttled function that only invokes `func` at most once per
+     * every `wait` milliseconds (or once per browser frame). The throttled function
+     * comes with a `cancel` method to cancel delayed `func` invocations and a
+     * `flush` method to immediately invoke them. Provide `options` to indicate
+     * whether `func` should be invoked on the leading and/or trailing edge of the
+     * `wait` timeout. The `func` is invoked with the last arguments provided to the
+     * throttled function. Subsequent calls to the throttled function return the
+     * result of the last `func` invocation.
+     *
+     * **Note:** If `leading` and `trailing` options are `true`, `func` is
+     * invoked on the trailing edge of the timeout only if the throttled function
+     * is invoked more than once during the `wait` timeout.
+     *
+     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
+     * until the next tick, similar to `setTimeout` with a timeout of `0`.
+     *
+     * If `wait` is omitted in an environment with `requestAnimationFrame`, `func`
+     * invocation will be deferred until the next frame is drawn (typically about
+     * 16ms).
+     *
+     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
+     * for details over the differences between `throttle` and `debounce`.
+     *
+     * @from Lodash
+     * @category Global
+     * @param {Function} func The function to throttle.
+     * @param {number} [wait=0] The number of milliseconds to throttle invocations to; if omitted, `requestAnimationFrame` is used (if available).
+     * @param {Object} [options={}] The options object.
+     * @param {boolean} [options.leading=true] Specify invoking on the leading edge of the timeout.
+     * @param {boolean} [options.trailing=true] Specify invoking on the trailing edge of the timeout.
+     * @return {Function} Returns the new throttled function.
+     * @example
+     *     // Avoid excessively updating the position while scrolling.
+     *     $(window).on('scroll', throttle(updatePosition, 100))
+     *
+     *     // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
+     *     const throttled = throttle(renewToken, (1000 * 60 * 5), {'trailing': false})
+     *     $(element).on('click', throttled)
+     *
+     *     // Cancel the trailing throttled invocation.
+     *     $(window).on('popstate', throttled.cancel)
+     */
+    throttle: function throttle(func, wait, options) {
+        var leading = true;
+        var trailing = true;
+
+        if (typeof func !== 'function') {
+            throw new TypeError('Expected a function');
+        }
+
+        if (validateHelpers.isObject(options)) {
+            leading = 'leading' in options ? !!options.leading : leading;
+            trailing = 'trailing' in options ? !!options.trailing : trailing;
+        }
+
+        return this.debounce(func, wait, {
+            'leading': leading,
+            'maxWait': wait,
+            'trailing': trailing
+        });
+    },
+
+
+    /**
+     * Invokes the iteratee `n` times, returning an array of the results of
+     * each invocation. The iteratee is invoked with one argumentindex).
+     *
+     * @from Lodash
+     * @category Global
+     * @param {number} n The number of times to invoke `iteratee`.
+     * @param {Function} iteratee The function invoked per iteration.
+     * @returns {Array} Returns the array of results.
+     * @example
+     *     times(3, String)
+     *     // => ['0', '1', '2']
+     *
+     *     times(4, () => 0)
+     *     // => [0, 0, 0, 0]
+     */
+    times: function times(n, iteratee) {
+        /** Used as references for various `Number` constants. */
+        var MAX_SAFE_INTEGER = 9007199254740991;
+        /** Used as references for the maximum length and index of an array. */
+        var MAX_ARRAY_LENGTH = 4294967295;
+
+        if (n < 1 || n > MAX_SAFE_INTEGER) {
+            return [];
+        }
+
+        var index = -1;
+        var length = Math.min(n, MAX_ARRAY_LENGTH);
+        var result = new Array(length);
+
+        while (++index < length) {
+            result[index] = iteratee(index);
+        }
+
+        index = MAX_ARRAY_LENGTH;
+        n -= MAX_ARRAY_LENGTH;
+
+        while (++index < n) {
+            iteratee(index);
+        }
+
+        return result;
+    },
+
+
+    /**
+     * Converts a value to a number if possible.
+     *
+     * @category Global
+     * @param {Mix} value The value to convert.
+     * @returns {Number} The converted number, otherwise the original value.
+     * @example
+     *     toNumber('123') // 123
+     *     toNumber('123.456') // 123.456
+     */
+    toNumber: function toNumber(value) {
+        var number = parseFloat(value);
+        if (number === undefined) {
+            return value;
+        }
+
+        if (number.toString().length !== value.toString().length) {
+            return value;
+        }
+
+        return Number.isNaN(number) ? value : number;
+    },
+
+
+    /**
+     * Unserialize a query string into an object.
+     *
+     * @category Global
+     * @param {string} [str = actual url] - The string that will be converted into a object
+     * @return {object}
+     * @example
+     *     // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
+     *     // If no provided, will get actual url
+     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
+     *     unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
+     */
+    unserialize: function unserialize(str) {
+        str = !validateHelpers.isString(str) ? window.location.href : str;
+
+        if (str.indexOf('?') < 0) {
+            return {};
+        }
+
+        str = str.indexOf('?') === 0 ? str.substr(1) : str.slice(str.indexOf('?') + 1);
+
+        var query = {};
+        var parts = str.split('&');
+
+        for (var i = 0, len = parts.length; i < len; i += 1) {
+            var part = parts[i].split('=');
+            query[decodeURIComponent(part[0])] = decodeURIComponent(part[1] || '');
+        }
+
+        return query;
+    }
+};
+
+// cache some methods to call later on
+var toString = Object.prototype.toString;
+
+var validateHelpers = {
+    /**
+     * is a given value Arguments?
+     * @category Validate
+     */
+    isArguments: function isArguments(value) {
+        // fallback check is for IE
+        return toString.call(value) === '[object Arguments]' || value != null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && 'callee' in value;
+    },
+
+
+    /**
+     * Check if the given value is an array.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isArray: function isArray(value) {
+        // check native isArray first
+        if (Array.isArray) {
+            return Array.isArray(value);
+        }
+
+        return toString.call(value) === '[object Array]';
+    },
+
+
+    /**
+     * Check if the given value is a boolean value.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isBoolean: function isBoolean(value) {
+        return value === true || value === false || toString.call(value) === '[object Boolean]';
+    },
+
+
+    /**
+     * is a given value Char?
+     *
+     * @category Validate
+     */
+    isChar: function isChar(value) {
+        return this.isString(value) && value.length === 1;
+    },
+
+
+    /**
+     * is a given value Date Object?
+     *
+     * @category Validate
+     */
+    isDate: function isDate(value) {
+        return toString.call(value) === '[object Date]';
+    },
+
+
+    /**
+     * is a given object a DOM node?
+     *
+     * @category Validate
+     */
+    isDomNode: function isDomNode(object) {
+        return this.isObject(object) && object.nodeType > 0;
+    },
+
+
+    /**
+     * Check if a string is a valid mail.
+     *
+     * @category Validate
+     * @param {string} email - The string to check
+     * @return {boolean}
+     */
+    isEmail: function isEmail(email) {
+        var regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
+
+        return regex.test(email);
+    },
+
+
+    /**
+     * is a given value empty? Objects, arrays, strings
+     *
+     * @category Validate
+     */
+    isEmpty: function isEmpty(variable) {
+        var emptyVariables = {
+            'undefined': true,
+            'null': true,
+            'number': false,
+            'boolean': false,
+            'function': false,
+            'regexp': false,
+            'date': false,
+            'error': false
+        };
+
+        var strType = globalHelpers.getType(variable);
+        var boolReturn = void 0;
+
+        if (emptyVariables.hasOwnProperty(strType)) {
+            boolReturn = emptyVariables[strType];
+        } else {
+            switch (strType) {
+                case 'object':
+                    boolReturn = this.isObjectEmpty(variable);
+                    break;
+
+                case 'string':
+                    boolReturn = variable ? false : true;
+                    break;
+
+                case 'array':
+                    boolReturn = variable.length ? false : true;
+                    break;
+            }
+        }
+
+        return boolReturn;
+    },
+
+
+    /**
+     * is a given value Error object?
+     *
+     * @category Validate
+     */
+    isError: function isError(value) {
+        return toString.call(value) === '[object Error]';
+    },
+
+
+    /**
+     * Check if the given value is a function.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
+     */
+    isFunction: function isFunction(value) {
+        // fallback check is for IE
+        return toString.call(value) === '[object Function]' || typeof value === 'function';
+    },
+
+
+    /**
+     * Check if a string is a valid JSON.
+     *
+     * @category Validate
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    isJson: function isJson(str) {
+        try {
+            var obj = JSON.parse(str);
+            return this.isObject(obj);
+        } catch (e) {/* ignore */}
+
+        return false;
+    },
+
+
+    /**
+     * is a given value null?
+     *
+     * @category Validate
+     */
+    isNull: function isNull(value) {
+        return value === null;
+    },
+
+
+    /**
+     * Check if the given value is a number.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a number, else 'false'.
+     */
+    isNumber: function isNumber(value) {
+        var isNaN = Number.isNaN || window.isNaN;
+
+        return typeof value === 'number' && !isNaN(value);
+    },
+
+
+    /**
+     * Check if the given value is an object
+     *
+     * @category Validate
+     * @param {*} value - The value to check
+     * @return {boolean} Returns 'true' if the given value is an object, else 'false'
+     */
+    isObject: function isObject(value) {
+        return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value !== null;
+    },
+
+
+    /**
+     * Verify if as objects is empty
+     *
+     * @category Validate
+     * @param {object} obj - The object to verify
+     * @return {boolean}
+     * @example
+     *     isObjectEmpty({}); // true
+     */
+    isObjectEmpty: function isObjectEmpty(obj) {
+        if (!this.isObject(obj)) {
+            return false;
+        }
+
+        for (var x in obj) {
+            if ({}.hasOwnProperty.call(obj, x)) {
+                return false;
+            }
+        }
+
+        return true;
+    },
+
+
+    /**
+     * Check if the given value is a plain object.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a plain object, else 'false'.
+     */
+    isPlainObject: function isPlainObject(value) {
+        if (!this.isObject(value)) {
+            return false;
+        }
+
+        try {
+            var _constructor = value.constructor;
+            var prototype = _constructor.prototype;
+
+
+            return _constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
+        } catch (e) {
+            return false;
+        }
+    },
+
+
+    /**
+     * is a given value RegExp?
+     *
+     * @category Validate
+     */
+    isRegexp: function isRegexp(value) {
+        return toString.call(value) === '[object RegExp]';
+    },
+
+
+    /**
+     * are given values same type?
+     *
+     * @category Validate
+     */
+    isSameType: function isSameType(value, other) {
+        var tag = toString.call(value);
+
+        if (tag !== toString.call(other)) {
+            return false;
+        }
+
+        return true;
+    },
+
+
+    /**
+     * Check if the given value is a string.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
+     */
+    isString: function isString(value) {
+        return toString.call(value) === '[object String]';
+    },
+
+
+    /**
+     * Check if the given value is undefined.
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
+     */
+    isUndefined: function isUndefined(value) {
+        return value === undefined;
+    }
+};
+
+var arrayHelpers = {
+    /**
+     * Remove all falsey values from an array.
+     *
+     * @category Array
+     * @param {Array} arr - Array to filter
+     * @example
+     *     arrayCompact([null, a, undefined, 0, false, b, c, '', true]); // [a, b, c, true]
+     */
+    arrayCompact: function arrayCompact(arr) {
+        if (!Array.isArray(arr)) {
+            throw new TypeError('arrayCompact() expects an array.');
+        }
+
+        return arr.filter(Boolean);
+    },
+
+
+    /**
+     * Returns a new array containing the intersection between two arrays given.
+     *
+     * @category Array
+     * @param {Array} arr1 First array
+     * @param {Array} arr2 Second array
+     * @return {Array} The intersection
+     * @example
+     *     arrayIntersection([1, 2, 3], [2, 3, 4]) // [2, 3]
+     */
+    arrayIntersection: function arrayIntersection(arr1, arr2) {
+        return arr1.filter(function (val) {
+            return arr2.indexOf(val) !== -1;
+        });
+    },
+
+
+    /**
+     * Return an array with unique values
+     *
+     * @category Array
+     * @param {Array} arr - The array
+     * @return {Array}
+     */
+    arrayUnique: function arrayUnique(arr) {
+        return arr.filter(function (value, index, self) {
+            return self.indexOf(value) === index;
+        });
+    },
+
+
+    /**
+     * Creates an array of elements split into groups the length of size.
+     * If array can't be split evenly, the final chunk will be the remaining elements.
+     *
+     * @category Array
+     * @param  {Array}    array      The array to proccess.
+     * @param  {Integer}  [size=1]   The length of each chunk.
+     * @return {Array}               Returns the new array of chunks.
+     * @example
+     *     chunk(['a', 'b', 'c', 'd'], 2)
+     *     // => [['a', 'b'], ['c', 'd']]
+     *
+     *     chunk(['a', 'b', 'c', 'd'], 3)
+     *     // => [['a', 'b', 'c'], ['d']]
+     */
+    chunk: function chunk(array, size) {
+        size = Math.max(size, 0);
+        var length = array === null ? 0 : array.length;
+
+        if (!length || size < 1) {
+            return [];
+        }
+
+        var index = 0;
+        var resIndex = 0;
+        var result = new Array(Math.ceil(length / size));
+
+        while (index < length) {
+            result[resIndex++] = this.slice(array, index, index += size);
+        }
+
+        return result;
+    },
+
+
+    /**
+     * Removes empty index from a array.
+     *
+     * @category Array
+     * @param {Array} arr - The array
+     * @return {Array}
+     */
+    cleanArray: function cleanArray(array) {
+        var newArray = [];
+
+        for (var i = 0, len = array.length; i < len; i += 1) {
+            if (array[i]) {
+                newArray.push(array[i]);
+            }
+        }
+
+        return newArray;
+    },
+
+
+    /**
      * Join array elements with glue string - PHP implode alike
+     *
+     * @category Array
      * @param {object|array} pieces - The array|object to implode.  If object it will implode the values, not the keys.
      * @param {string} [glue=','] - The glue
      * @return {string} The imploded array|object
@@ -975,6 +1477,110 @@ var globalHelpers = {
         }
 
         return '';
+    },
+
+
+    /**
+     * Randomize a array elements with Fisher–Yates shuffle algorithm base.
+     *
+     * @category Array
+     * @param {array} array - The array to randomize
+     * @return {array} The new modified array
+     * @example
+     *     const arr = [1, 2, 3, 4];
+     *     shuffleArray(arr); // [3, 2, 4, 1]
+     */
+    shuffleArray: function shuffleArray(array) {
+        var j = 0;
+        var temp = [];
+        var newArray = [];
+
+        for (var i = array.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            temp = array[i];
+
+            newArray[i] = array[j];
+            newArray[j] = temp;
+        }
+
+        return newArray;
+    },
+
+
+    /**
+     * Creates a slice of `array` from `start` up to, but not including, `end`.
+     *
+     * **Note:** This method is used instead of
+     * [`Array#slice`](https://mdn.io/Array/slice) to ensure dense arrays are returned.
+     *
+     * @from Lodash
+     *
+     * @category Array
+     * @param {Array} array The array to slice.
+     * @param {number} [start=0] The start position. A negative index will be treated as an offset from the end.
+     * @param {number} [end=array.length] The end position. A negative index will be treated as an offset from the end.
+     * @returns {Array} Returns the slice of `array`.
+     */
+    slice: function slice(array, start, end) {
+        var length = array == null ? 0 : array.length;
+
+        if (!length) {
+            return [];
+        }
+        start = start == null ? 0 : start;
+        end = end === undefined ? length : end;
+
+        if (start < 0) {
+            start = -start > length ? 0 : length + start;
+        }
+
+        end = end > length ? length : end;
+
+        if (end < 0) {
+            end += length;
+        }
+
+        length = start > end ? 0 : end - start >>> 0;
+        start >>>= 0;
+
+        var index = -1;
+        var result = new Array(length);
+
+        while (++index < length) {
+            result[index] = array[index + start];
+        }
+
+        return result;
+    }
+};
+
+var objectHelpers = {
+    /**
+     * Extend the given object
+     * @param {object} obj - The object to be extended
+     * @param {*} args - The rest objects which will be merged to the first object
+     * @return {object} The extended object
+     */
+    extend: function extend(obj) {
+        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+            args[_key - 1] = arguments[_key];
+        }
+
+        if (validateHelpers.isObject(obj) && args.length > 0) {
+            if (Object.assign) {
+                return Object.assign.apply(Object, [obj].concat(toConsumableArray(args)));
+            }
+
+            args.forEach(function (arg) {
+                if (validateHelpers.isObject(arg)) {
+                    Object.keys(arg).forEach(function (key) {
+                        obj[key] = arg[key];
+                    });
+                }
+            });
+        }
+
+        return obj;
     },
 
 
@@ -1054,6 +1660,31 @@ var globalHelpers = {
         }
 
         return false;
+    }
+};
+
+var stringHelpers = {
+    /**
+     * Capitalize a string
+     * @param {string} str - The String
+     * @return {string} The modified string
+     * @example
+     *     capitalize('foo bar'); // 'Foo Bar'
+     */
+    capitalize: function capitalize(str) {
+        return str.replace(/(?:^|\s)\S/g, function (match) {
+            return match.toUpperCase();
+        });
+    },
+
+
+    /**
+     * Replace <, >, &, ', " and / with HTML entities.
+     * @param {string} str - The string to check
+     * @return {boolean}
+     */
+    escape: function escape(str) {
+        return str.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#x27;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').replace(/\\/g, '&#x5C;').replace(/`/g, '&#96;');
     },
 
 
@@ -1095,114 +1726,6 @@ var globalHelpers = {
 
 
     /**
-     * Resize image by aspect ratio
-     *
-     * @param  {String} type          Resize by 'width' or 'height'
-     * @param  {Number} newSize       New value to resize
-     * @param  {Number} aspectRatio   Image aspect ratio (calculate by (width / height))
-     * @return {Object}               Object with new 'width' and 'height'
-     */
-    resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
-        if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
-            newSize = parseFloat(newSize);
-            aspectRatio = parseFloat(aspectRatio);
-        }
-
-        var dimensions = {};
-
-        switch (type) {
-            case 'width':
-                dimensions.width = parseFloat(newSize);
-                dimensions.height = parseFloat(newSize / aspectRatio);
-
-                break;
-
-            case 'height':
-                dimensions.width = parseFloat(newSize * aspectRatio);
-                dimensions.height = parseFloat(newSize);
-
-                break;
-
-            default:
-                throw new Error('\'type\' needs to be \'width\' or \'height\'');
-        }
-
-        return dimensions;
-    },
-
-
-    /**
-     * Randomize a array elements with Fisher–Yates shuffle algorithm base
-     * @param {array} array - The array to randomize
-     * @return {array} The new modified array
-     * @example
-     *     const arr = [1, 2, 3, 4];
-     *     shuffleArray(arr); // [3, 2, 4, 1]
-     */
-    shuffleArray: function shuffleArray(array) {
-        var j = 0;
-        var temp = [];
-        var newArray = [];
-
-        for (var i = array.length - 1; i > 0; i--) {
-            j = Math.floor(Math.random() * (i + 1));
-            temp = array[i];
-
-            newArray[i] = array[j];
-            newArray[j] = temp;
-        }
-
-        return newArray;
-    },
-
-
-    /**
-     * Creates a slice of `array` from `start` up to, but not including, `end`.
-     *
-     * **Note:** This method is used instead of
-     * [`Array#slice`](https://mdn.io/Array/slice) to ensure dense arrays are returned.
-     *
-     * From Lodash
-     *
-     * @param {Array} array The array to slice.
-     * @param {number} [start=0] The start position. A negative index will be treated as an offset from the end.
-     * @param {number} [end=array.length] The end position. A negative index will be treated as an offset from the end.
-     * @returns {Array} Returns the slice of `array`.
-     */
-    slice: function slice(array, start, end) {
-        var length = array == null ? 0 : array.length;
-
-        if (!length) {
-            return [];
-        }
-        start = start == null ? 0 : start;
-        end = end === undefined ? length : end;
-
-        if (start < 0) {
-            start = -start > length ? 0 : length + start;
-        }
-
-        end = end > length ? length : end;
-
-        if (end < 0) {
-            end += length;
-        }
-
-        length = start > end ? 0 : end - start >>> 0;
-        start >>>= 0;
-
-        var index = -1;
-        var result = new Array(length);
-
-        while (++index < length) {
-            result[index] = array[index + start];
-        }
-
-        return result;
-    },
-
-
-    /**
      * Slugify a text, removing/replacing all special characters and spaces with dashes '-'
      * @param {string} str - The string to sanitize
      * @return {string} The modified string
@@ -1231,32 +1754,6 @@ var globalHelpers = {
         if (str.charAt(str.length - 1) === '-') str = str.substr(0, str.length - 1);
 
         return str;
-    },
-
-
-    /**
-     * Removes the host from an url
-     * @param {string} url - The url
-     * @return {string} The modified string
-     * @example
-     *     stripHost("http://test.com.br/contact/test"); //  "/contact/test"
-     */
-    stripHost: function stripHost(url) {
-        var newUrl = url;
-        return newUrl.toString().replace(/https?:\/\/.*?\//i, '/');
-    },
-
-
-    /**
-     * Removes the protocol from an url
-     * @param {string} url - The url
-     * @return {string} The modified string
-     * @example
-     *     stripHttp('http://test.com.br/contact/test'); // '//test.com.br/contact/test'
-     */
-    stripHttp: function stripHttp(url) {
-        var newUrl = url;
-        return newUrl.replace(/^https?:/, '');
     },
 
 
@@ -1292,138 +1789,6 @@ var globalHelpers = {
 
 
     /**
-     * Creates a throttled function that only invokes `func` at most once per
-     * every `wait` milliseconds (or once per browser frame). The throttled function
-     * comes with a `cancel` method to cancel delayed `func` invocations and a
-     * `flush` method to immediately invoke them. Provide `options` to indicate
-     * whether `func` should be invoked on the leading and/or trailing edge of the
-     * `wait` timeout. The `func` is invoked with the last arguments provided to the
-     * throttled function. Subsequent calls to the throttled function return the
-     * result of the last `func` invocation.
-     *
-     * **Note:** If `leading` and `trailing` options are `true`, `func` is
-     * invoked on the trailing edge of the timeout only if the throttled function
-     * is invoked more than once during the `wait` timeout.
-     *
-     * If `wait` is `0` and `leading` is `false`, `func` invocation is deferred
-     * until the next tick, similar to `setTimeout` with a timeout of `0`.
-     *
-     * If `wait` is omitted in an environment with `requestAnimationFrame`, `func`
-     * invocation will be deferred until the next frame is drawn (typically about
-     * 16ms).
-     *
-     * See [David Corbacho's article](https://css-tricks.com/debouncing-throttling-explained-examples/)
-     * for details over the differences between `throttle` and `debounce`.
-     *
-     * From Lodash
-     *
-     * @param {Function} func The function to throttle.
-     * @param {number} [wait=0] The number of milliseconds to throttle invocations to; if omitted, `requestAnimationFrame` is used (if available).
-     * @param {Object} [options={}] The options object.
-     * @param {boolean} [options.leading=true] Specify invoking on the leading edge of the timeout.
-     * @param {boolean} [options.trailing=true] Specify invoking on the trailing edge of the timeout.
-     * @return {Function} Returns the new throttled function.
-     * @example
-     *     // Avoid excessively updating the position while scrolling.
-     *     $(window).on('scroll', throttle(updatePosition, 100))
-     *
-     *     // Invoke `renewToken` when the click event is fired, but not more than once every 5 minutes.
-     *     const throttled = throttle(renewToken, (1000 * 60 * 5), {'trailing': false})
-     *     $(element).on('click', throttled)
-     *
-     *     // Cancel the trailing throttled invocation.
-     *     $(window).on('popstate', throttled.cancel)
-     */
-    throttle: function throttle(func, wait, options) {
-        var leading = true;
-        var trailing = true;
-
-        if (typeof func !== 'function') {
-            throw new TypeError('Expected a function');
-        }
-
-        if (validateHelpers.isObject(options)) {
-            leading = 'leading' in options ? !!options.leading : leading;
-            trailing = 'trailing' in options ? !!options.trailing : trailing;
-        }
-
-        return this.debounce(func, wait, {
-            'leading': leading,
-            'maxWait': wait,
-            'trailing': trailing
-        });
-    },
-
-
-    /**
-     * Invokes the iteratee `n` times, returning an array of the results of
-     * each invocation. The iteratee is invoked with one argumentindex).
-     *
-     * From Lodash
-     *
-     * @param {number} n The number of times to invoke `iteratee`.
-     * @param {Function} iteratee The function invoked per iteration.
-     * @returns {Array} Returns the array of results.
-     * @example
-     *     times(3, String)
-     *     // => ['0', '1', '2']
-     *
-     *     times(4, () => 0)
-     *     // => [0, 0, 0, 0]
-     */
-    times: function times(n, iteratee) {
-        /** Used as references for various `Number` constants. */
-        var MAX_SAFE_INTEGER = 9007199254740991;
-        /** Used as references for the maximum length and index of an array. */
-        var MAX_ARRAY_LENGTH = 4294967295;
-
-        if (n < 1 || n > MAX_SAFE_INTEGER) {
-            return [];
-        }
-
-        var index = -1;
-        var length = Math.min(n, MAX_ARRAY_LENGTH);
-        var result = new Array(length);
-
-        while (++index < length) {
-            result[index] = iteratee(index);
-        }
-
-        index = MAX_ARRAY_LENGTH;
-        n -= MAX_ARRAY_LENGTH;
-
-        while (++index < n) {
-            iteratee(index);
-        }
-
-        return result;
-    },
-
-
-    /**
-     * Converts a value to a number if possible.
-     *
-     * @param {Mix} value The value to convert.
-     * @returns {Number} The converted number, otherwise the original value.
-     * @example
-     *     toNumber('123') // 123
-     *     toNumber('123.456') // 123.456
-     */
-    toNumber: function toNumber(value) {
-        var number = parseFloat(value);
-        if (number === undefined) {
-            return value;
-        }
-
-        if (number.toString().length !== value.toString().length) {
-            return value;
-        }
-
-        return Number.isNaN(number) ? value : number;
-    },
-
-
-    /**
      * Remove leading and trailing empty spaces.
      *
      * @param {String} str - The string.
@@ -1447,283 +1812,6 @@ var globalHelpers = {
      */
     unescape: function unescape(str) {
         return str.replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#x27;/g, '\'').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&#x2F;/g, '/').replace(/&#x5C;/g, '\\').replace(/&#96;/g, '`');
-    },
-
-
-    /**
-     * Unserialize a query string into an object
-     * @param {string} [str = actual url] - The string that will be converted into a object
-     * @return {object}
-     * @example
-     *     // str can be '?param1=foo&param2=bar&param3=baz', 'param1=foo&param2=bar&param3=baz' or a full url
-     *     // If no provided, will get actual url
-     *     var url = 'http://www.site.com?param1=foo&param2=bar&param3=baz';
-     *     unserialize(url); // {param1: 'foo', param2: 'bar', param3: 'baz'}
-     */
-    unserialize: function unserialize(str) {
-        str = !validateHelpers.isString(str) ? window.location.href : str;
-
-        if (str.indexOf('?') < 0) {
-            return {};
-        }
-
-        str = str.indexOf('?') === 0 ? str.substr(1) : str.slice(str.indexOf('?') + 1);
-
-        var query = {};
-        var parts = str.split('&');
-
-        for (var i = 0, len = parts.length; i < len; i += 1) {
-            var part = parts[i].split('=');
-            query[decodeURIComponent(part[0])] = decodeURIComponent(part[1] || '');
-        }
-
-        return query;
-    }
-};
-
-// cache some methods to call later on
-var toString = Object.prototype.toString;
-
-var validateHelpers = {
-    // is a given value Arguments?
-    isArguments: function isArguments(value) {
-        // fallback check is for IE
-        return toString.call(value) === '[object Arguments]' || value != null && (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && 'callee' in value;
-    },
-
-
-    /**
-     * Check if the given value is an array.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isArray: function isArray(value) {
-        // check native isArray first
-        if (Array.isArray) {
-            return Array.isArray(value);
-        }
-
-        return toString.call(value) === '[object Array]';
-    },
-
-
-    /**
-     * Check if the given value is a boolean value.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isBoolean: function isBoolean(value) {
-        return value === true || value === false || toString.call(value) === '[object Boolean]';
-    },
-
-
-    // is a given value Char?
-    isChar: function isChar(value) {
-        return this.isString(value) && value.length === 1;
-    },
-
-
-    // is a given value Date Object?
-    isDate: function isDate(value) {
-        return toString.call(value) === '[object Date]';
-    },
-
-
-    // is a given object a DOM node?
-    isDomNode: function isDomNode(object) {
-        return this.isObject(object) && object.nodeType > 0;
-    },
-
-
-    /**
-     * Check if a string is a valid mail.
-     * @param {string} email - The string to check
-     * @return {boolean}
-     */
-    isEmail: function isEmail(email) {
-        var regex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i;
-
-        return regex.test(email);
-    },
-
-
-    // is a given value empty? Objects, arrays, strings
-    isEmpty: function isEmpty(variable) {
-        var emptyVariables = {
-            'undefined': true,
-            'null': true,
-            'number': false,
-            'boolean': false,
-            'function': false,
-            'regexp': false,
-            'date': false,
-            'error': false
-        };
-
-        var strType = globalHelpers.getType(variable);
-        var boolReturn = void 0;
-
-        if (emptyVariables.hasOwnProperty(strType)) {
-            boolReturn = emptyVariables[strType];
-        } else {
-            switch (strType) {
-                case 'object':
-                    boolReturn = this.isObjectEmpty(variable);
-                    break;
-
-                case 'string':
-                    boolReturn = variable ? false : true;
-                    break;
-
-                case 'array':
-                    boolReturn = variable.length ? false : true;
-                    break;
-            }
-        }
-
-        return boolReturn;
-    },
-
-
-    // is a given value Error object?
-    isError: function isError(value) {
-        return toString.call(value) === '[object Error]';
-    },
-
-
-    /**
-     * Check if the given value is a function.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a function, else 'false'.
-     */
-    isFunction: function isFunction(value) {
-        // fallback check is for IE
-        return toString.call(value) === '[object Function]' || typeof value === 'function';
-    },
-
-
-    /**
-     * Check if a string is a valid JSON.
-     * @param {string} str - The string to check
-     * @return {boolean}
-     */
-    isJson: function isJson(str) {
-        try {
-            var obj = JSON.parse(str);
-            return this.isObject(obj);
-        } catch (e) {/* ignore */}
-
-        return false;
-    },
-
-
-    // is a given value null?
-    isNull: function isNull(value) {
-        return value === null;
-    },
-
-
-    /**
-     * Check if the given value is a number.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a number, else 'false'.
-     */
-    isNumber: function isNumber(value) {
-        var isNaN = Number.isNaN || window.isNaN;
-
-        return typeof value === 'number' && !isNaN(value);
-    },
-
-
-    /**
-     * Check if the given value is an object
-     * @param {*} value - The value to check
-     * @return {boolean} Returns 'true' if the given value is an object, else 'false'
-     */
-    isObject: function isObject(value) {
-        return (typeof value === 'undefined' ? 'undefined' : _typeof(value)) === 'object' && value !== null;
-    },
-
-
-    /**
-     * Verify if as objects is empty
-     * @param {object} obj - The object to verify
-     * @return {boolean}
-     * @example
-     *     isObjectEmpty({}); // true
-     */
-    isObjectEmpty: function isObjectEmpty(obj) {
-        if (!this.isObject(obj)) {
-            return false;
-        }
-
-        for (var x in obj) {
-            if ({}.hasOwnProperty.call(obj, x)) {
-                return false;
-            }
-        }
-
-        return true;
-    },
-
-
-    /**
-     * Check if the given value is a plain object.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a plain object, else 'false'.
-     */
-    isPlainObject: function isPlainObject(value) {
-        if (!this.isObject(value)) {
-            return false;
-        }
-
-        try {
-            var _constructor = value.constructor;
-            var prototype = _constructor.prototype;
-
-
-            return _constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
-        } catch (e) {
-            return false;
-        }
-    },
-
-
-    // is a given value RegExp?
-    isRegexp: function isRegexp(value) {
-        return toString.call(value) === '[object RegExp]';
-    },
-
-
-    // are given values same type?
-    isSameType: function isSameType(value, other) {
-        var tag = toString.call(value);
-
-        if (tag !== toString.call(other)) {
-            return false;
-        }
-
-        return true;
-    },
-
-
-    /**
-     * Check if the given value is a string.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is a string, else 'false'.
-     */
-    isString: function isString(value) {
-        return toString.call(value) === '[object String]';
-    },
-
-
-    /**
-     * Check if the given value is undefined.
-     * @param {*} value - The value to check.
-     * @return {boolean} Returns 'true' if the given value is undefined, else 'false'.
-     */
-    isUndefined: function isUndefined(value) {
-        return value === undefined;
     }
 };
 
@@ -1849,32 +1937,32 @@ var GlobalHelpers = function () {
     }, {
         key: 'arrayCompact',
         value: function arrayCompact(arr) {
-            return globalHelpers.arrayCompact(arr);
+            return arrayHelpers.arrayCompact(arr);
         }
     }, {
         key: 'arrayIntersection',
         value: function arrayIntersection(arr1, arr2) {
-            return globalHelpers.arrayIntersection(arr1, arr2);
+            return arrayHelpers.arrayIntersection(arr1, arr2);
         }
     }, {
         key: 'arrayUnique',
         value: function arrayUnique(arr) {
-            return globalHelpers.arrayUnique(arr);
+            return arrayHelpers.arrayUnique(arr);
         }
     }, {
         key: 'capitalize',
         value: function capitalize(str) {
-            return globalHelpers.capitalize(str);
+            return stringHelpers.capitalize(str);
         }
     }, {
         key: 'chunk',
         value: function chunk(array, size) {
-            return globalHelpers.chunk(array, size);
+            return arrayHelpers.chunk(array, size);
         }
     }, {
         key: 'cleanArray',
         value: function cleanArray(array) {
-            return globalHelpers.cleanArray(array);
+            return arrayHelpers.cleanArray(array);
         }
     }, {
         key: 'contains',
@@ -1889,7 +1977,7 @@ var GlobalHelpers = function () {
     }, {
         key: 'escape',
         value: function escape(str) {
-            return globalHelpers.escape(str);
+            return stringHelpers.escape(str);
         }
     }, {
         key: 'extend',
@@ -1898,7 +1986,7 @@ var GlobalHelpers = function () {
                 args[_key - 1] = arguments[_key];
             }
 
-            return globalHelpers.extend.apply(globalHelpers, [obj].concat(args));
+            return objectHelpers.extend.apply(objectHelpers, [obj].concat(args));
         }
     }, {
         key: 'getType',
@@ -1913,27 +2001,27 @@ var GlobalHelpers = function () {
     }, {
         key: 'implode',
         value: function implode(pieces, glue) {
-            return globalHelpers.implode(pieces, glue);
+            return arrayHelpers.implode(pieces, glue);
         }
     }, {
         key: 'length',
         value: function length(item) {
-            return globalHelpers.length(item);
+            return objectHelpers.length(item);
         }
     }, {
         key: 'objectSearch',
         value: function objectSearch(object, needle) {
-            return globalHelpers.objectSearch(object, needle);
+            return objectHelpers.objectSearch(object, needle);
         }
     }, {
         key: 'pad',
         value: function pad(number, size) {
-            return globalHelpers.pad(number, size);
+            return stringHelpers.pad(number, size);
         }
     }, {
         key: 'removeAccent',
         value: function removeAccent(str) {
-            return globalHelpers.removeAccent(str);
+            return stringHelpers.removeAccent(str);
         }
     }, {
         key: 'resizeImageByRatio',
@@ -1943,12 +2031,12 @@ var GlobalHelpers = function () {
     }, {
         key: 'shuffleArray',
         value: function shuffleArray(array) {
-            return globalHelpers.shuffleArray(array);
+            return arrayHelpers.shuffleArray(array);
         }
     }, {
         key: 'slugifyText',
         value: function slugifyText(str) {
-            return globalHelpers.slugifyText(str);
+            return stringHelpers.slugifyText(str);
         }
     }, {
         key: 'stripHost',
@@ -1963,7 +2051,7 @@ var GlobalHelpers = function () {
     }, {
         key: 'strReplace',
         value: function strReplace(search, replace, subject) {
-            return globalHelpers.strReplace(search, replace, subject);
+            return stringHelpers.strReplace(search, replace, subject);
         }
     }, {
         key: 'throttle',
@@ -1983,12 +2071,12 @@ var GlobalHelpers = function () {
     }, {
         key: 'trim',
         value: function trim(str) {
-            return globalHelpers.trim(str);
+            return stringHelpers.trim(str);
         }
     }, {
         key: 'unescape',
         value: function unescape(str) {
-            return globalHelpers.unescape(str);
+            return stringHelpers.unescape(str);
         }
     }, {
         key: 'unserialize',
@@ -2105,7 +2193,7 @@ var locationHelpers = {
         var _loop = function _loop(region) {
             if ({}.hasOwnProperty.call(_this2._regionMap, region)) {
                 _this2._regionMap[region].some(function (el, i, arr) {
-                    if (globalHelpers.removeAccent(el.toLowerCase()) === globalHelpers.removeAccent(state.toLowerCase())) {
+                    if (stringHelpers.removeAccent(el.toLowerCase()) === stringHelpers.removeAccent(state.toLowerCase())) {
                         filteredRegion = region;
                     }
                 });
@@ -2131,7 +2219,7 @@ var locationHelpers = {
     filteredState: function filteredState(state) {
         this._validateStateInitials(state);
 
-        return globalHelpers.objectSearch(this._stateMap, { initials: state.toUpperCase() });
+        return objectHelpers.objectSearch(this._stateMap, { initials: state.toUpperCase() });
     },
     getStates: function getStates() {
         return this._stateMap;
@@ -2217,13 +2305,13 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.1.0';
+  this.version = '0.1.1';
 
   /**
    * Package name
    * @type {String}
    */
-  this.name = '@Utilify';
+  this.name = '@UtilifyJS';
 
   /**
    * Global Helpers instance
@@ -2913,7 +3001,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.6.0';
+  this.version = '1.6.1';
 
   /**
    * Package name
