@@ -10,8 +10,8 @@ class VtexHelpers {
         return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
     }
 
-    isValidPrice(price, thousands, decimal, decimalLength) {
-        return vtexHelpers.isValidPrice(price, thousands, decimal, decimalLength);
+    getFirstAvailableSku(skus) {
+        return vtexHelpers.getFirstAvailableSku(skus);
     }
 
     getOriginalImage(src) {

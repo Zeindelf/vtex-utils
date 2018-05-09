@@ -25,6 +25,29 @@ export default {
         return currency + number.replace('.', (decimals || ',')).replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
     },
 
+    getFirstAvailableSku(skus) {
+        let newArr = [];
+
+        if ( !globalHelpers.isArray(skus) ) {
+            throw new Error(`'skus' must be an Array`);
+        }
+
+        const some = skus.some((item, index, oldArr) => {
+            if ( item.available ) {
+                newArr = oldArr[index];
+                return true;
+            }
+
+            return false;
+        });
+
+        if ( some ) {
+            return newArr;
+        }
+
+        return false;
+    },
+
     /**
      * Get the original VTEX image source from a thumb
      *

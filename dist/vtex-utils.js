@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-06T00:32:37.102Z
+ * Date: 2018-05-09T19:34:25.301Z
  */
 
 (function (global, factory) {
@@ -23,13 +23,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*!!
-	 * Utilify.js v0.1.1
+	 * Utilify.js v0.2.0
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-05-05T23:15:13.418Z
+	 * Date: 2018-05-09T19:31:29.960Z
 	 */
 
 	(function (global, factory) {
@@ -1080,6 +1080,9 @@
 
 	        return toString.call(value) === '[object Array]';
 	    },
+	    isArrayIndex: function isArrayIndex(n) {
+	        return n >>> 0 === n && n !== 0xFFFFFFFF;
+	    },
 
 
 	    /**
@@ -1302,6 +1305,15 @@
 	            return false;
 	        }
 	    },
+	    isPrimitive: function isPrimitive(obj, type) {
+	        type = type || (typeof obj === 'undefined' ? 'undefined' : _typeof(obj));
+
+	        return obj == null || type === 'string' || type === 'number' || type === 'boolean';
+	    },
+	    isRealNaN: function isRealNaN(obj) {
+	        // This is only true of NaN
+	        return obj != null && obj !== obj;
+	    },
 
 
 	    /**
@@ -1356,6 +1368,23 @@
 
 	var arrayHelpers = {
 	    /**
+	     * Creates a shallow clone of the array.
+	     *
+	     * @param  {Array} arr Array to clone
+	     * @return {Array}     Array cloned
+	     */
+	    arrayClone: function arrayClone(arr) {
+	        var clone = new Array(arr.length);
+
+	        this._forEach(arr, function (el, i) {
+	            clone[i] = el;
+	        });
+
+	        return clone;
+	    },
+
+
+	    /**
 	     * Remove all falsey values from an array.
 	     *
 	     * @category Array
@@ -1373,6 +1402,31 @@
 
 
 	    /**
+	     * Returns a flattened, one-dimensional copy of the array.
+	     * You can optionally specify a limit, which will only flatten to that depth.
+	     *
+	     * @param  {Array}   arr              Array to flatten
+	     * @param  {Integer} level[Infinity]  Depth
+	     * @return {Array}
+	     */
+	    arrayFlatten: function arrayFlatten(arr, level) {
+	        var self = this;
+	        var result = [];
+	        var current = 0;
+	        level = level || Infinity;
+
+	        self._forEach(arr, function (el) {
+	            if (validateHelpers.isArray(el) && current < level) {
+	                result = result.concat(self.arrayFlatten(el, level, current + 1));
+	            } else {
+	                result.push(el);
+	            }
+	        });
+	        return result;
+	    },
+
+
+	    /**
 	     * Returns a new array containing the intersection between two arrays given.
 	     *
 	     * @category Array
@@ -1386,6 +1440,51 @@
 	        return arr1.filter(function (val) {
 	            return arr2.indexOf(val) !== -1;
 	        });
+	    },
+
+
+	    /**
+	     * Returns a random element from the array.
+	     * If num is passed, will return an array of num elements.
+	     * If remove is true, sampled elements will also be removed from the array.
+	     * remove can also be passed in place of num.
+	     *
+	     * @param  {Array} [arr]  Array to sample
+	     * @param  {Integer|Boolean} [num=1]    Num of elements
+	     * @param  {Boolean} [remove=false]     Remove sampled elements
+	     * @return {String|Array}
+	     */
+	    arraySample: function arraySample(arr, num, remove) {
+	        var result = [];
+	        var _num = void 0;
+	        var _remove = void 0;
+	        var single = void 0;
+
+	        if (validateHelpers.isBoolean(num)) {
+	            _remove = num;
+	        } else {
+	            _num = num;
+	            _remove = remove;
+	        }
+
+	        if (validateHelpers.isUndefined(_num)) {
+	            _num = 1;
+	            single = true;
+	        }
+
+	        if (!_remove) {
+	            arr = this.arrayClone(arr);
+	        }
+
+	        _num = Math.min(_num, arr.length);
+
+	        for (var i = 0, index; i < _num; i += 1) {
+	            index = Math.trunc(Math.random() * arr.length);
+	            result.push(arr[index]);
+	            arr.splice(index, 1);
+	        }
+
+	        return single ? result[0] : result;
 	    },
 
 
@@ -1557,6 +1656,55 @@
 	        }
 
 	        return result;
+	    },
+
+
+	    // PRIVATE
+	    _getSparseArrayIndexes: function _getSparseArrayIndexes(arr, fromIndex, loop, fromRight) {
+	        var indexes = [];
+	        var i = void 0;
+
+	        for (i in arr) {
+	            // Istanbul ignore next
+	            if (validateHelpers.isArrayIndex(i) && (loop || (fromRight ? i <= fromIndex : i >= fromIndex))) {
+	                indexes.push(+i);
+	            }
+	        }
+
+	        indexes.sort(function (a, b) {
+	            var aLoop = a > fromIndex;
+	            var bLoop = b > fromIndex;
+
+	            // This block cannot be reached unless ES5 methods are being shimmed.
+	            // istanbul ignore if
+	            if (aLoop !== bLoop) {
+	                return aLoop ? -1 : 1;
+	            }
+
+	            return a - b;
+	        });
+
+	        return indexes;
+	    },
+	    _iterateOverSparseArray: function _iterateOverSparseArray(arr, fn, fromIndex, loop) {
+	        var indexes = this._getSparseArrayIndexes(arr, fromIndex, loop);
+	        var index = void 0;
+
+	        for (var i = 0, len = indexes.length; i < len; i += 1) {
+	            index = indexes[i];
+	            fn.call(arr, arr[index], index, arr);
+	        }
+
+	        return arr;
+	    },
+	    _forEach: function _forEach(arr, fn) {
+	        for (var i = 0, len = arr.length; i < len; i += 1) {
+	            if (!(i in arr)) {
+	                return this._iterateOverSparseArray(arr, fn, i);
+	            }
+
+	            fn(arr[i], i);
+	        }
 	    }
 	};
 
@@ -1764,6 +1912,21 @@
 
 
 	    /**
+	     * Compacts whitespace in the string to a single space and trims the ends.
+	     *
+	     * @param  {String} [str] String to remove spaces
+	     * @return {String}
+	     * @example
+	     *     trim('  Foo  Bar    Baz  ') // 'Foo Bar Baz'
+	     */
+	    strCompact: function strCompact(str) {
+	        return this.trim(str).replace(/([\r\n\s])+/g, function (match, whitespace) {
+	            return whitespace === '　' ? whitespace : ' ';
+	        });
+	    },
+
+
+	    /**
 	     * Multiple string replace, PHP str_replace clone
 	     * @param {string|Array} search - The value being searched for, otherwise known as the needle.
 	     *     An array may be used to designate multiple needles.
@@ -1846,6 +2009,11 @@
 	            return validateHelpers.isArray(value);
 	        }
 	    }, {
+	        key: 'isArrayIndex',
+	        value: function isArrayIndex(n) {
+	            return validateHelpers.isArrayIndex(n);
+	        }
+	    }, {
 	        key: 'isBoolean',
 	        value: function isBoolean(value) {
 	            return validateHelpers.isBoolean(value);
@@ -1911,6 +2079,16 @@
 	            return validateHelpers.isObjectEmpty(obj);
 	        }
 	    }, {
+	        key: 'isPrimitive',
+	        value: function isPrimitive(obj, type) {
+	            return validateHelpers.isPrimitive(obj, type);
+	        }
+	    }, {
+	        key: 'isRealNaN',
+	        value: function isRealNaN(obj) {
+	            return validateHelpers.isRealNaN(obj);
+	        }
+	    }, {
 	        key: 'isPlainObject',
 	        value: function isPlainObject(value) {
 	            return validateHelpers.isPlainObject(value);
@@ -1946,9 +2124,19 @@
 	            return arrayHelpers.arrayCompact(arr);
 	        }
 	    }, {
+	        key: 'arrayFlatten',
+	        value: function arrayFlatten(arr, level) {
+	            return arrayHelpers.arrayFlatten(arr, level);
+	        }
+	    }, {
 	        key: 'arrayIntersection',
 	        value: function arrayIntersection(arr1, arr2) {
 	            return arrayHelpers.arrayIntersection(arr1, arr2);
+	        }
+	    }, {
+	        key: 'arraySample',
+	        value: function arraySample(arr, arg1, arg2) {
+	            return arrayHelpers.arraySample(arr, arg1, arg2);
 	        }
 	    }, {
 	        key: 'arrayUnique',
@@ -2053,6 +2241,11 @@
 	        key: 'stripHttp',
 	        value: function stripHttp(url) {
 	            return globalHelpers.stripHttp(url);
+	        }
+	    }, {
+	        key: 'strCompact',
+	        value: function strCompact(str) {
+	            return stringHelpers.strCompact(str);
 	        }
 	    }, {
 	        key: 'strReplace',
@@ -2311,7 +2504,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '0.1.1';
+	  this.version = '0.2.0';
 
 	  /**
 	   * Package name
@@ -2367,6 +2560,28 @@
 	        number = (number * 1).toFixed(Math.max(0, ~~length));
 
 	        return currency + number.replace('.', decimals || ',').replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
+	    },
+	    getFirstAvailableSku: function getFirstAvailableSku(skus) {
+	        var newArr = [];
+
+	        if (!globalHelpers.isArray(skus)) {
+	            throw new Error('\'skus\' must be an Array');
+	        }
+
+	        var some = skus.some(function (item, index, oldArr) {
+	            if (item.available) {
+	                newArr = oldArr[index];
+	                return true;
+	            }
+
+	            return false;
+	        });
+
+	        if (some) {
+	            return newArr;
+	        }
+
+	        return false;
 	    },
 
 
@@ -2930,9 +3145,9 @@
 	            return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
 	        }
 	    }, {
-	        key: 'isValidPrice',
-	        value: function isValidPrice(price, thousands, decimal, decimalLength) {
-	            return vtexHelpers.isValidPrice(price, thousands, decimal, decimalLength);
+	        key: 'getFirstAvailableSku',
+	        value: function getFirstAvailableSku(skus) {
+	            return vtexHelpers.getFirstAvailableSku(skus);
 	        }
 	    }, {
 	        key: 'getOriginalImage',
