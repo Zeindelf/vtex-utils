@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.7.0
+ * VtexUtils.js v1.7.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-09T20:45:38.997Z
+ * Date: 2018-05-09T23:36:03.606Z
  */
 
 'use strict';
@@ -19,13 +19,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.2.0
+ * Utilify.js v0.2.1
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-09T19:31:29.960Z
+ * Date: 2018-05-09T23:31:28.916Z
  */
 
 (function (global, factory) {
@@ -1706,6 +1706,28 @@ var arrayHelpers = {
 
 var objectHelpers = {
     /**
+     * Call Object.freeze(obj) recursively on all unfrozen
+     * properties of obj that are functions or objects.
+     *
+     * @param  {Object} [obj] Object to freeze
+     * @return {Object}
+     */
+    deepFreeze: function deepFreeze(obj) {
+        var _this = this;
+
+        Object.freeze(obj);
+
+        Object.getOwnPropertyNames(obj).forEach(function (prop) {
+            if (obj.hasOwnProperty(prop) && obj[prop] !== null && (_typeof(obj[prop]) === 'object' || typeof obj[prop] === 'function') && !Object.isFrozen(obj[prop])) {
+                _this.deepFreeze(obj[prop]);
+            }
+        });
+
+        return obj;
+    },
+
+
+    /**
      * Extend the given object
      * @param {object} obj - The object to be extended
      * @param {*} args - The rest objects which will be merged to the first object
@@ -2165,6 +2187,11 @@ var GlobalHelpers = function () {
             return globalHelpers.debounce(func, wait, options);
         }
     }, {
+        key: 'deepFreeze',
+        value: function deepFreeze(obj) {
+            return objectHelpers.deepFreeze(obj);
+        }
+    }, {
         key: 'escape',
         value: function escape(str) {
             return stringHelpers.escape(str);
@@ -2500,7 +2527,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.2.0';
+  this.version = '0.2.1';
 
   /**
    * Package name
@@ -3218,7 +3245,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.7.0';
+  this.version = '1.7.1';
 
   /**
    * Package name
