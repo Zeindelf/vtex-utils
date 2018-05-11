@@ -15,7 +15,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.7.1';
+        this.version = '1.7.2';
 
         /**
          * Package name

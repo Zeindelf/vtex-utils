@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.7.1
+ * VtexUtils.js v1.7.2
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-09T23:36:03.606Z
+ * Date: 2018-05-11T17:58:07.642Z
  */
 
 (function (global, factory) {
@@ -3127,6 +3127,10 @@
 	        return Array.prototype.slice.apply(arr, args);
 	    };
 
+	    rivets.formatters.objProp = function (val, key) {
+	        return val[key];
+	    };
+
 	    rivets.formatters.formatPrice = function (val) {
 	        return vtexHelpers.formatPrice(val);
 	    };
@@ -3249,7 +3253,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '1.7.1';
+	  this.version = '1.7.2';
 
 	  /**
 	   * Package name
