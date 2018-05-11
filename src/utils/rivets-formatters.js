@@ -202,6 +202,10 @@ if ( 'rivets' in window ) {
         return Array.prototype.slice.apply(arr, args);
     };
 
+    rivets.formatters.objProp = (val, key) => {
+        return val[key];
+    };
+
     rivets.formatters.formatPrice = (val) => {
         return vtexHelpers.formatPrice(val);
     };
