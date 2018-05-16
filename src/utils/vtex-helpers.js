@@ -1,5 +1,5 @@
 
-import utilify from './vendor.utilify.js';
+import {utilify} from './vendor.utilify.js';
 
 const globalHelpers = utilify.globalHelpers;
 

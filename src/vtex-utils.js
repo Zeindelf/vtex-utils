@@ -2,7 +2,7 @@
 import './utils/rivets-formatters.js';
 
 import VtexHelpers from './class/VtexHelpers.js';
-import utilify from './utils/vendor.utilify.js';
+import {utilify} from './utils/vendor.utilify.js';
 
 
 /**
@@ -15,7 +15,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.7.2';
+        this.version = '1.7.3';
 
         /**
          * Package name

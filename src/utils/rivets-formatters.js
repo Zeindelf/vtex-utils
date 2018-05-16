@@ -1,6 +1,6 @@
 
 import vtexHelpers from './vtex-helpers.js';
-import utilify from './vendor.utilify.js';
+import {utilify} from './vendor.utilify.js';
 
 if ( typeof window !== 'object' ) {
     global.window = global;
