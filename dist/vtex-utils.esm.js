@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.7.3
+ * VtexUtils.js v1.7.4
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-16T05:56:16.826Z
+ * Date: 2018-05-18T19:30:07.278Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -17,13 +17,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.3.3
+ * Utilify.js v0.3.4
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-16T05:49:54.478Z
+ * Date: 2018-05-18T19:26:07.680Z
  */
 
 (function (global, factory) {
@@ -539,6 +539,28 @@ var stringHelpers = {
 
 
     /**
+     * Normalize text adding first character to upper after punctuations (. ? !)
+     *
+     * @param  {String} [str]  Text to convert
+     * @return {String}
+     */
+    normalizeText: function normalizeText(str) {
+        var re = /(^|[.!?]\s+)([a-z])/g;
+
+        var normalize = function normalize(str) {
+            return str.toLowerCase().replace(re, function (m, $1, $2) {
+                return $1 + $2.toUpperCase();
+            });
+        };
+        var addSpace = function addSpace(str) {
+            return strCompact(str.replace(/[,.!?:;]+(?=\S)/g, '$& '));
+        };
+
+        return normalize(addSpace(this.strCompact(str)));
+    },
+
+
+    /**
      * Zero padding number
      *
      * @param  {integer} number     Number to format
@@ -667,6 +689,23 @@ var stringHelpers = {
         }
 
         return '';
+    },
+
+
+    /**
+     * Make a string's first character uppercase
+     * PHP ucfirst clone
+     *
+     * @param {String} str - The string.
+     * @returns {String} The new string.
+     * @example
+     *     ucfirst('foo bar foz') // 'Foo bar foz'
+     */
+    ucfirst: function ucfirst(str) {
+        str += '';
+        var f = str.charAt(0).toUpperCase();
+
+        return f + str.substr(1);
     },
 
 
@@ -2297,6 +2336,11 @@ var GlobalHelpers = function () {
             return objectHelpers.length(item);
         }
     }, {
+        key: 'normalizeText',
+        value: function normalizeText(str) {
+            return stringHelpers.normalizeText(str);
+        }
+    }, {
         key: 'objectSearch',
         value: function objectSearch(object, needle) {
             return objectHelpers.objectSearch(object, needle);
@@ -2370,6 +2414,11 @@ var GlobalHelpers = function () {
         key: 'trim',
         value: function trim(str) {
             return stringHelpers.trim(str);
+        }
+    }, {
+        key: 'ucfirst',
+        value: function ucfirst(str) {
+            return stringHelpers.ucfirst(str);
         }
     }, {
         key: 'underscore',
@@ -2608,7 +2657,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.3.3';
+  this.version = '0.3.4';
 
   /**
    * Package name
@@ -3330,7 +3379,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.7.3';
+  this.version = '1.7.4';
 
   /**
    * Package name
