@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.7.4
+ * VtexUtils.js v1.7.5
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-18T19:30:07.278Z
+ * Date: 2018-05-18T19:56:35.204Z
  */
 
 (function (global, factory) {
@@ -23,13 +23,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*!!
-	 * Utilify.js v0.3.4
+	 * Utilify.js v0.3.5
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-05-18T19:26:07.680Z
+	 * Date: 2018-05-18T19:52:46.875Z
 	 */
 
 	(function (global, factory) {
@@ -551,18 +551,19 @@
 	     * @return {String}
 	     */
 	    normalizeText: function normalizeText(str) {
-	        var re = /(^|[.!?]\s+)([a-z])/g;
+	        var _this = this;
 
+	        var re = /(^|[.!?]\s+)([a-z])/g;
 	        var normalize = function normalize(str) {
 	            return str.toLowerCase().replace(re, function (m, $1, $2) {
 	                return $1 + $2.toUpperCase();
 	            });
 	        };
 	        var addSpace = function addSpace(str) {
-	            return strCompact(str.replace(/[,.!?:;]+(?=\S)/g, '$& '));
+	            return _this.strCompact(str.replace(/[,.!?:;]+(?=\S)/g, '$& '));
 	        };
 
-	        return normalize(addSpace(this.strCompact(str)));
+	        return normalize(addSpace(str));
 	    },
 
 
@@ -2663,7 +2664,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '0.3.4';
+	  this.version = '0.3.5';
 
 	  /**
 	   * Package name
@@ -3385,7 +3386,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '1.7.4';
+	  this.version = '1.7.5';
 
 	  /**
 	   * Package name
