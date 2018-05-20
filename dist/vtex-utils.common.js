@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.7.5
+ * VtexUtils.js v1.8.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-18T19:56:35.204Z
+ * Date: 2018-05-20T21:43:09.758Z
  */
 
 'use strict';
@@ -19,13 +19,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.3.5
+ * Utilify.js v0.3.6
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-18T19:52:46.875Z
+ * Date: 2018-05-20T21:26:39.522Z
  */
 
 (function (global, factory) {
@@ -2660,7 +2660,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.3.5';
+  this.version = '0.3.6';
 
   /**
    * Package name
@@ -3054,239 +3054,26 @@ var createClass = function () {
   };
 }();
 
-var _arguments = arguments;
-
 if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object') {
     global.window = global;
     global.window.navigator = {};
 }
 
 if ('rivets' in window) {
-    rivets.formatters['!'] = function (value) {
-        return !value;
+    rivets.formatters.formatPrice = function (target) {
+        return vtexHelpers.formatPrice(target);
     };
-
-    rivets.formatters.eq = function (value, args) {
-        return value === args;
+    rivets.formatters.getResizedImage = function (src, width, height) {
+        return vtexHelpers.getResizedImage(src, width, height);
     };
-
-    rivets.formatters.neq = function (value, args) {
-        return value !== args;
-    };
-
-    rivets.formatters.gt = function (value, args) {
-        return value > args;
-    };
-
-    rivets.formatters.gte = function (value, args) {
-        return value >= args;
-    };
-
-    rivets.formatters.lt = function (value, args) {
-        return value < args;
-    };
-
-    rivets.formatters.lte = function (value, args) {
-        return value <= args;
-    };
-
-    rivets.formatters.or = function (value, args) {
-        return value || args;
-    };
-
-    rivets.formatters.isEmpty = function (value) {
-        return typeof value === 'undefined' || value === null || typeof value === 'string' && value.length === 0;
-    };
-
-    rivets.formatters.isNotEmpty = function (value) {
-        return !rivets.formatters.isEmpty(value);
-    };
-
-    rivets.formatters.pass = function (value, args) {
-        return args;
-    };
-
-    rivets.formatters.json = function (value, intendation) {
-        return JSON.stringify(value, null, intendation || 0);
-    };
-
-    rivets.formatters.prefix = function (value, prefix) {
-        return '' + prefix + value;
-    };
-
-    rivets.formatters.suffix = function (value, suffix) {
-        return '' + value + suffix;
-    };
-
-    rivets.formatters.ucFirst = function (value) {
-        return value.substr(0, 1).toUpperCase() + value.substr(1);
-    };
-
-    rivets.formatters['+'] = function (value, args) {
-        return value + args;
-    };
-
-    rivets.formatters['-'] = function (value, args) {
-        return value - args;
-    };
-
-    rivets.formatters['*'] = function (value, args) {
-        return value * args;
-    };
-
-    rivets.formatters['/'] = function (value, args) {
-        return value / args;
-    };
-
-    rivets.formatters.round = function (value, decimals) {
-        if (decimals) {
-            var exp = Math.pow(10, decimals);
-            value = Math.round(value * exp) / exp;
-        } else {
-            value = Math.round(value);
-        }
-
-        return value;
-    };
-
-    rivets.formatters.get = function (obj, key) {
-        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            return obj[key];
-        }
-
-        return null;
-    };
-
-    rivets.formatters.set = function (obj, key, value) {
-        if (obj && (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            obj[key] = value;
-        }
-
-        return obj;
-    };
-
-    rivets.formatters['.'] = rivets.formatters.get;
-
-    rivets.formatters.keys = function (obj) {
-        if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object') {
-            return Object.keys(obj);
-        }
-
-        return [];
-    };
-
-    rivets.formatters.length = function (value) {
-        return value ? value.length || 0 : 0;
-    };
-
-    rivets.formatters.sort = function () /* value[, by][, direction]*/{
-        var args = Array.from(_arguments);
-        var value = args.shift();
-        var by = args.shift();
-        var direction = args.shift();
-
-        if (!direction && (by == 'asc' || by == 'desc')) {
-            direction = by;
-            by = null;
-        }
-
-        if (!by) {
-            value.sort();
-        } else {
-            value.sort(function (a, b) {
-                if (a[by] === b[by]) {
-                    return 0;
-                }
-
-                return a[by] < b[by] ? -1 : 1;
-            });
-        }
-
-        if (direction == 'desc') {
-            value.reverse();
-        }
-
-        return value;
-    };
-
-    rivets.formatters.default = function (value, args) {
-        return typeof value !== 'undefined' && value !== null ? value : args;
-    };
-
-    rivets.formatters.contains = function (value, search) {
-        if (Array.isArray(value)) {
-            return value.indexOf(search) !== -1;
-        }
-
-        return false;
-    };
-
-    rivets.formatters.percent = function (value, decimals) {
-        return number_format(value * 100, decimals || 0, ',') + '%';
-    };
-
-    rivets.formatters.bind = function () /* fn, thisArg[, arg1, arg2, ..., argN]*/{
-        var args = Array.from(_arguments);
-        var fn = args.shift();
-        var self = args.shift();
-
-        if (typeof fn === 'function') {
-            return function () {
-                fn.apply(self, args);
-            };
-        }
-
-        return fn;
-    };
-
-    rivets.formatters.with = function () /* fn, arg1, arg2, ..., argN*/{
-        var args = Array.from(_arguments);
-        var fn = args.shift();
-
-        if (typeof fn === 'function') {
-            return fn.bind(null, args);
-        }
-
-        return fn;
-    };
-
-    rivets.formatters.slice = function () {
-        var args = Array.from(_arguments);
-        var arr = args.shift();
-        return Array.prototype.slice.apply(arr, args);
-    };
-
-    rivets.formatters.objProp = function (val, key) {
-        return val[key];
-    };
-
-    rivets.formatters.formatPrice = function (val) {
-        return vtexHelpers.formatPrice(val);
-    };
-
-    rivets.formatters.productImgSize = function (val, arg1, arg2) {
-        return vtexHelpers.getResizedImage(val, arg1, arg2);
-    };
-
-    rivets.formatters.getResizedImage = function (val, arg1, arg2) {
-        return vtexHelpers.getResizedImage(val, arg1, arg2);
-    };
-
     rivets.formatters.getResizeImageByRatio = function (src, type, newSize, aspectRatio) {
         return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     };
-
-    rivets.formatters.replaceBreakLines = function (val) {
-        return vtexHelpers.replaceBreakLines(val);
+    rivets.formatters.replaceBreakLines = function (target) {
+        return vtexHelpers.replaceBreakLines(target);
     };
 
-    rivets.formatters.pad = function (val) {
-        return utilify$1.globalHelpers.pad(val);
-    };
-
-    rivets.formatters.capitalize = function (val) {
-        return utilify$1.globalHelpers.capitalize(val);
-    };
+    rivets.formatters.productImgSize = rivets.formatters.getResizedImage;
 }
 
 /**
@@ -3382,7 +3169,7 @@ var VtexUtils = function VtexUtils() {
    * Version
    * @type {String}
    */
-  this.version = '1.7.5';
+  this.version = '1.8.0';
 
   /**
    * Package name

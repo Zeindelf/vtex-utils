@@ -1,9 +1,8 @@
 
-import './utils/rivets-formatters.js';
+import './rivets/init.formatters.js';
 
 import VtexHelpers from './class/VtexHelpers.js';
 import {utilify} from './utils/vendor.utilify.js';
-
 
 /**
  * Create a VtexUtils class
@@ -15,7 +14,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.7.5';
+        this.version = '1.8.0';
 
         /**
          * Package name
