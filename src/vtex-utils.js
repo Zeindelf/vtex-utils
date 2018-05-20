@@ -14,7 +14,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.8.0';
+        this.version = '1.9.0';
 
         /**
          * Package name
@@ -45,6 +45,10 @@ class VtexUtils {
          * @type {Object}
          */
         this.storage = utilify.storage;
+    }
+
+    setRivetsUtilify(RivetsUtilify) {
+        this.rivetsUtilify = new RivetsUtilify(utilify);
     }
 }
 

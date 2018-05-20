@@ -12,6 +12,7 @@ A collection of utilities methods for Vtex stores.
 - [Getting started](#getting-started)
 - [UtilifyJS](#utilifyjs)
 - [Vtex Methods](#vtex-methods)
+- [Rivets Utilify](#rivets-utilify)
 - [Tests](#tests)
 - [License](#license)
 - [Dependencies](#dependencies)
@@ -392,7 +393,24 @@ vtexHelpers.clearCart()
   .fail(function(err) {
     window.console.log(err)
   });
+```
 
+
+## Rivets Utilify
+
+Docs for RivetsUtilify can be found [here](https://github.com/Zeindelf/rivets-utilify)
+
+To set RivetsUtilify:
+
+```js
+// Import RivetsUtilify
+<script type="text/javascript" src="rivets-utilify.min.js"></script>
+
+// Initialize constructor
+var vtexUtils = new VTEX.VtexUtils();
+
+// Sets method
+vtexUtils.setRivetsUtilify(RivetsUtilify);
 ```
 
 

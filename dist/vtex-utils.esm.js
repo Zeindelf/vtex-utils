@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-20T21:43:09.758Z
+ * Date: 2018-05-20T22:32:23.816Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -3160,44 +3160,54 @@ var VtexHelpers = function () {
  * Main class
  */
 
-var VtexUtils = function VtexUtils() {
-  classCallCheck(this, VtexUtils);
+var VtexUtils = function () {
+  function VtexUtils() {
+    classCallCheck(this, VtexUtils);
 
-  /**
-   * Version
-   * @type {String}
-   */
-  this.version = '1.8.0';
+    /**
+     * Version
+     * @type {String}
+     */
+    this.version = '1.8.0';
 
-  /**
-   * Package name
-   * @type {String}
-   */
-  this.name = '@VtexUtils';
+    /**
+     * Package name
+     * @type {String}
+     */
+    this.name = '@VtexUtils';
 
-  /**
-   * Vtex Helpers instance
-   * @type {VtexHelpers}
-   */
-  this.vtexHelpers = new VtexHelpers();
+    /**
+     * Vtex Helpers instance
+     * @type {VtexHelpers}
+     */
+    this.vtexHelpers = new VtexHelpers();
 
-  /**
-   * Global Helpers instance
-   * @type {GlobalHelpers}
-   */
-  this.globalHelpers = utilify$1.globalHelpers;
+    /**
+     * Global Helpers instance
+     * @type {GlobalHelpers}
+     */
+    this.globalHelpers = utilify$1.globalHelpers;
 
-  /**
-   * Location Helpers instance
-   * @type {LocationHelpers}
-   */
-  this.locationHelpers = utilify$1.locationHelpers;
+    /**
+     * Location Helpers instance
+     * @type {LocationHelpers}
+     */
+    this.locationHelpers = utilify$1.locationHelpers;
 
-  /**
-   * Local/Session Storage
-   * @type {Object}
-   */
-  this.storage = utilify$1.storage;
-};
+    /**
+     * Local/Session Storage
+     * @type {Object}
+     */
+    this.storage = utilify$1.storage;
+  }
+
+  createClass(VtexUtils, [{
+    key: 'setRivetsUtilify',
+    value: function setRivetsUtilify(RivetsUtilify) {
+      this.rivetsUtilify = new RivetsUtilify(utilify$1);
+    }
+  }]);
+  return VtexUtils;
+}();
 
 export default VtexUtils;
