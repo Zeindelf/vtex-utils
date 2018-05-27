@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.9.0
+ * VtexUtils.js v1.10.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-27T06:13:40.638Z
+ * Date: 2018-05-27T06:30:17.812Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -2836,10 +2836,10 @@ var vtexHelpers = {
     /**
      * Unformat Vtex price
      *
-     * @param {String}          value                 Price formatted
+     * @param {String|Array}    value                 Price formatted
      * @param {string}          [decimal=',']         The decimal delimiter
      * @param {integer}         [formatPrice=false]   Thousands separator (pt-BR default: '.')
-     * @return {string} The unformatted price
+     * @return {string|Array}   The unformatted price
      */
     unformatPrice: function unformatPrice(value, decimal) {
         var _this = this;
@@ -3346,7 +3346,7 @@ var VtexUtils = function () {
      * Version
      * @type {String}
      */
-    this.version = '1.9.0';
+    this.version = '1.10.0';
 
     /**
      * Package name
