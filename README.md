@@ -121,6 +121,64 @@ vtexHelpers.formatPrice(123456, null, ',', 3); // R$ 1234,560
 vtexHelpers.formatPrice(123456, ',', '.', 2, '$ '); // $ 1,234.56
 ```
 
+
+### vtexHelpers.unformatPrice(value[, decimal[, formatNumber]])
+
+Unformat Vtex price. Value can be a single string or an array of values
+
+- **value**:
+  - Type: `String|Array`
+  - Price formatted
+
+- **decimal** (optional):
+  - Type: `String`
+  - Default: `','`
+  - The decimal delimiter
+
+- **formatNumber** (optional):
+  - Type: `Boolean`
+  - Default: `false`
+  - Thousands separator (pt-BR default: `'.'`)
+
+#### Example
+
+```js
+var priceFormatted = 'R$ 1.234,56';
+vtexHelpers.unformatPrice(priceFormatted); // {unformatted: 123456, real: '1234', cents: '56'}
+vtexHelpers.unformatPrice(priceFormatted, null, true); // {unformatted: 123456, real: '1.234', cents: '56'}
+
+vtexHelpers.unformatPrice(['R$ 12,34', 'R$ 23,45', 'R$ 34,56']); 
+/* 
+[
+    {unformatted: 1234, real: '12', cents: '34'}
+    {unformatted: 2345, real: '23', cents: '45'}
+    {unformatted: 3456, real: '34', cents: '56'}
+]
+*/
+```
+
+
+### vtexHelpers.getFirstAvailableSku(skus)
+
+Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
+(same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+Returns an object with first available SKU or false if all are unvailable
+
+- **skus**:
+  - Type: `Array`
+  - Skus array data
+
+#### Example
+
+```js
+vtexjs.catalog.getProductWithVariations(1234)
+    .then(function(res) {
+        const sku = vtexHelpers.getFirstAvailableSku(res.skus);
+        window.console.log(sku);
+    });
+```
+
+
 ### vtexHelpers.getOriginalImage(src)
 
 Get the original VTEX image source from a thumb

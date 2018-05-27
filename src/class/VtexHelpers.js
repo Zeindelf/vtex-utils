@@ -10,6 +10,10 @@ class VtexHelpers {
         return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
     }
 
+    unformatPrice(value, decimal, formatNumber) {
+        return vtexHelpers.unformatPrice(value, decimal, formatNumber);
+    }
+
     getFirstAvailableSku(skus) {
         return vtexHelpers.getFirstAvailableSku(skus);
     }

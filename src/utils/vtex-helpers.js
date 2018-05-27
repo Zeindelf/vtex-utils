@@ -25,6 +25,56 @@ export default {
         return currency + number.replace('.', (decimals || ',')).replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
     },
 
+    /**
+     * Unformat Vtex price
+     *
+     * @param {String|Array}    value                 Price formatted
+     * @param {string}          [decimal=',']         The decimal delimiter
+     * @param {integer}         [formatPrice=false]   Thousands separator (pt-BR default: '.')
+     * @return {string|Array}   The unformatted price
+     */
+    unformatPrice(value, decimal, formatNumber = false) {
+        // Recursively unformat arrays:
+        if ( globalHelpers.isArray(value) ) {
+            return value.map((val) => this.unformatPrice(val, decimal, formatNumber));
+        }
+
+        // Fails silently (need decent errors):
+        value = value || 0;
+
+        // Return the value as-is if it's already a number:
+        if ( globalHelpers.isNumber(value) ) {
+            return value;
+        }
+
+        decimal = decimal || ',';
+
+         // Build regex to strip out everything except digits, decimal point and minus sign:
+        const format = `[^0-9-${decimal}]`;
+        const regex = new RegExp(format, ['g']);
+        const unformatted = parseFloat(
+                ('' + value)
+                    .replace(/\((?=\d+)(.*)\)/, '-$1') // replace bracketed values with negatives
+                    .replace(regex, '') // strip out any cruft
+                    .replace(decimal, '.') // make sure decimal point is standard
+            ).toFixed(2);
+
+        const values = unformatted.toString().split('.');
+
+        return {
+            unformatted: parseFloat(globalHelpers.toNumber(values.join('')), 10),
+            real: ( formatNumber ) ? globalHelpers.formatNumber(values[0]) : values[0],
+            cents: values[1] || '00',
+        };
+    },
+
+    /**
+     * Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
+     * (same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+     *
+     * @param  {Array}  skus      Skus array data
+     * @return {Object|Boolean}   An available SKU data or false
+     */
     getFirstAvailableSku(skus) {
         let newArr = [];
 

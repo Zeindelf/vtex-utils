@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-20T22:39:30.316Z
+ * Date: 2018-05-27T06:13:40.638Z
  */
 
 (function (global, factory) {
@@ -23,13 +23,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*!!
-	 * Utilify.js v0.3.6
+	 * Utilify.js v0.4.0
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-05-20T21:26:39.522Z
+	 * Date: 2018-05-27T01:25:22.608Z
 	 */
 
 	(function (global, factory) {
@@ -1095,24 +1095,25 @@
 	     * @param  {Number} aspectRatio   Image aspect ratio (calculate by (width / height))
 	     * @return {Object}               Object with new 'width' and 'height'
 	     */
-	    resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio) {
+	    resizeImageByRatio: function resizeImageByRatio(type, newSize, aspectRatio, decimal) {
 	        if (!validateHelpers.isNumber(newSize) || !validateHelpers.isNumber(aspectRatio)) {
-	            newSize = parseFloat(newSize);
-	            aspectRatio = parseFloat(aspectRatio);
+	            newSize = parseFloat(newSize, 10);
+	            aspectRatio = parseFloat(aspectRatio, 10);
 	        }
 
 	        var dimensions = {};
+	        decimal = decimal || 4;
 
 	        switch (type) {
 	            case 'width':
-	                dimensions.width = parseFloat(newSize);
-	                dimensions.height = parseFloat(newSize / aspectRatio);
+	                dimensions.width = parseFloat(newSize, 10);
+	                dimensions.height = parseFloat((newSize / aspectRatio).toFixed(decimal), 10);
 
 	                break;
 
 	            case 'height':
-	                dimensions.width = parseFloat(newSize * aspectRatio);
-	                dimensions.height = parseFloat(newSize);
+	                dimensions.width = parseFloat((newSize * aspectRatio).toFixed(decimal), 10);
+	                dimensions.height = parseFloat(newSize, 10);
 
 	                break;
 
@@ -1260,30 +1261,6 @@
 	        }
 
 	        return result;
-	    },
-
-
-	    /**
-	     * Converts a value to a number if possible.
-	     *
-	     * @category Global
-	     * @param {Mix} value The value to convert.
-	     * @returns {Number} The converted number, otherwise the original value.
-	     * @example
-	     *     toNumber('123') // 123
-	     *     toNumber('123.456') // 123.456
-	     */
-	    toNumber: function toNumber(value) {
-	        var number = parseFloat(value);
-	        if (number === undefined) {
-	            return value;
-	        }
-
-	        if (number.toString().length !== value.toString().length) {
-	            return value;
-	        }
-
-	        return Number.isNaN(number) ? value : number;
 	    },
 
 
@@ -1549,6 +1526,18 @@
 	        }
 
 	        return true;
+	    },
+
+
+	    /**
+	     * Returns whether a value is a percentage.
+	     *
+	     * @category Validate
+	     * @param  {Mix}  percentage - The percentage to test.
+	     * @return {Boolean}
+	     */
+	    isPercentage: function isPercentage(percentage) {
+	        return this.isNumber(percentage) && percentage <= 100 && percentage >= 0;
 	    },
 
 
@@ -1977,6 +1966,123 @@
 	    }
 	};
 
+	// import validateHelpers from './validate-helpers.js';
+
+	var numberHelpers = {
+	    /**
+	     * Formats an integer number with dots/commas as thousands separators
+	     *
+	     * @param  {Integer} num Number to format
+	     * @param  {String} [separator='.'] Separator
+	     * @return {String}
+	     */
+	    formatNumber: function formatNumber(num, separator) {
+	        separator = separator || '.';
+
+	        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, separator);
+	    },
+
+
+	    /**
+	     * Convert long numbers into a human-readable format, e.g. 25000 to '25K'
+	     *
+	     * @from millify
+	     * @param  {Number} number    Number to format
+	     * @param  {Integer} [decimal=1]  Decimal places
+	     * @return {String}
+	     */
+	    milify: function milify(number, decimal) {
+	        var suffixes = new Map();
+	        suffixes.set(3, 'K');
+	        suffixes.set(6, 'M');
+	        suffixes.set(9, 'B');
+	        suffixes.set(12, 'T');
+	        suffixes.set(15, 'P');
+	        suffixes.set(18, 'E');
+
+	        // Make sure value is a number
+	        number = function (num) {
+	            if (typeof num !== 'number') {
+	                throw new Error('Input value is not a number');
+	            }
+
+	            return parseFloat(num, 10);
+	        }(number);
+
+	        // Figure out how many digits in the integer
+	        var digits = Math.floor(Math.log10(Math.abs(number))) + 1;
+
+	        // Figure out the appropriate unit for the number
+	        var units = function (num, zeroes) {
+	            var _iteratorNormalCompletion = true;
+	            var _didIteratorError = false;
+	            var _iteratorError = undefined;
+
+	            try {
+	                for (var _iterator = suffixes.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+	                    var z = _step.value;
+
+	                    if (num > z) {
+	                        zeroes = z;
+	                    }
+	                }
+	            } catch (err) {
+	                _didIteratorError = true;
+	                _iteratorError = err;
+	            } finally {
+	                try {
+	                    if (!_iteratorNormalCompletion && _iterator.return) {
+	                        _iterator.return();
+	                    }
+	                } finally {
+	                    if (_didIteratorError) {
+	                        throw _iteratorError;
+	                    }
+	                }
+	            }
+
+	            return {
+	                suffix: suffixes.get(zeroes),
+	                zeroes: zeroes
+	            };
+	        }(digits, null);
+
+	        var pretty = number / Math.pow(10, units.zeroes);
+
+	        decimal = pretty % 1 === 0 ? 2 : Math.max(1, decimal + 1) || 3;
+
+	        if (-1000 < number && number < 1000) {
+	            return number;
+	        }
+
+	        return '' + parseFloat(pretty.toPrecision(decimal)) + units.suffix;
+	    },
+
+
+	    /**
+	     * Converts a value to a number if possible.
+	     *
+	     * @category Global
+	     * @param {Mix} value The value to convert.
+	     * @returns {Number} The converted number, otherwise the original value.
+	     * @example
+	     *     toNumber('123') // 123
+	     *     toNumber('123.456') // 123.456
+	     */
+	    toNumber: function toNumber(value) {
+	        var number = parseFloat(value);
+	        if (number === undefined) {
+	            return value;
+	        }
+
+	        if (number.toString().length !== value.toString().length) {
+	            return value;
+	        }
+
+	        return Number.isNaN(number) ? value : number;
+	    }
+	};
+
 	var objectHelpers = {
 	    /**
 	     * Call Object.freeze(obj) recursively on all unfrozen
@@ -2323,6 +2429,11 @@
 	            return objectHelpers.extend.apply(objectHelpers, [obj].concat(args));
 	        }
 	    }, {
+	        key: 'formatNumber',
+	        value: function formatNumber(num, separator) {
+	            return numberHelpers.formatNumber(num, separator);
+	        }
+	    }, {
 	        key: 'getType',
 	        value: function getType(variable) {
 	            return globalHelpers.getType(variable);
@@ -2341,6 +2452,11 @@
 	        key: 'length',
 	        value: function length(item) {
 	            return objectHelpers.length(item);
+	        }
+	    }, {
+	        key: 'milify',
+	        value: function milify(ugly, decimal) {
+	            return numberHelpers.milify(ugly, decimal);
 	        }
 	    }, {
 	        key: 'normalizeText',
@@ -2364,8 +2480,8 @@
 	        }
 	    }, {
 	        key: 'resizeImageByRatio',
-	        value: function resizeImageByRatio(type, newValue, aspectRatio) {
-	            return globalHelpers.resizeImageByRatio(type, newValue, aspectRatio);
+	        value: function resizeImageByRatio(type, newValue, aspectRatio, decimals) {
+	            return globalHelpers.resizeImageByRatio(type, newValue, aspectRatio, decimals);
 	        }
 	    }, {
 	        key: 'shuffleArray',
@@ -2415,7 +2531,7 @@
 	    }, {
 	        key: 'toNumber',
 	        value: function toNumber(value) {
-	            return globalHelpers.toNumber(value);
+	            return numberHelpers.toNumber(value);
 	        }
 	    }, {
 	        key: 'trim',
@@ -2664,7 +2780,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '0.3.6';
+	  this.version = '0.4.0';
 
 	  /**
 	   * Package name
@@ -2721,6 +2837,63 @@
 
 	        return currency + number.replace('.', decimals || ',').replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
 	    },
+
+
+	    /**
+	     * Unformat Vtex price
+	     *
+	     * @param {String}          value                 Price formatted
+	     * @param {string}          [decimal=',']         The decimal delimiter
+	     * @param {integer}         [formatPrice=false]   Thousands separator (pt-BR default: '.')
+	     * @return {string} The unformatted price
+	     */
+	    unformatPrice: function unformatPrice(value, decimal) {
+	        var _this = this;
+
+	        var formatNumber = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+	        // Recursively unformat arrays:
+	        if (globalHelpers.isArray(value)) {
+	            return value.map(function (val) {
+	                return _this.unformatPrice(val, decimal, formatNumber);
+	            });
+	        }
+
+	        // Fails silently (need decent errors):
+	        value = value || 0;
+
+	        // Return the value as-is if it's already a number:
+	        if (globalHelpers.isNumber(value)) {
+	            return value;
+	        }
+
+	        decimal = decimal || ',';
+
+	        // Build regex to strip out everything except digits, decimal point and minus sign:
+	        var format = '[^0-9-' + decimal + ']';
+	        var regex = new RegExp(format, ['g']);
+	        var unformatted = parseFloat(('' + value).replace(/\((?=\d+)(.*)\)/, '-$1') // replace bracketed values with negatives
+	        .replace(regex, '') // strip out any cruft
+	        .replace(decimal, '.') // make sure decimal point is standard
+	        ).toFixed(2);
+
+	        var values = unformatted.toString().split('.');
+
+	        return {
+	            unformatted: parseFloat(globalHelpers.toNumber(values.join('')), 10),
+	            real: formatNumber ? globalHelpers.formatNumber(values[0]) : values[0],
+	            cents: values[1] || '00'
+	        };
+	    },
+
+
+	    /**
+	     * Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
+	     * (same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+	     *
+	     * @param  {Array}  skus      Skus array data
+	     * @return {Object|Boolean}   An available SKU data or false
+	     */
 	    getFirstAvailableSku: function getFirstAvailableSku(skus) {
 	        var newArr = [];
 
@@ -3094,6 +3267,11 @@
 	        key: 'formatPrice',
 	        value: function formatPrice(number, thousands, decimals, length, currency) {
 	            return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
+	        }
+	    }, {
+	        key: 'unformatPrice',
+	        value: function unformatPrice(value, decimal, formatNumber) {
+	            return vtexHelpers.unformatPrice(value, decimal, formatNumber);
 	        }
 	    }, {
 	        key: 'getFirstAvailableSku',

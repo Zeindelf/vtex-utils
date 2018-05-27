@@ -67,7 +67,7 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-watch": "^4.3.1",
     "uglify-js": "^3.3.11",
-    "utilify-js": "^0.3.6"
+    "utilify-js": "^0.4.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",

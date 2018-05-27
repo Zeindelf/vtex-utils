@@ -9,11 +9,27 @@ const vtexHelpers = vtexUtils.vtexHelpers;
 
 describe('Vtex Methods', () => {
     const imageResized = 'http://domain.vteximg.com.br/arquivos/ids/155242-292-292/image.png';
+
     it('format price', (done) => {
         expect(vtexHelpers.formatPrice(1234)).to.equal('R$ 12,34');
         expect(vtexHelpers.formatPrice(123456)).to.equal('R$ 1.234,56');
         expect(vtexHelpers.formatPrice(123456, '.', ',', 3)).to.equal('R$ 1.234,560');
         expect(vtexHelpers.formatPrice(123456, ',', '.', 2, '$ ')).to.equal('$ 1,234.56');
+        done();
+    });
+
+    it('unformat price', (done) => {
+        const priceToFormat = 1000;
+        const priceFormatted = vtexHelpers.formatPrice(priceToFormat);
+        const priceUnformatted = vtexHelpers.unformatPrice(priceFormatted);
+
+        const priceFormattedArr = ['R$ 12,34', 'R$ 23,45', 'R$ 34,56'];
+        const unformattedArr = vtexHelpers.unformatPrice(priceFormattedArr);
+
+        expect(priceUnformatted).to.deep.equal({unformatted: 1000, real: '10', cents: '00'});
+        expect(unformattedArr).to.deep.equal([{unformatted: 1234, real: '12', cents: '34'},{unformatted: 2345, real: '23', cents: '45'},{unformatted: 3456, real: '34', cents: '56'}]);
+
+        expect(priceToFormat).to.equal(priceUnformatted.unformatted);
         done();
     });
 
