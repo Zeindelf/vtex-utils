@@ -69,29 +69,48 @@ export default {
     },
 
     /**
-     * Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
-     * (same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+     * Formats price from Vtex API `/api/catalog_system/pub/products/search/`
+     * to a correct `formatPrice` method
      *
-     * @param  {Array}  skus      Skus array data
-     * @return {Object|Boolean}   An available SKU data or false
+     * @param  {Number} val Value to convert
+     * @return {Integer}
      */
-    getFirstAvailableSku(skus) {
-        let newArr = [];
+    fixProductSearchPrice(val) {
+        return val.toFixed(2).split('.').join('') * 1;
+    },
 
-        if ( !globalHelpers.isArray(skus) ) {
-            throw new Error(`'skus' must be an Array`);
+    /**
+     * Get first available SKU from Vtex API `/api/catalog_system/` end point
+     *
+     * @param  {Object}  product     Product full data
+     * @return {Object|Boolean}      An available SKU data or false
+     */
+    getFirstAvailableSku(product) {
+        let newArr = {};
+
+        if ( product.hasOwnProperty('items') ) {
+            product.items.some((item, index, oldArr) => {
+                if ( item.sellers[0].commertialOffer.AvailableQuantity > 0 || item.sellers[0].commertialOffer.availableQuantity > 0 ) {
+                    newArr = oldArr[index];
+                    return true;
+                }
+
+                return false;
+            });
         }
 
-        const some = skus.some((item, index, oldArr) => {
-            if ( item.available ) {
-                newArr = oldArr[index];
-                return true;
-            }
+        if ( product.hasOwnProperty('skus') ) {
+            product.skus.some((item, index, oldArr) => {
+                if ( item.available ) {
+                    newArr = oldArr[index];
+                    return true;
+                }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
-        if ( some ) {
+        if ( globalHelpers.length(newArr) > 0 ) {
             return newArr;
         }
 
@@ -238,7 +257,7 @@ export default {
      * @param {Boolean|String}   [defaultValue]      Value if spec doesn't exists
      * @returns spec value or false/defaultVal if spec doesn't exists
      */
-    getProductSpec(data, specName, defaultVal) {
+    getProductSpec(data, specName, defaultVal = false) {
         if ( globalHelpers.isUndefined(data[specName]) ) {
             return defaultVal;
         }
@@ -250,6 +269,43 @@ export default {
         }
 
         return defaultVal;
+    },
+
+    /**
+     * From '/api/catalog_system/pub/products/search/' endpoint
+     *
+     * @returns {Array}  A new instance of array with skus ordered
+     */
+    sortProductSearch(product, map, dimension, reverse = false) {
+        if ( !globalHelpers.isString(dimension) ) {
+            throw new TypeError(`'dimension' param must be a String value`);
+        }
+
+        if ( !product.hasOwnProperty('items') ) {
+            throw new Error(`Product data must be an response from Vtex API '/api/catalog_system/pub/products/search/{productId}' endpoint`);
+        }
+
+        return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
+    },
+
+    /**
+     * From '/api/catalog_system/pub/products/variations/' endpoint (same as SkuJson)
+     * If product data is camelized, set `map` manually or convert `dimensionsMap` prop to camelize too
+     *
+     * @returns {Array}  A new instance of array with skus ordered
+     */
+    sortProductVariations(product, map, dimension, reverse = false) {
+        if ( !globalHelpers.isString(dimension) ) {
+            throw new TypeError(`'dimension' param must be a String value`);
+        }
+
+        if ( !product.hasOwnProperty('skus') ) {
+            throw new Error(`Product data must be an response from Vtex API '/api/catalog_system/pub/products/variations/{productId}' endpoint or global variable 'skuJson' on product page`);
+        }
+
+        map = (globalHelpers.isArray(map) && map.length) ? map : product.dimensionsMap[dimension];
+
+        return globalHelpers.objectArraySortByValue(product.skus, map, `dimensions.${dimension}`, reverse);
     },
 
     /**

@@ -147,8 +147,8 @@ var priceFormatted = 'R$ 1.234,56';
 vtexHelpers.unformatPrice(priceFormatted); // {unformatted: 123456, real: '1234', cents: '56'}
 vtexHelpers.unformatPrice(priceFormatted, null, true); // {unformatted: 123456, real: '1.234', cents: '56'}
 
-vtexHelpers.unformatPrice(['R$ 12,34', 'R$ 23,45', 'R$ 34,56']); 
-/* 
+vtexHelpers.unformatPrice(['R$ 12,34', 'R$ 23,45', 'R$ 34,56']);
+/*
 [
     {unformatted: 1234, real: '12', cents: '34'}
     {unformatted: 2345, real: '23', cents: '45'}
@@ -158,23 +158,37 @@ vtexHelpers.unformatPrice(['R$ 12,34', 'R$ 23,45', 'R$ 34,56']);
 ```
 
 
-### vtexHelpers.getFirstAvailableSku(skus)
+### vtexHelpers.fixProductSearchPrice(val)
 
-Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
-(same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+Formats price from Vtex API `/api/catalog_system/pub/products/search/` to use in `formatPrice` method
+
+- **val**:
+  - Type: `Number`
+  - Value to convert
+
+#### Example
+
+```js
+vtexHelpers.fixProductSearchPrice(250.25); // 25025
+```
+
+
+### vtexHelpers.getFirstAvailableSku(product)
+
+Get first available SKU from Vtex API `/api/catalog_system/` end point
 Returns an object with first available SKU or false if all are unvailable
 
-- **skus**:
-  - Type: `Array`
-  - Skus array data
+- **product**:
+  - Type: `Object`
+  - Product full data
 
 #### Example
 
 ```js
 vtexjs.catalog.getProductWithVariations(1234)
     .then(function(res) {
-        const sku = vtexHelpers.getFirstAvailableSku(res.skus);
-        window.console.log(sku);
+        var availableSku = vtexHelpers.getFirstAvailableSku(res);
+        window.console.log(availableSku);
     });
 ```
 

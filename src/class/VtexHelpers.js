@@ -14,8 +14,12 @@ class VtexHelpers {
         return vtexHelpers.unformatPrice(value, decimal, formatNumber);
     }
 
-    getFirstAvailableSku(skus) {
-        return vtexHelpers.getFirstAvailableSku(skus);
+    fixProductSearchPrice(val) {
+        return vtexHelpers.fixProductSearchPrice(val);
+    }
+
+    getFirstAvailableSku(product) {
+        return vtexHelpers.getFirstAvailableSku(product);
     }
 
     getOriginalImage(src) {
@@ -38,8 +42,16 @@ class VtexHelpers {
         return vtexHelpers.getCategories(depth, categoryId);
     }
 
-    getProductSpec(data, specName, defaultVal = false) {
+    getProductSpec(data, specName, defaultVal) {
         return vtexHelpers.getProductSpec(data, specName, defaultVal);
+    }
+
+    sortProductSearch(product, map, dimension, reverse) {
+        return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
+    }
+
+    sortProductVariations(product, map, dimension, reverse) {
+        return vtexHelpers.sortProductVariations(product, map, dimension, reverse);
     }
 
     replaceBreakLines(str) {
