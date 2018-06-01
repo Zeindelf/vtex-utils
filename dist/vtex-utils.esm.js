@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.10.0
+ * VtexUtils.js v1.11.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-27T06:30:17.812Z
+ * Date: 2018-06-01T08:36:15.309Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -17,13 +17,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.4.0
+ * Utilify.js v0.5.1
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-05-27T01:25:22.608Z
+ * Date: 2018-06-01T04:58:23.813Z
  */
 
 (function (global, factory) {
@@ -2130,6 +2130,26 @@ var objectHelpers = {
 
 
     /**
+     * A function to take a string written in dot notation style, and use it to
+     * find a nested object property inside of an object.
+     *
+     * @param {Object} obj    The object to search
+     * @param {String} path   A dot notation style parameter reference (ie 'a.b.c')
+     *
+     * @returns the value of the property in question
+     */
+    getDescendantProp: function getDescendantProp(obj, path) {
+        if (!validateHelpers.isPlainObject(obj)) {
+            throw new TypeError('\'obj\' param must be an plain object');
+        }
+
+        return path.split('.').reduce(function (acc, part) {
+            return acc && acc[part];
+        }, obj);
+    },
+
+
+    /**
      * Return the length of an item (Object mostly)
      * @param {mixed}
      * @return {int}
@@ -2144,6 +2164,49 @@ var objectHelpers = {
         }
 
         return 0;
+    },
+
+
+    /**
+     * Sorting an array of objects by values
+     *
+     * @param  {Array}   [arr]              An Array of objects
+     * @param  {Mix}     [map]              Map to custom order. If value isn't an array with values, will do natural sort
+     * @param  {String}  [key]              Object key to use for sorting (accepts dot notation)
+     * @param  {Boolean} [reverse=false]    Reverse sorting
+     * @returns {Array}                     New object array with sorting values
+     * @example
+     *     var mapToSort = ['A', 'B', 'C', 'D', 'E']; // Map to sorting
+     *
+     *     var obj = [{param: 'D'}, {param: 'A'}, {param: 'E'}, {param: 'C'}, {param: 'B'}];
+     *     globalHelpers.objectArraySortByValue(objToSortByValue, mapToSort, 'param');
+     *     //=> [{param: 'A'}, {param: 'B'}, {param: 'C'}, {param: 'D'}, {param: 'E'}]
+     *
+     *     // Deep key
+     *     var obj = [{deep: {param: 'D'}}, {deep: {param: 'A'}}, {deep: {param: 'E'}}, {deep: {param: 'C'}}, {deep: {param: 'B'}}];
+     *     globalHelpers.objectArraySortByValue(objToSortByValue, mapToSort, 'deep.param');
+     *     //=> [{deep: {param: 'A'}}, {deep: {param: 'B'}}, {deep: {param: 'C'}}, {deep: {param: 'D'}}, {deep: {param: 'E'}}]
+     */
+    objectArraySortByValue: function objectArraySortByValue(arr, map, key) {
+        var _this2 = this;
+
+        var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+        if (!validateHelpers.isArray(map) || map.length < 1) {
+            var compare = function compare(a, b, n) {
+                return _this2.getDescendantProp(a, n).toString().localeCompare(_this2.getDescendantProp(b, n).toString(), undefined, { numeric: true });
+            };
+
+            return arr.slice().sort(function (a, b) {
+                return reverse ? -compare(a, b, key) : compare(a, b, key);
+            });
+        }
+
+        return arr.slice().sort(function (a, b) {
+            var ordered = map.indexOf(_this2.getDescendantProp(a, key).toString()) - map.indexOf(_this2.getDescendantProp(b, key).toString());
+
+            return reverse ? ordered * -1 : ordered;
+        });
     },
 
 
@@ -2428,6 +2491,11 @@ var GlobalHelpers = function () {
             return numberHelpers.formatNumber(num, separator);
         }
     }, {
+        key: 'getDescendantProp',
+        value: function getDescendantProp(obj, path) {
+            return objectHelpers.getDescendantProp(obj, path);
+        }
+    }, {
         key: 'getType',
         value: function getType(variable) {
             return globalHelpers.getType(variable);
@@ -2456,6 +2524,11 @@ var GlobalHelpers = function () {
         key: 'normalizeText',
         value: function normalizeText(str) {
             return stringHelpers.normalizeText(str);
+        }
+    }, {
+        key: 'objectArraySortByValue',
+        value: function objectArraySortByValue(arr, map, key, reverse) {
+            return objectHelpers.objectArraySortByValue(arr, map, key, reverse);
         }
     }, {
         key: 'objectSearch',
@@ -2774,7 +2847,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.4.0';
+  this.version = '0.5.1';
 
   /**
    * Package name
@@ -2882,29 +2955,49 @@ var vtexHelpers = {
 
 
     /**
-     * Get first available SKU from `/api/catalog_system/pub/products/variations/{productId}` end point
-     * (same from `vtexjs.catalog.getProductWithVariations({productId})` vtexjs method)
+     * Formats price from Vtex API `/api/catalog_system/pub/products/search/`
+     * to a correct `formatPrice` method
      *
-     * @param  {Array}  skus      Skus array data
-     * @return {Object|Boolean}   An available SKU data or false
+     * @param  {Number} val Value to convert
+     * @return {Integer}
      */
-    getFirstAvailableSku: function getFirstAvailableSku(skus) {
-        var newArr = [];
+    fixProductSearchPrice: function fixProductSearchPrice(val) {
+        return val.toFixed(2).split('.').join('') * 1;
+    },
 
-        if (!globalHelpers.isArray(skus)) {
-            throw new Error('\'skus\' must be an Array');
+
+    /**
+     * Get first available SKU from Vtex API `/api/catalog_system/` end point
+     *
+     * @param  {Object}  product     Product full data
+     * @return {Object|Boolean}      An available SKU data or false
+     */
+    getFirstAvailableSku: function getFirstAvailableSku(product) {
+        var newArr = {};
+
+        if (product.hasOwnProperty('items')) {
+            product.items.some(function (item, index, oldArr) {
+                if (item.sellers[0].commertialOffer.AvailableQuantity > 0 || item.sellers[0].commertialOffer.availableQuantity > 0) {
+                    newArr = oldArr[index];
+                    return true;
+                }
+
+                return false;
+            });
         }
 
-        var some = skus.some(function (item, index, oldArr) {
-            if (item.available) {
-                newArr = oldArr[index];
-                return true;
-            }
+        if (product.hasOwnProperty('skus')) {
+            product.skus.some(function (item, index, oldArr) {
+                if (item.available) {
+                    newArr = oldArr[index];
+                    return true;
+                }
 
-            return false;
-        });
+                return false;
+            });
+        }
 
-        if (some) {
+        if (globalHelpers.length(newArr) > 0) {
             return newArr;
         }
 
@@ -3057,7 +3150,9 @@ var vtexHelpers = {
      * @param {Boolean|String}   [defaultValue]      Value if spec doesn't exists
      * @returns spec value or false/defaultVal if spec doesn't exists
      */
-    getProductSpec: function getProductSpec(data, specName, defaultVal) {
+    getProductSpec: function getProductSpec(data, specName) {
+        var defaultVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
         if (globalHelpers.isUndefined(data[specName])) {
             return defaultVal;
         }
@@ -3069,6 +3164,49 @@ var vtexHelpers = {
         }
 
         return defaultVal;
+    },
+
+
+    /**
+     * From '/api/catalog_system/pub/products/search/' endpoint
+     *
+     * @returns {Array}  A new instance of array with skus ordered
+     */
+    sortProductSearch: function sortProductSearch(product, map, dimension) {
+        var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+        if (!globalHelpers.isString(dimension)) {
+            throw new TypeError('\'dimension\' param must be a String value');
+        }
+
+        if (!product.hasOwnProperty('items')) {
+            throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/search/{productId}\' endpoint');
+        }
+
+        return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
+    },
+
+
+    /**
+     * From '/api/catalog_system/pub/products/variations/' endpoint (same as SkuJson)
+     * If product data is camelized, set `map` manually or convert `dimensionsMap` prop to camelize too
+     *
+     * @returns {Array}  A new instance of array with skus ordered
+     */
+    sortProductVariations: function sortProductVariations(product, map, dimension) {
+        var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
+        if (!globalHelpers.isString(dimension)) {
+            throw new TypeError('\'dimension\' param must be a String value');
+        }
+
+        if (!product.hasOwnProperty('skus')) {
+            throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/variations/{productId}\' endpoint or global variable \'skuJson\' on product page');
+        }
+
+        map = globalHelpers.isArray(map) && map.length ? map : product.dimensionsMap[dimension];
+
+        return globalHelpers.objectArraySortByValue(product.skus, map, 'dimensions.' + dimension, reverse);
     },
 
 
@@ -3268,9 +3406,14 @@ var VtexHelpers = function () {
             return vtexHelpers.unformatPrice(value, decimal, formatNumber);
         }
     }, {
+        key: 'fixProductSearchPrice',
+        value: function fixProductSearchPrice(val) {
+            return vtexHelpers.fixProductSearchPrice(val);
+        }
+    }, {
         key: 'getFirstAvailableSku',
-        value: function getFirstAvailableSku(skus) {
-            return vtexHelpers.getFirstAvailableSku(skus);
+        value: function getFirstAvailableSku(product) {
+            return vtexHelpers.getFirstAvailableSku(product);
         }
     }, {
         key: 'getOriginalImage',
@@ -3299,10 +3442,18 @@ var VtexHelpers = function () {
         }
     }, {
         key: 'getProductSpec',
-        value: function getProductSpec(data, specName) {
-            var defaultVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
-
+        value: function getProductSpec(data, specName, defaultVal) {
             return vtexHelpers.getProductSpec(data, specName, defaultVal);
+        }
+    }, {
+        key: 'sortProductSearch',
+        value: function sortProductSearch(product, map, dimension, reverse) {
+            return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
+        }
+    }, {
+        key: 'sortProductVariations',
+        value: function sortProductVariations(product, map, dimension, reverse) {
+            return vtexHelpers.sortProductVariations(product, map, dimension, reverse);
         }
     }, {
         key: 'replaceBreakLines',
@@ -3346,7 +3497,7 @@ var VtexUtils = function () {
      * Version
      * @type {String}
      */
-    this.version = '1.10.0';
+    this.version = '1.11.0';
 
     /**
      * Package name
