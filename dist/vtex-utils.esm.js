@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-06-01T08:36:15.309Z
+ * Date: 2018-06-06T19:35:28.981Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -2881,7 +2881,55 @@ return Utilify;
 
 var utilify$1 = new utilify();
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
+};
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+var defineProperty = function (obj, key, value) {
+  if (key in obj) {
+    Object.defineProperty(obj, key, {
+      value: value,
+      enumerable: true,
+      configurable: true,
+      writable: true
+    });
+  } else {
+    obj[key] = value;
+  }
+
+  return obj;
+};
+
 var globalHelpers = utilify$1.globalHelpers;
+var CONSTANTS = {
+    camelize: 'You must set camelize your items to use this method'
+};
 
 var vtexHelpers = {
     /**
@@ -2911,7 +2959,7 @@ var vtexHelpers = {
      *
      * @param {String|Array}    value                 Price formatted
      * @param {string}          [decimal=',']         The decimal delimiter
-     * @param {integer}         [formatPrice=false]   Thousands separator (pt-BR default: '.')
+     * @param {integer}         [formatNumber=false]  Thousands separator (pt-BR default: '.')
      * @return {string|Array}   The unformatted price
      */
     unformatPrice: function unformatPrice(value, decimal) {
@@ -2947,7 +2995,7 @@ var vtexHelpers = {
         var values = unformatted.toString().split('.');
 
         return {
-            unformatted: parseFloat(globalHelpers.toNumber(values.join('')), 10),
+            unformatted: globalHelpers.toNumber(values.join('')) * 1,
             real: formatNumber ? globalHelpers.formatNumber(values[0]) : values[0],
             cents: values[1] || '00'
         };
@@ -2973,11 +3021,15 @@ var vtexHelpers = {
      * @return {Object|Boolean}      An available SKU data or false
      */
     getFirstAvailableSku: function getFirstAvailableSku(product) {
+        if (!this._checkCamelize(product)) {
+            throw new Error(CONSTANTS.camelize);
+        }
+
         var newArr = {};
 
         if (product.hasOwnProperty('items')) {
             product.items.some(function (item, index, oldArr) {
-                if (item.sellers[0].commertialOffer.AvailableQuantity > 0 || item.sellers[0].commertialOffer.availableQuantity > 0) {
+                if (item.sellers[0].commertialOffer.availableQuantity > 0) {
                     newArr = oldArr[index];
                     return true;
                 }
@@ -3165,6 +3217,76 @@ var vtexHelpers = {
 
         return defaultVal;
     },
+    getProductSellerInfo: function getProductSellerInfo(product) {
+        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        window.console.log('SELLER_INFO_IN', product);
+        var seller = sellerId ? sellerId : true;
+        var sellerKey = sellerId ? 'sellerId' : 'sellerDefault';
+        var availableProduct = this.getFirstAvailableSku(product);
+
+        if (availableProduct) {
+            return globalHelpers.objectSearch(availableProduct, defineProperty({}, sellerKey, seller));
+        }
+
+        return false;
+    },
+    getProductInstallments: function getProductInstallments(data) {
+        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        if (!globalHelpers.isPlainObject(data)) {
+            throw new TypeError('\'data\' must be an plain object');
+        }
+
+        // Get by min price value
+        var commertialOffer = data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
+        return commertialOffer.installments.reduce(function (prev, current) {
+            return prev.value < current.value ? prev : current;
+        }, {});
+    },
+    getProductBankInvoice: function getProductBankInvoice(product) {
+        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+        var sellerInfo = this.getProductSellerInfo(product, sellerId);
+
+        if (sellerInfo) {
+            return globalHelpers.objectSearch(sellerInfo.commertialOffer.installments, { paymentSystemName: 'Boleto Bancário' });
+        }
+
+        return false;
+    },
+    getProductPriceInfo: function getProductPriceInfo(sellerInfo) {
+        if (!sellerInfo) {
+            return false;
+        }
+
+        var co = sellerInfo.commertialOffer;
+
+        var installments = this.getProductInstallments(sellerInfo);
+        var qty = co.availableQuantity;
+        var noListPrice = co.price === co.listPrice;
+        var fix = this.fixProductSearchPrice;
+        var format = this.formatPrice;
+
+        return {
+            available: qty ? true : false,
+            availableQuantity: qty,
+
+            sellerName: sellerInfo.sellerName,
+            sellerId: sellerInfo.sellerId,
+
+            bestPrice: qty ? fix(co.price) : 0,
+            listPrice: qty ? noListPrice ? false : fix(co.listPrice) : 0,
+
+            installments: qty ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: qty ? installments.interestRate : null,
+            installmentsValue: qty ? fix(installments.value) : 0,
+
+            bestPriceFormatted: qty ? format(fix(co.price)) : format(0),
+            listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
+            installmentsValueFormatted: qty ? format(fix(installments.value)) : format(0)
+        };
+    },
 
 
     /**
@@ -3183,6 +3305,7 @@ var vtexHelpers = {
             throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/search/{productId}\' endpoint');
         }
 
+        dimension = this._checkCamelize(product) ? globalHelpers.camelize(dimension) : dimension;
         return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
     },
 
@@ -3330,38 +3453,20 @@ var vtexHelpers = {
                 return def.reject(err);
             });
         }).promise();
+    },
+
+
+    /**
+     * PRIVATE
+     */
+    _checkCamelize: function _checkCamelize(product) {
+        if (product.hasOwnProperty('isCamelized') && product.isCamelized) {
+            return true;
+        }
+
+        return false;
     }
 };
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
-  return typeof obj;
-} : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
-};
-
-var classCallCheck = function (instance, Constructor) {
-  if (!(instance instanceof Constructor)) {
-    throw new TypeError("Cannot call a class as a function");
-  }
-};
-
-var createClass = function () {
-  function defineProperties(target, props) {
-    for (var i = 0; i < props.length; i++) {
-      var descriptor = props[i];
-      descriptor.enumerable = descriptor.enumerable || false;
-      descriptor.configurable = true;
-      if ("value" in descriptor) descriptor.writable = true;
-      Object.defineProperty(target, descriptor.key, descriptor);
-    }
-  }
-
-  return function (Constructor, protoProps, staticProps) {
-    if (protoProps) defineProperties(Constructor.prototype, protoProps);
-    if (staticProps) defineProperties(Constructor, staticProps);
-    return Constructor;
-  };
-}();
 
 if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object') {
     global.window = global;
@@ -3444,6 +3549,26 @@ var VtexHelpers = function () {
         key: 'getProductSpec',
         value: function getProductSpec(data, specName, defaultVal) {
             return vtexHelpers.getProductSpec(data, specName, defaultVal);
+        }
+    }, {
+        key: 'getProductSellerInfo',
+        value: function getProductSellerInfo(product, sellerId) {
+            return vtexHelpers.getProductSellerInfo(product, sellerId);
+        }
+    }, {
+        key: 'getProductInstallments',
+        value: function getProductInstallments(product, sellerId) {
+            return vtexHelpers.getProductInstallments(product, sellerId);
+        }
+    }, {
+        key: 'getProductBankInvoice',
+        value: function getProductBankInvoice(product, sellerId) {
+            return vtexHelpers.getProductBankInvoice(product, sellerId);
+        }
+    }, {
+        key: 'getProductPriceInfo',
+        value: function getProductPriceInfo(sellerInfo) {
+            return vtexHelpers.getProductPriceInfo(sellerInfo);
         }
     }, {
         key: 'sortProductSearch',

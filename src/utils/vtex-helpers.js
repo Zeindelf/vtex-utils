@@ -2,6 +2,9 @@
 import {utilify} from './vendor.utilify.js';
 
 const globalHelpers = utilify.globalHelpers;
+const CONSTANTS = {
+    camelize: `You must set camelize your items to use this method`,
+};
 
 export default {
     /**
@@ -30,7 +33,7 @@ export default {
      *
      * @param {String|Array}    value                 Price formatted
      * @param {string}          [decimal=',']         The decimal delimiter
-     * @param {integer}         [formatPrice=false]   Thousands separator (pt-BR default: '.')
+     * @param {integer}         [formatNumber=false]  Thousands separator (pt-BR default: '.')
      * @return {string|Array}   The unformatted price
      */
     unformatPrice(value, decimal, formatNumber = false) {
@@ -62,7 +65,7 @@ export default {
         const values = unformatted.toString().split('.');
 
         return {
-            unformatted: parseFloat(globalHelpers.toNumber(values.join('')), 10),
+            unformatted: globalHelpers.toNumber(values.join('')) * 1,
             real: ( formatNumber ) ? globalHelpers.formatNumber(values[0]) : values[0],
             cents: values[1] || '00',
         };
@@ -86,11 +89,15 @@ export default {
      * @return {Object|Boolean}      An available SKU data or false
      */
     getFirstAvailableSku(product) {
+        if ( !this._checkCamelize(product) ) {
+            throw new Error(CONSTANTS.camelize);
+        }
+
         let newArr = {};
 
         if ( product.hasOwnProperty('items') ) {
             product.items.some((item, index, oldArr) => {
-                if ( item.sellers[0].commertialOffer.AvailableQuantity > 0 || item.sellers[0].commertialOffer.availableQuantity > 0 ) {
+                if ( item.sellers[0].commertialOffer.availableQuantity > 0 ) {
                     newArr = oldArr[index];
                     return true;
                 }
@@ -152,7 +159,7 @@ export default {
         width = Math.round(width);
         height = Math.round(height);
 
-        src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, function(match, matchedWidth, matchedHeight) {
+        src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, (match, matchedWidth, matchedHeight) => {
             return match.replace('-' + matchedWidth + '-' + matchedHeight, '-' + width + '-' + height);
         });
 
@@ -271,6 +278,75 @@ export default {
         return defaultVal;
     },
 
+    getProductSellerInfo(product, sellerId = false) {
+        window.console.log('SELLER_INFO_IN', product);
+        const seller = ( sellerId ) ? sellerId : true;
+        const sellerKey = ( sellerId ) ? 'sellerId' : 'sellerDefault';
+        const availableProduct = this.getFirstAvailableSku(product);
+
+        if ( availableProduct ) {
+            return globalHelpers.objectSearch(availableProduct, {[sellerKey]: seller});
+        }
+
+        return false;
+    },
+
+    getProductInstallments(data, sellerId = false) {
+        if ( !globalHelpers.isPlainObject(data) ) {
+            throw new TypeError(`'data' must be an plain object`);
+        }
+
+        // Get by min price value
+        const commertialOffer = ( data.hasOwnProperty('commertialOffer') ) ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
+        return commertialOffer.installments.reduce((prev, current) => (prev.value < current.value) ? prev : current, {});
+    },
+
+    getProductBankInvoice(product, sellerId = false) {
+        const sellerInfo = this.getProductSellerInfo(product, sellerId);
+
+        if ( sellerInfo ) {
+            return globalHelpers.objectSearch(sellerInfo.commertialOffer.installments, {paymentSystemName: 'Boleto Bancário'});
+        }
+
+        return false;
+    },
+
+    getProductPriceInfo(sellerInfo) {
+        if ( !sellerInfo ) {
+            return false;
+        }
+
+        const {commertialOffer: co} = sellerInfo;
+        const installments = this.getProductInstallments(sellerInfo);
+        const qty = co.availableQuantity;
+        const noListPrice = co.price === co.listPrice;
+        const fix = this.fixProductSearchPrice;
+        const format = this.formatPrice;
+
+        return {
+            available: (qty) ? true : false,
+            availableQuantity: qty,
+
+            sellerName: sellerInfo.sellerName,
+            sellerId: sellerInfo.sellerId,
+
+            bestPrice: (qty) ? fix(co.price) : 0,
+            listPrice: (qty) ?
+                ( (noListPrice) ? false : fix(co.listPrice) ) :
+                0,
+
+            installments: (qty) ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: (qty) ? installments.interestRate : null,
+            installmentsValue: (qty) ? fix(installments.value) : 0,
+
+            bestPriceFormatted: (qty) ? format(fix(co.price)) : format(0),
+            listPriceFormatted: (qty) ?
+                ( (noListPrice) ? false : format(fix(co.listPrice)) ) :
+                ( noListPrice) ? false : format(0),
+            installmentsValueFormatted: (qty) ? format(fix(installments.value)) : format(0),
+        };
+    },
+
     /**
      * From '/api/catalog_system/pub/products/search/' endpoint
      *
@@ -285,6 +361,7 @@ export default {
             throw new Error(`Product data must be an response from Vtex API '/api/catalog_system/pub/products/search/{productId}' endpoint`);
         }
 
+        dimension = ( this._checkCamelize(product) ) ? globalHelpers.camelize(dimension) : dimension;
         return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
     },
 
@@ -417,5 +494,16 @@ export default {
                 return def.resolve(orderForm);
             }).fail((err) => def.reject(err));
         }).promise();
+    },
+
+    /**
+     * PRIVATE
+     */
+    _checkCamelize(product) {
+        if ( product.hasOwnProperty('isCamelized') && product.isCamelized ) {
+            return true;
+        }
+
+        return false;
     },
 };

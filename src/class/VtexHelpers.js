@@ -46,6 +46,22 @@ class VtexHelpers {
         return vtexHelpers.getProductSpec(data, specName, defaultVal);
     }
 
+    getProductSellerInfo(product, sellerId) {
+        return vtexHelpers.getProductSellerInfo(product, sellerId);
+    }
+
+    getProductInstallments(product, sellerId) {
+        return vtexHelpers.getProductInstallments(product, sellerId);
+    }
+
+    getProductBankInvoice(product, sellerId) {
+        return vtexHelpers.getProductBankInvoice(product, sellerId);
+    }
+
+    getProductPriceInfo(sellerInfo) {
+        return vtexHelpers.getProductPriceInfo(sellerInfo);
+    }
+
     sortProductSearch(product, map, dimension, reverse) {
         return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
     }
