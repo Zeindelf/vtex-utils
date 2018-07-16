@@ -62,6 +62,10 @@ class VtexHelpers {
         return vtexHelpers.getProductPriceInfo(sellerInfo);
     }
 
+    getShipping(postalCode, skuId, quantity) {
+        return vtexHelpers.getShipping(postalCode, skuId, quantity);
+    }
+
     sortProductSearch(product, map, dimension, reverse) {
         return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
     }

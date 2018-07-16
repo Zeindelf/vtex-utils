@@ -348,6 +348,64 @@ vtexHelpers.getProductSpec(response, 'Cores'); // false
 vtexHelpers.getProductSpec(response, 'Cores', 'Branco'); // 'Branco'
 ```
 
+
+### vtexHelpers.getShipping(postalCode[, skuId[, quantity]])
+
+Get product shipping value.
+
+- **postalCode**:
+  - Type: `String`
+  - Postal code to calculate. Can be `xxxxx-xxx` or `xxxxxxxx` format
+
+- **skuId** (optional):
+  - Type: `Integer`
+  - Default: `skuId`
+  - Sku ID to calculate. If not passed, get first sku available on product page from `skuJson` global variable. If this method used on other pages, `skuId` is required
+
+- **quantity** (optional):
+  - Type: `Integer`
+  - Default: `1`
+  - Product quantity to calculate
+
+#### Example
+
+```js
+// On product page with a valid postal code
+vtexHelpers.getShipping('01010-010')
+  .then(function(res) {
+    if ( !res.error ) {
+      console.log('SUCCESS', res);
+    }
+
+    if ( res.error ) {
+      console.log('INVALID TYPE', res);
+    }
+  });
+
+/* 
+  Case success, will return an object with properties:
+  {
+    error: false,
+    formattedResponse: {
+      shippingValue: 'R$ 10,00',
+      shippingText: 'Entrega em 4 dias úteis para o CEP 01010-010',
+      shippingType: 'Frete Transportadora'
+    }
+    fullResponse: '<table><thead>...' // Original content from api
+  }
+
+  Case failed (invalid postal code, invalid sku ID, etc.), will return
+  {
+    error: true,
+    formattedResponse: {
+      shippingText: 'Não é possível calcular o valor do Frete para o CEP informado'
+    }
+    fullResponse: '<div class="cep-invalido" id="divFreteInvalido">...' // Original content from api
+  }
+*/
+```
+
+
 ### vtexHelpers.replaceBreakLines(str)
 
 Replace break lines from product descriptions/more

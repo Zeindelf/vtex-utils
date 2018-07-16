@@ -89,9 +89,9 @@ export default {
      * @return {Object|Boolean}      An available SKU data or false
      */
     getFirstAvailableSku(product) {
-        if ( !this._checkCamelize(product) ) {
-            throw new Error(CONSTANTS.camelize);
-        }
+        // if ( !this._checkCamelize(product) ) {
+        //     throw new Error(CONSTANTS.camelize);
+        // }
 
         let newArr = {};
 
@@ -278,8 +278,10 @@ export default {
         return defaultVal;
     },
 
+    /**
+     * Method to use with VtexCatalog
+     */
     getProductSellerInfo(product, sellerId = false) {
-        window.console.log('SELLER_INFO_IN', product);
         const seller = ( sellerId ) ? sellerId : true;
         const sellerKey = ( sellerId ) ? 'sellerId' : 'sellerDefault';
         const availableProduct = this.getFirstAvailableSku(product);
@@ -291,6 +293,9 @@ export default {
         return false;
     },
 
+    /**
+     * Method to use with VtexCatalog
+     */
     getProductInstallments(data, sellerId = false) {
         if ( !globalHelpers.isPlainObject(data) ) {
             throw new TypeError(`'data' must be an plain object`);
@@ -301,6 +306,9 @@ export default {
         return commertialOffer.installments.reduce((prev, current) => (prev.value < current.value) ? prev : current, {});
     },
 
+    /**
+     * Method to use with VtexCatalog
+     */
     getProductBankInvoice(product, sellerId = false) {
         const sellerInfo = this.getProductSellerInfo(product, sellerId);
 
@@ -311,6 +319,9 @@ export default {
         return false;
     },
 
+    /**
+     * Method to use with VtexCatalog
+     */
     getProductPriceInfo(sellerInfo) {
         if ( !sellerInfo ) {
             return false;
@@ -345,6 +356,61 @@ export default {
                 ( noListPrice) ? false : format(0),
             installmentsValueFormatted: (qty) ? format(fix(installments.value)) : format(0),
         };
+    },
+
+    getShipping(postalCode, skuId, quantity) {
+        if ( 'skuJson' in window ) {
+            const firstSku = this.getFirstAvailableSku(skuJson);
+            skuId = skuId || firstSku.sku;
+        }
+
+        /* eslint-disable */
+        return $.Deferred((def) => {
+            /* eslint-enable */
+            return $.ajax({
+                type: 'get',
+                url: `/frete/calcula/${skuId}`,
+                data: {
+                    shippinCep: postalCode.replace(/[^A-Za-z0-9]/g, ''),
+                    quantity: quantity || 1,
+                },
+            })
+            .then((res) => {
+                const $html = $($.parseHTML(res));
+                const $tr = $html.find('tbody > tr');
+                const $p = $html.find('.valor');
+
+                const returnData = {
+                    fullResponse: res,
+                };
+
+                const stripHtml = (str) => str.replace(/<\/?[^>]+(>|$)/g, '');
+
+                if ( $p.length ) {
+                    returnData.error = true;
+                    returnData.formattedResponse = {
+                        shippingText: globalHelpers.strCompact(stripHtml(res)),
+                    };
+                }
+
+                if ( $tr.length ) {
+                    returnData.error = false;
+                    returnData.formattedResponse = $tr.map((index, item) => {
+                        const $td = $(item).children('td');
+                        const _shippingText = $td.eq(1).text().split(',');
+
+                        const shippingValue = $td.eq(0).text();
+                        const shippingType = _shippingText[0];
+                        const shippingText = globalHelpers.ucfirst(globalHelpers.strCompact(_shippingText[1]));
+
+                        return { shippingValue, shippingText, shippingType };
+                    }).toArray();
+                }
+
+                return def.resolve(returnData);
+            })
+            .fail((err) => def.reject(err));
+        }).promise();
     },
 
     /**

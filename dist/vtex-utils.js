@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-07-07T11:02:45.381Z
+ * Date: 2018-07-15T13:15:16.643Z
  */
 
 (function (global, factory) {
@@ -2933,9 +2933,6 @@
 	};
 
 	var globalHelpers = utilify$1.globalHelpers;
-	var CONSTANTS = {
-	    camelize: 'You must set camelize your items to use this method'
-	};
 
 	var vtexHelpers = {
 	    /**
@@ -3027,9 +3024,9 @@
 	     * @return {Object|Boolean}      An available SKU data or false
 	     */
 	    getFirstAvailableSku: function getFirstAvailableSku(product) {
-	        if (!this._checkCamelize(product)) {
-	            throw new Error(CONSTANTS.camelize);
-	        }
+	        // if ( !this._checkCamelize(product) ) {
+	        //     throw new Error(CONSTANTS.camelize);
+	        // }
 
 	        var newArr = {};
 
@@ -3223,10 +3220,14 @@
 
 	        return defaultVal;
 	    },
+
+
+	    /**
+	     * Method to use with VtexCatalog
+	     */
 	    getProductSellerInfo: function getProductSellerInfo(product) {
 	        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-	        window.console.log('SELLER_INFO_IN', product);
 	        var seller = sellerId ? sellerId : true;
 	        var sellerKey = sellerId ? 'sellerId' : 'sellerDefault';
 	        var availableProduct = this.getFirstAvailableSku(product);
@@ -3237,6 +3238,11 @@
 
 	        return false;
 	    },
+
+
+	    /**
+	     * Method to use with VtexCatalog
+	     */
 	    getProductInstallments: function getProductInstallments(data) {
 	        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -3250,6 +3256,11 @@
 	            return prev.value < current.value ? prev : current;
 	        }, {});
 	    },
+
+
+	    /**
+	     * Method to use with VtexCatalog
+	     */
 	    getProductBankInvoice: function getProductBankInvoice(product) {
 	        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
@@ -3261,6 +3272,11 @@
 
 	        return false;
 	    },
+
+
+	    /**
+	     * Method to use with VtexCatalog
+	     */
 	    getProductPriceInfo: function getProductPriceInfo(sellerInfo) {
 	        if (!sellerInfo) {
 	            return false;
@@ -3292,6 +3308,62 @@
 	            listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
 	            installmentsValueFormatted: qty ? format(fix(installments.value)) : format(0)
 	        };
+	    },
+	    getShipping: function getShipping(postalCode, skuId, quantity) {
+	        if ('skuJson' in window) {
+	            var firstSku = this.getFirstAvailableSku(skuJson);
+	            skuId = skuId || firstSku.sku;
+	        }
+
+	        /* eslint-disable */
+	        return $.Deferred(function (def) {
+	            /* eslint-enable */
+	            return $.ajax({
+	                type: 'get',
+	                url: '/frete/calcula/' + skuId,
+	                data: {
+	                    shippinCep: postalCode.replace(/[^A-Za-z0-9]/g, ''),
+	                    quantity: quantity || 1
+	                }
+	            }).then(function (res) {
+	                var $html = $($.parseHTML(res));
+	                var $tr = $html.find('tbody > tr');
+	                var $p = $html.find('.valor');
+
+	                var returnData = {
+	                    fullResponse: res
+	                };
+
+	                var stripHtml = function stripHtml(str) {
+	                    return str.replace(/<\/?[^>]+(>|$)/g, '');
+	                };
+
+	                if ($p.length) {
+	                    returnData.error = true;
+	                    returnData.formattedResponse = {
+	                        shippingText: globalHelpers.strCompact(stripHtml(res))
+	                    };
+	                }
+
+	                if ($tr.length) {
+	                    returnData.error = false;
+	                    returnData.formattedResponse = $tr.map(function (index, item) {
+	                        var $td = $(item).children('td');
+	                        var _shippingText = $td.eq(1).text().split(',');
+
+	                        var shippingValue = $td.eq(0).text();
+	                        var shippingType = _shippingText[0];
+	                        var shippingText = globalHelpers.ucfirst(globalHelpers.strCompact(_shippingText[1]));
+
+	                        return { shippingValue: shippingValue, shippingText: shippingText, shippingType: shippingType };
+	                    }).toArray();
+	                }
+
+	                return def.resolve(returnData);
+	            }).fail(function (err) {
+	                return def.reject(err);
+	            });
+	        }).promise();
 	    },
 
 
@@ -3575,6 +3647,11 @@
 	        key: 'getProductPriceInfo',
 	        value: function getProductPriceInfo(sellerInfo) {
 	            return vtexHelpers.getProductPriceInfo(sellerInfo);
+	        }
+	    }, {
+	        key: 'getShipping',
+	        value: function getShipping(postalCode, skuId, quantity) {
+	            return vtexHelpers.getShipping(postalCode, skuId, quantity);
 	        }
 	    }, {
 	        key: 'sortProductSearch',
