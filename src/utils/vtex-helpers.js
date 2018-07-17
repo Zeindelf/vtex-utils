@@ -2,9 +2,6 @@
 import {utilify} from './vendor.utilify.js';
 
 const globalHelpers = utilify.globalHelpers;
-const CONSTANTS = {
-    camelize: `You must set camelize your items to use this method`,
-};
 
 export default {
     /**
@@ -430,7 +427,7 @@ export default {
                         const shippingType = _shippingText[0];
                         const shippingText = globalHelpers.ucfirst(globalHelpers.strCompact(_shippingText[1]));
 
-                        return { shippingValue, shippingText, shippingType };
+                        return {shippingValue, shippingText, shippingType};
                     }).toArray();
                 }
 
