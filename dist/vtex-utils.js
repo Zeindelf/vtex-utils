@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-07-15T13:15:16.643Z
+ * Date: 2018-07-17T07:19:03.256Z
  */
 
 (function (global, factory) {
@@ -3224,6 +3224,13 @@
 
 	    /**
 	     * Method to use with VtexCatalog
+	     *
+	     * Full methods:
+	     *     const sellerInfo = vtexHelpers.getProductSellerInfo(productData);
+	     *     const installments = vtexHelpers.getProductInstallments(sellerInfo) || vtexHelpers.getProductInstallments(productData);
+	     *     const bankInvoice = vtexHelpers.getProductBankInvoice(productData);
+	     *     const priceInfo = vtexHelpers.getProductPriceInfo(sellerInfo);
+	     *     const groupedInstallments = vtexHelpers.getGroupInstallments(productData);
 	     */
 	    getProductSellerInfo: function getProductSellerInfo(product) {
 	        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -3246,12 +3253,13 @@
 	    getProductInstallments: function getProductInstallments(data) {
 	        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-	        if (!globalHelpers.isPlainObject(data)) {
-	            throw new TypeError('\'data\' must be an plain object');
+	        var commertialOffer = this._getCommertialInfo(data, sellerId);
+
+	        if (globalHelpers.isUndefined(commertialOffer)) {
+	            return false;
 	        }
 
 	        // Get by min price value
-	        var commertialOffer = data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
 	        return commertialOffer.installments.reduce(function (prev, current) {
 	            return prev.value < current.value ? prev : current;
 	        }, {});
@@ -3308,6 +3316,26 @@
 	            listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
 	            installmentsValueFormatted: qty ? format(fix(installments.value)) : format(0)
 	        };
+	    },
+
+
+	    /**
+	     * Method to use with VtexCatalog
+	     */
+	    getGroupInstallments: function getGroupInstallments(data, sellerId) {
+	        var commertialOffer = this._getCommertialInfo(data, sellerId);
+
+	        if (globalHelpers.isUndefined(commertialOffer)) {
+	            return false;
+	        }
+
+	        var groupedInstallments = commertialOffer.installments.reduce(function (r, a) {
+	            r[a.paymentSystemName] = r[a.paymentSystemName] || [];
+	            r[a.paymentSystemName].push(a);
+	            return r;
+	        }, Object.create(null));
+
+	        return globalHelpers.camelize(groupedInstallments);
 	    },
 	    getShipping: function getShipping(postalCode, skuId, quantity) {
 	        if ('skuJson' in window) {
@@ -3535,6 +3563,38 @@
 
 
 	    /**
+	     * Send notify me data
+	     *
+	     * @param  {String} name  Customer name
+	     * @param  {String} email Customer e-mail
+	     * @param  {Integer} skuId Sku ID
+	     * @return {Promise}
+	     */
+	    notifyMe: function notifyMe(name, email, skuId) {
+	        /* eslint-disable */
+	        return $.Deferred(function (def) {
+	            /* eslint-enable */
+	            var successMessage = 'Cadastrado com sucesso. Assim que o produto for disponibilizado você receberá um email avisando.';
+	            var errorMessage = 'Não foi possível cadastrar. Tente mais tarde.';
+
+	            return $.ajax({
+	                url: '/no-cache/AviseMe.aspx',
+	                type: 'post',
+	                data: {
+	                    notifymeClientName: name,
+	                    notifymeClientEmail: email,
+	                    notifymeIdSku: skuId
+	                }
+	            }).then(function (res) {
+	                return def.resolve({ successMessage: successMessage });
+	            }).fail(function (err) {
+	                return def.reject({ errorMessage: errorMessage });
+	            });
+	        }).promise();
+	    },
+
+
+	    /**
 	     * PRIVATE
 	     */
 	    _checkCamelize: function _checkCamelize(product) {
@@ -3543,6 +3603,13 @@
 	        }
 
 	        return false;
+	    },
+	    _getCommertialInfo: function _getCommertialInfo(data, sellerId) {
+	        if (!globalHelpers.isPlainObject(data)) {
+	            throw new TypeError('\'data\' must be an plain object');
+	        }
+
+	        return data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
 	    }
 	};
 
@@ -3649,6 +3716,11 @@
 	            return vtexHelpers.getProductPriceInfo(sellerInfo);
 	        }
 	    }, {
+	        key: 'getGroupInstallments',
+	        value: function getGroupInstallments(data, sellerId) {
+	            return vtexHelpers.getGroupInstallments(data, sellerId);
+	        }
+	    }, {
 	        key: 'getShipping',
 	        value: function getShipping(postalCode, skuId, quantity) {
 	            return vtexHelpers.getShipping(postalCode, skuId, quantity);
@@ -3687,6 +3759,11 @@
 	        key: 'clearCart',
 	        value: function clearCart() {
 	            return vtexHelpers.clearCart();
+	        }
+	    }, {
+	        key: 'notifyMe',
+	        value: function notifyMe(name, email, skuId) {
+	            return vtexHelpers.notifyMe(name, email, skuId);
 	        }
 	    }]);
 	    return VtexHelpers;

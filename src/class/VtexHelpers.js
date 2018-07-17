@@ -62,6 +62,10 @@ class VtexHelpers {
         return vtexHelpers.getProductPriceInfo(sellerInfo);
     }
 
+    getGroupInstallments(data, sellerId) {
+        return vtexHelpers.getGroupInstallments(data, sellerId);
+    }
+
     getShipping(postalCode, skuId, quantity) {
         return vtexHelpers.getShipping(postalCode, skuId, quantity);
     }
@@ -92,6 +96,10 @@ class VtexHelpers {
 
     clearCart() {
         return vtexHelpers.clearCart();
+    }
+
+    notifyMe(name, email, skuId) {
+        return vtexHelpers.notifyMe(name, email, skuId);
     }
 }
 

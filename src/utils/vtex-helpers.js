@@ -280,6 +280,13 @@ export default {
 
     /**
      * Method to use with VtexCatalog
+     *
+     * Full methods:
+     *     const sellerInfo = vtexHelpers.getProductSellerInfo(productData);
+     *     const installments = vtexHelpers.getProductInstallments(sellerInfo) || vtexHelpers.getProductInstallments(productData);
+     *     const bankInvoice = vtexHelpers.getProductBankInvoice(productData);
+     *     const priceInfo = vtexHelpers.getProductPriceInfo(sellerInfo);
+     *     const groupedInstallments = vtexHelpers.getGroupInstallments(productData);
      */
     getProductSellerInfo(product, sellerId = false) {
         const seller = ( sellerId ) ? sellerId : true;
@@ -297,12 +304,13 @@ export default {
      * Method to use with VtexCatalog
      */
     getProductInstallments(data, sellerId = false) {
-        if ( !globalHelpers.isPlainObject(data) ) {
-            throw new TypeError(`'data' must be an plain object`);
+        const commertialOffer = this._getCommertialInfo(data, sellerId);
+
+        if ( globalHelpers.isUndefined(commertialOffer) ) {
+            return false;
         }
 
         // Get by min price value
-        const commertialOffer = ( data.hasOwnProperty('commertialOffer') ) ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
         return commertialOffer.installments.reduce((prev, current) => (prev.value < current.value) ? prev : current, {});
     },
 
@@ -356,6 +364,25 @@ export default {
                 ( noListPrice) ? false : format(0),
             installmentsValueFormatted: (qty) ? format(fix(installments.value)) : format(0),
         };
+    },
+
+    /**
+     * Method to use with VtexCatalog
+     */
+    getGroupInstallments(data, sellerId) {
+        const commertialOffer = this._getCommertialInfo(data, sellerId);
+
+        if ( globalHelpers.isUndefined(commertialOffer) ) {
+            return false;
+        }
+
+        const groupedInstallments = commertialOffer.installments.reduce((r, a) => {
+            r[a.paymentSystemName] = r[a.paymentSystemName] || [];
+            r[a.paymentSystemName].push(a);
+            return r;
+        }, Object.create(null));
+
+        return globalHelpers.camelize(groupedInstallments);
     },
 
     getShipping(postalCode, skuId, quantity) {
@@ -563,6 +590,35 @@ export default {
     },
 
     /**
+     * Send notify me data
+     *
+     * @param  {String} name  Customer name
+     * @param  {String} email Customer e-mail
+     * @param  {Integer} skuId Sku ID
+     * @return {Promise}
+     */
+    notifyMe(name, email, skuId) {
+        /* eslint-disable */
+        return $.Deferred((def) => {
+            /* eslint-enable */
+            const successMessage = 'Cadastrado com sucesso. Assim que o produto for disponibilizado você receberá um email avisando.';
+            const errorMessage = 'Não foi possível cadastrar. Tente mais tarde.';
+
+            return $.ajax({
+                url: '/no-cache/AviseMe.aspx',
+                type: 'post',
+                data: {
+                    notifymeClientName: name,
+                    notifymeClientEmail: email,
+                    notifymeIdSku: skuId,
+                },
+            })
+            .then((res) => def.resolve({successMessage}))
+            .fail((err) => def.reject({errorMessage}));
+        }).promise();
+    },
+
+    /**
      * PRIVATE
      */
     _checkCamelize(product) {
@@ -571,5 +627,13 @@ export default {
         }
 
         return false;
+    },
+
+    _getCommertialInfo(data, sellerId) {
+        if ( !globalHelpers.isPlainObject(data) ) {
+            throw new TypeError(`'data' must be an plain object`);
+        }
+
+        return ( data.hasOwnProperty('commertialOffer') ) ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
     },
 };

@@ -442,6 +442,7 @@ vtexHelpers.checkLogin().then(function(res) {
 ### vtexHelpers.openPopupLogin([noReload[, url]])
 
 Open default Vtex popup login.
+
 Before use, don't forget to import Vtex Controller `<vtex.cmc:welcomeMessage/>`
 
 - **noReload** (optional):
@@ -460,8 +461,8 @@ Before use, don't forget to import Vtex Controller `<vtex.cmc:welcomeMessage/>`
 vtexHelpers.openPopupLogin(); // Open popup and reload page after success login
 vtexHelpers.openPopupLogin(true); // Open popup and don't reload page after success login
 vtexHelpers.openPopupLogin(false, '/account'); // Open popup and don't reload page after success login and redirect to Account page
-
 ```
+
 #### TIP
 Use `$(window).on('closed.vtexid', callback)` event to set any property if `noReload` is `true`
 
@@ -470,6 +471,7 @@ If `noReload` is `true`, it'll ignore `url` param
 ### vtexHelpers.addToCart(items[, expectedOrderFormSections[, salesChannel]])
 
 Open default Vtex popup login.
+
 Require `vtexjs`.
 
 - **items**:
@@ -522,6 +524,42 @@ vtexHelpers.clearCart()
   })
   .fail(function(err) {
     window.console.log(err)
+  });
+```
+
+
+### vtexHelpers.notifyMe(name, email, skuId)
+
+Send notify me data for unavailable products.
+
+Return a promise.
+
+- **name**:
+  - Type: `String`
+  - Customer name
+
+- **email**:
+  - Type: `String`
+  - Customer e-mail
+
+- **skuId**:
+  - Type: `Integer`
+  - Sku ID (if product ID passed, will return a fail promise)
+
+
+#### Example
+
+```js
+var name = 'Test Notify';
+var email = 'test.notify@email.com';
+var skuId = 12321;
+
+vtexHelpers.notifyMe(name, email, skuId)
+  .then(function(res) {
+    console.log(res.successMessage); // Cadastrado com sucesso. Assim que o produto for disponibilizado você receberá um email avisando.
+  })
+  .fail(function(err) {
+    console.log(err.errorMessage); // Não foi possível cadastrar. Tente mais tarde.
   });
 ```
 
