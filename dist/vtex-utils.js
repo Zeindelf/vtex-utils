@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.13.0
+ * VtexUtils.js v1.13.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-07-17T14:27:34.383Z
+ * Date: 2018-08-11T20:08:43.569Z
  */
 
 (function (global, factory) {
@@ -23,13 +23,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*!!
-	 * Utilify.js v0.5.1
+	 * Utilify.js v0.5.2
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-06-01T04:58:23.813Z
+	 * Date: 2018-08-11T19:59:45.329Z
 	 */
 
 	(function (global, factory) {
@@ -2418,6 +2418,11 @@
 	         */
 
 	    }, {
+	        key: 'arrayClone',
+	        value: function arrayClone(arr) {
+	            return arrayHelpers.arrayClone(arr);
+	        }
+	    }, {
 	        key: 'arrayCompact',
 	        value: function arrayCompact(arr) {
 	            return arrayHelpers.arrayCompact(arr);
@@ -2853,7 +2858,7 @@
 	   * Version
 	   * @type {String}
 	   */
-	  this.version = '0.5.1';
+	  this.version = '0.5.2';
 
 	  /**
 	   * Package name
@@ -3782,7 +3787,7 @@
 	     * Version
 	     * @type {String}
 	     */
-	    this.version = '1.13.0';
+	    this.version = '1.13.1';
 
 	    /**
 	     * Package name
