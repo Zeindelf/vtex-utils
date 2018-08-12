@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.13.1
+ * VtexUtils.js v1.13.2
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-11T20:08:43.569Z
+ * Date: 2018-08-12T04:55:43.864Z
  */
 
 'use strict';
@@ -3309,13 +3309,13 @@ var vtexHelpers = {
             bestPrice: qty ? fix(co.price) : 0,
             listPrice: qty ? noListPrice ? false : fix(co.listPrice) : 0,
 
-            installments: qty ? installments.numberOfInstallments : 0,
-            installmentsInsterestRate: qty ? installments.interestRate : null,
-            installmentsValue: qty ? fix(installments.value) : 0,
+            installments: qty && installments ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: qty && installments ? installments.interestRate : null,
+            installmentsValue: qty && installments ? fix(installments.value) : 0,
 
             bestPriceFormatted: qty ? format(fix(co.price)) : format(0),
             listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
-            installmentsValueFormatted: qty ? format(fix(installments.value)) : format(0)
+            installmentsValueFormatted: qty && installments ? format(fix(installments.value)) : format(0)
         };
     },
 
@@ -3783,7 +3783,7 @@ var VtexUtils = function () {
      * Version
      * @type {String}
      */
-    this.version = '1.13.1';
+    this.version = '1.13.2';
 
     /**
      * Package name

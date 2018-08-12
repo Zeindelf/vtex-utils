@@ -351,15 +351,15 @@ export default {
                 ( (noListPrice) ? false : fix(co.listPrice) ) :
                 0,
 
-            installments: (qty) ? installments.numberOfInstallments : 0,
-            installmentsInsterestRate: (qty) ? installments.interestRate : null,
-            installmentsValue: (qty) ? fix(installments.value) : 0,
+            installments: (qty && installments) ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: (qty && installments) ? installments.interestRate : null,
+            installmentsValue: (qty && installments) ? fix(installments.value) : 0,
 
             bestPriceFormatted: (qty) ? format(fix(co.price)) : format(0),
             listPriceFormatted: (qty) ?
                 ( (noListPrice) ? false : format(fix(co.listPrice)) ) :
                 ( noListPrice) ? false : format(0),
-            installmentsValueFormatted: (qty) ? format(fix(installments.value)) : format(0),
+            installmentsValueFormatted: (qty && installments) ? format(fix(installments.value)) : format(0),
         };
     },
 
