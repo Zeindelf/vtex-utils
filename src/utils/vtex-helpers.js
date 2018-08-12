@@ -76,6 +76,7 @@ export default {
      * @return {Integer}
      */
     fixProductSearchPrice(val) {
+        val = globalHelpers.toNumber(val);
         return val.toFixed(2).split('.').join('') * 1;
     },
 
@@ -334,6 +335,7 @@ export default {
 
         const {commertialOffer: co} = sellerInfo;
         const installments = this.getProductInstallments(sellerInfo);
+        const isInstallments = !globalHelpers.isObjectEmpty(installments);
         const qty = co.availableQuantity;
         const noListPrice = co.price === co.listPrice;
         const fix = this.fixProductSearchPrice;
@@ -351,15 +353,15 @@ export default {
                 ( (noListPrice) ? false : fix(co.listPrice) ) :
                 0,
 
-            installments: (qty && installments) ? installments.numberOfInstallments : 0,
-            installmentsInsterestRate: (qty && installments) ? installments.interestRate : null,
-            installmentsValue: (qty && installments) ? fix(installments.value) : 0,
+            installments: (qty && isInstallments) ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: (qty && isInstallments) ? installments.interestRate : null,
+            installmentsValue: (qty && isInstallments) ? fix(installments.value) : 0,
 
             bestPriceFormatted: (qty) ? format(fix(co.price)) : format(0),
             listPriceFormatted: (qty) ?
                 ( (noListPrice) ? false : format(fix(co.listPrice)) ) :
                 ( noListPrice) ? false : format(0),
-            installmentsValueFormatted: (qty && installments) ? format(fix(installments.value)) : format(0),
+            installmentsValueFormatted: (qty && isInstallments) ? format(fix(installments.value)) : format(0),
         };
     },
 

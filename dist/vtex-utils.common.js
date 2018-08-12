@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-12T04:55:43.864Z
+ * Date: 2018-08-12T21:40:41.825Z
  */
 
 'use strict';
@@ -3014,6 +3014,7 @@ var vtexHelpers = {
      * @return {Integer}
      */
     fixProductSearchPrice: function fixProductSearchPrice(val) {
+        val = globalHelpers.toNumber(val);
         return val.toFixed(2).split('.').join('') * 1;
     },
 
@@ -3294,6 +3295,7 @@ var vtexHelpers = {
         var co = sellerInfo.commertialOffer;
 
         var installments = this.getProductInstallments(sellerInfo);
+        var isInstallments = !globalHelpers.isObjectEmpty(installments);
         var qty = co.availableQuantity;
         var noListPrice = co.price === co.listPrice;
         var fix = this.fixProductSearchPrice;
@@ -3309,13 +3311,13 @@ var vtexHelpers = {
             bestPrice: qty ? fix(co.price) : 0,
             listPrice: qty ? noListPrice ? false : fix(co.listPrice) : 0,
 
-            installments: qty && installments ? installments.numberOfInstallments : 0,
-            installmentsInsterestRate: qty && installments ? installments.interestRate : null,
-            installmentsValue: qty && installments ? fix(installments.value) : 0,
+            installments: qty && isInstallments ? installments.numberOfInstallments : 0,
+            installmentsInsterestRate: qty && isInstallments ? installments.interestRate : null,
+            installmentsValue: qty && isInstallments ? fix(installments.value) : 0,
 
             bestPriceFormatted: qty ? format(fix(co.price)) : format(0),
             listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
-            installmentsValueFormatted: qty && installments ? format(fix(installments.value)) : format(0)
+            installmentsValueFormatted: qty && isInstallments ? format(fix(installments.value)) : format(0)
         };
     },
 
