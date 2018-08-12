@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.13.2
+ * VtexUtils.js v1.13.3
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-12T21:40:41.825Z
+ * Date: 2018-08-12T22:14:31.259Z
  */
 
 'use strict';
@@ -3785,7 +3785,7 @@ var VtexUtils = function () {
      * Version
      * @type {String}
      */
-    this.version = '1.13.2';
+    this.version = '1.13.3';
 
     /**
      * Package name
