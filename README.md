@@ -422,6 +422,33 @@ var string = 'Foo\nBar\n\rBaz\r';
 vtexHelpers.replaceBreakLines(string); // 'Foo<br />Bar<br /><br />Baz<br />'
 ```
 
+
+### vtexHelpers.stringIdsToArray(str, separator = ',')
+
+Replace break lines from product descriptions/more
+
+- **str**:
+  - Type: `String`
+  - String with IDs
+
+- **separator** (optional):
+  - Type: `String`
+  - Default: `','`
+  - Separator to split
+
+#### Example
+
+```js
+var commaStr = '1, 2, 3, 4';
+stringIdsToArray(str); // [1, 2, 3, 4]
+
+var dashedStr = ' - 1 - 2 - 3 - 4 - ';
+stringIdsToArray(dashedStr, '-'); // [1, 2, 3, 4]
+```
+
+
+
+
 ### vtexHelpers.checkLogin()
 
 Check if the user is logged into Vtex

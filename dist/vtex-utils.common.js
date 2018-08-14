@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.13.3
+ * VtexUtils.js v1.14.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-12T22:14:31.259Z
+ * Date: 2018-08-14T20:13:02.313Z
  */
 
 'use strict';
@@ -19,13 +19,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.5.2
+ * Utilify.js v0.6.0
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-11T19:59:45.329Z
+ * Date: 2018-08-14T19:48:22.568Z
  */
 
 (function (global, factory) {
@@ -1840,6 +1840,34 @@ var arrayHelpers = {
 
 
     /**
+     * Split array elements by separator - PHP implode alike
+     *
+     * @category Array
+     * @param {String} str - String to split
+     * @param {string} separator - The separator
+     * @param {Number} limit - Limit splitted elements
+     * @return {Array} The array with values
+     * @example
+     *     explode('a', '.', 2); // ['a']
+     *     explode('a.b', '.', 2); // ['a', 'b']
+     *     explode('a.b.c', '.', 2); // ['a', 'b.c']
+     */
+    explode: function explode(str, separator, limit) {
+        if (!validateHelpers.isString(str)) {
+            throw new Error('\'str\' must be a String');
+        }
+
+        var arr = str.split(separator);
+
+        if (limit !== undefined && arr.length >= limit) {
+            arr.push(arr.splice(limit - 1).join(separator));
+        }
+
+        return arr;
+    },
+
+
+    /**
      * Randomize a array elements with Fisher–Yates shuffle algorithm base.
      *
      * @category Array
@@ -2276,6 +2304,26 @@ var objectHelpers = {
         }
 
         return false;
+    },
+
+
+    /**
+     * Convert object given into an array values
+     *
+     * @param  {Object}  obj  Object to convert
+     * @return {Array}
+     * @example
+     *     const obj = {a: 'a', b: 'b'};
+     *     objectToArray(obj); // ['a', 'b']
+     */
+    objectToArray: function objectToArray(obj) {
+        if (!validateHelpers.isPlainObject(obj)) {
+            throw new Error('\'obj\' must be a plain object');
+        }
+
+        return Object.keys(obj).map(function (key) {
+            return obj[key];
+        });
     }
 };
 
@@ -2518,6 +2566,11 @@ var GlobalHelpers = function () {
             return arrayHelpers.implode(pieces, glue);
         }
     }, {
+        key: 'explode',
+        value: function explode(str, separator, limit) {
+            return arrayHelpers.explode(str, separator, limit);
+        }
+    }, {
         key: 'length',
         value: function length(item) {
             return objectHelpers.length(item);
@@ -2541,6 +2594,11 @@ var GlobalHelpers = function () {
         key: 'objectSearch',
         value: function objectSearch(object, needle) {
             return objectHelpers.objectSearch(object, needle);
+        }
+    }, {
+        key: 'objectToArray',
+        value: function objectToArray(obj) {
+            return objectHelpers.objectToArray(obj);
         }
     }, {
         key: 'pad',
@@ -2854,7 +2912,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.5.2';
+  this.version = '0.6.0';
 
   /**
    * Package name
@@ -3456,6 +3514,31 @@ var vtexHelpers = {
 
 
     /**
+     * Convert a string IDs given into an integer array values
+     *
+     * @param  {String} str              String with IDs
+     * @param  {String} [separator=',']  Separator to split
+     * @return {Array}
+     * @example
+     *     const str = '1, 2, 3, 4';
+     *     stringIdsToArray(str); // [1, 2, 3, 4]
+     *
+     *     const str2 = '1 - 2 - 3 - 4';
+     *     stringIdsToArray(str2); // [1, 2, 3, 4]
+     */
+    stringIdsToArray: function stringIdsToArray(str) {
+        var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
+
+        var splitStr = globalHelpers.explode(str, separator);
+        var arr = splitStr.map(function (item) {
+            return globalHelpers.toNumber(globalHelpers.strCompact(item));
+        });
+
+        return globalHelpers.arrayCompact(arr);
+    },
+
+
+    /**
      * Check if the user is logged into Vtex
      * @return {promise} jQuery Ajax Promise
      * @example
@@ -3744,6 +3827,11 @@ var VtexHelpers = function () {
             return vtexHelpers.replaceBreakLines(str);
         }
     }, {
+        key: 'stringIdsToArray',
+        value: function stringIdsToArray(str, separator) {
+            return vtexHelpers.stringIdsToArray(str, separator);
+        }
+    }, {
         key: 'checkLogin',
         value: function checkLogin() {
             return vtexHelpers.checkLogin();
@@ -3785,7 +3873,7 @@ var VtexUtils = function () {
      * Version
      * @type {String}
      */
-    this.version = '1.13.3';
+    this.version = '1.14.0';
 
     /**
      * Package name

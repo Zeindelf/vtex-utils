@@ -1,6 +1,6 @@
 {
   "name": "vtex-utils",
-  "version": "1.13.3",
+  "version": "1.14.0",
   "description": "A collection of utilities methods for Vtex stores",
   "main": "dist/vtex-utils.common.js",
   "module": "dist/vtex-utils.esm.js",
@@ -67,7 +67,7 @@
     "rollup-plugin-node-resolve": "^3.3.0",
     "rollup-watch": "^4.3.1",
     "uglify-js": "^3.3.11",
-    "utilify-js": "^0.5.2"
+    "utilify-js": "^0.6.0"
   },
   "devDependencies": {
     "chai": "^4.1.2",

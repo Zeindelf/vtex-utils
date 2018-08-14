@@ -82,6 +82,10 @@ class VtexHelpers {
         return vtexHelpers.replaceBreakLines(str);
     }
 
+    stringIdsToArray(str, separator) {
+        return vtexHelpers.stringIdsToArray(str, separator);
+    }
+
     checkLogin() {
         return vtexHelpers.checkLogin();
     }

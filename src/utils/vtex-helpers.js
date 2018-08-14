@@ -490,6 +490,27 @@ export default {
     },
 
     /**
+     * Convert a string IDs given into an integer array values
+     *
+     * @param  {String} str              String with IDs
+     * @param  {String} [separator=',']  Separator to split
+     * @return {Array}
+     * @example
+     *     const str = '1, 2, 3, 4';
+     *     stringIdsToArray(str); // [1, 2, 3, 4]
+     *
+     *     const str2 = '1 - 2 - 3 - 4';
+     *     stringIdsToArray(str2); // [1, 2, 3, 4]
+     */
+    stringIdsToArray(str, separator = ',') {
+        const splitStr = globalHelpers.explode(str, separator);
+        const arr = splitStr.map((item) =>
+            globalHelpers.toNumber(globalHelpers.strCompact(item)));
+
+        return globalHelpers.arrayCompact(arr);
+    },
+
+    /**
      * Check if the user is logged into Vtex
      * @return {promise} jQuery Ajax Promise
      * @example
