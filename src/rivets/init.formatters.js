@@ -9,8 +9,11 @@ if ( typeof window !== 'object' ) {
 if ( 'rivets' in window ) {
     rivets.formatters.formatPrice = (target) => vtexHelpers.formatPrice(target);
     rivets.formatters.getResizedImage = (src, width, height) => vtexHelpers.getResizedImage(src, width, height);
-    rivets.formatters.getResizeImageByRatio = (src, type, newSize, aspectRatio) => vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
+    rivets.formatters.getResizedImageByRatio = (src, type, newSize, aspectRatio) => vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
     rivets.formatters.replaceBreakLines = (target) => vtexHelpers.replaceBreakLines(target);
 
     rivets.formatters.productImgSize = rivets.formatters.getResizedImage;
+    rivets.formatters.getResizeImage = rivets.formatters.getResizedImage;
+    rivets.formatters.getResizeImageByRatio = rivets.formatters.getResizedImageByRatio;
+    rivets.formatters.productImgSizeByRatio = rivets.formatters.getResizedImageByRatio;
 }

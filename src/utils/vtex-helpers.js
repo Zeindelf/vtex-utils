@@ -54,9 +54,9 @@ export default {
         const regex = new RegExp(format, ['g']);
         const unformatted = parseFloat(
                 ('' + value)
-                    .replace(/\((?=\d+)(.*)\)/, '-$1') // replace bracketed values with negatives
-                    .replace(regex, '') // strip out any cruft
-                    .replace(decimal, '.') // make sure decimal point is standard
+                    .replace(/\((?=\d+)(.*)\)/, '-$1') // Replace bracketed values with negatives
+                    .replace(regex, '') // Strip out any cruft
+                    .replace(decimal, '.') // Make sure decimal point is standard
             ).toFixed(2);
 
         const values = unformatted.toString().split('.');
@@ -655,5 +655,44 @@ export default {
         }
 
         return ( data.hasOwnProperty('commertialOffer') ) ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
+    },
+
+    /**
+     * Check if user is logged in
+     *
+     * @return {Boolean}
+     */
+    _isUserLogged(storeName) {
+        const check = this._getCookie(`VtexIdclientAutCookie_${storeName}`);
+
+        return ( check ) ? true : false;
+    },
+
+    _getCookie(name) {
+        const dc = document.cookie;
+        const prefix = name + '=';
+        let begin = dc.indexOf('; ' + prefix);
+        let end = dc.length; // Default to end of the string
+
+        // Found, and not in first position
+        if ( begin !== -1 ) {
+            // Exclude the "; "
+            begin += 2;
+        } else {
+            // See if cookie is in first position
+            begin = dc.indexOf(prefix);
+            // Not found at all or found as a portion of another cookie name
+            if ( begin === -1 || begin !== 0 ) {
+                return false;
+            }
+        }
+
+        // If we find a ';' somewhere after the prefix position then "end" is that position,
+        // otherwise it defaults to the end of the string
+        if ( dc.indexOf(';', begin) !== -1 ) {
+            end = dc.indexOf(';', begin);
+        }
+
+        return decodeURI(dc.substring(begin + prefix.length, end) ).replace(/"/g, '');
     },
 };

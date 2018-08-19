@@ -6,6 +6,11 @@ import vtexHelpers from './../utils/vtex-helpers.js';
  * Vtex utilities methods
  */
 class VtexHelpers {
+    constructor() {
+        this.getStoreName = window.jsnomeLoja;
+        this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName);
+    }
+
     formatPrice(number, thousands, decimals, length, currency) {
         return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
     }

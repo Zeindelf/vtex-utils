@@ -176,6 +176,7 @@ vtexHelpers.fixProductSearchPrice(250.25); // 25025
 ### vtexHelpers.getFirstAvailableSku(product)
 
 Get first available SKU from Vtex API `/api/catalog_system/` end point
+
 Returns an object with first available SKU or false if all are unvailable
 
 - **product**:
@@ -382,7 +383,7 @@ vtexHelpers.getShipping('01010-010')
     }
   });
 
-/* 
+/*
   Case success, will return an object with properties:
   {
     error: false,
@@ -423,7 +424,7 @@ vtexHelpers.replaceBreakLines(string); // 'Foo<br />Bar<br /><br />Baz<br />'
 ```
 
 
-### vtexHelpers.stringIdsToArray(str, separator = ',')
+### vtexHelpers.stringIdsToArray(str[, separator])
 
 Replace break lines from product descriptions/more
 
