@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.14.0
+ * VtexUtils.js v1.14.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-14T20:13:02.313Z
+ * Date: 2018-08-19T21:13:01.067Z
  */
 
 (function (global, factory) {
@@ -3053,9 +3053,9 @@
 	        // Build regex to strip out everything except digits, decimal point and minus sign:
 	        var format = '[^0-9-' + decimal + ']';
 	        var regex = new RegExp(format, ['g']);
-	        var unformatted = parseFloat(('' + value).replace(/\((?=\d+)(.*)\)/, '-$1') // replace bracketed values with negatives
-	        .replace(regex, '') // strip out any cruft
-	        .replace(decimal, '.') // make sure decimal point is standard
+	        var unformatted = parseFloat(('' + value).replace(/\((?=\d+)(.*)\)/, '-$1') // Replace bracketed values with negatives
+	        .replace(regex, '') // Strip out any cruft
+	        .replace(decimal, '.') // Make sure decimal point is standard
 	        ).toFixed(2);
 
 	        var values = unformatted.toString().split('.');
@@ -3700,6 +3700,45 @@
 	        }
 
 	        return data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
+	    },
+
+
+	    /**
+	     * Check if user is logged in
+	     *
+	     * @return {Boolean}
+	     */
+	    _isUserLogged: function _isUserLogged(storeName) {
+	        var check = this._getCookie('VtexIdclientAutCookie_' + storeName);
+
+	        return check ? true : false;
+	    },
+	    _getCookie: function _getCookie(name) {
+	        var dc = document.cookie;
+	        var prefix = name + '=';
+	        var begin = dc.indexOf('; ' + prefix);
+	        var end = dc.length; // Default to end of the string
+
+	        // Found, and not in first position
+	        if (begin !== -1) {
+	            // Exclude the "; "
+	            begin += 2;
+	        } else {
+	            // See if cookie is in first position
+	            begin = dc.indexOf(prefix);
+	            // Not found at all or found as a portion of another cookie name
+	            if (begin === -1 || begin !== 0) {
+	                return false;
+	            }
+	        }
+
+	        // If we find a ';' somewhere after the prefix position then "end" is that position,
+	        // otherwise it defaults to the end of the string
+	        if (dc.indexOf(';', begin) !== -1) {
+	            end = dc.indexOf(';', begin);
+	        }
+
+	        return decodeURI(dc.substring(begin + prefix.length, end)).replace(/"/g, '');
 	    }
 	};
 
@@ -3715,7 +3754,7 @@
 	    rivets.formatters.getResizedImage = function (src, width, height) {
 	        return vtexHelpers.getResizedImage(src, width, height);
 	    };
-	    rivets.formatters.getResizeImageByRatio = function (src, type, newSize, aspectRatio) {
+	    rivets.formatters.getResizedImageByRatio = function (src, type, newSize, aspectRatio) {
 	        return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
 	    };
 	    rivets.formatters.replaceBreakLines = function (target) {
@@ -3723,6 +3762,9 @@
 	    };
 
 	    rivets.formatters.productImgSize = rivets.formatters.getResizedImage;
+	    rivets.formatters.getResizeImage = rivets.formatters.getResizedImage;
+	    rivets.formatters.getResizeImageByRatio = rivets.formatters.getResizedImageByRatio;
+	    rivets.formatters.productImgSizeByRatio = rivets.formatters.getResizedImageByRatio;
 	}
 
 	/**
@@ -3733,6 +3775,9 @@
 	var VtexHelpers = function () {
 	    function VtexHelpers() {
 	        classCallCheck(this, VtexHelpers);
+
+	        this.getStoreName = window.jsnomeLoja;
+	        this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName);
 	    }
 
 	    createClass(VtexHelpers, [{
@@ -3877,7 +3922,7 @@
 	     * Version
 	     * @type {String}
 	     */
-	    this.version = '1.14.0';
+	    this.version = '1.14.1';
 
 	    /**
 	     * Package name

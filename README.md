@@ -426,7 +426,7 @@ vtexHelpers.replaceBreakLines(string); // 'Foo<br />Bar<br /><br />Baz<br />'
 
 ### vtexHelpers.stringIdsToArray(str[, separator])
 
-Replace break lines from product descriptions/more
+Convert a string IDs given into an integer array values
 
 - **str**:
   - Type: `String`
