@@ -3,6 +3,10 @@ import {utilify} from './vendor.utilify.js';
 
 const globalHelpers = utilify.globalHelpers;
 
+const CONSTANTS = {
+    CAMELIZE: `You must set camelize your items to use this method`,
+};
+
 export default {
     /**
      * Formats Vtex price
@@ -69,6 +73,100 @@ export default {
     },
 
     /**
+     * Take the value of the installment with min price and max installments given
+     *
+     * @param {String|Number} price             Price to get installments. Can be formatted price or a integer value
+     * @param {String|Number} minPrice          Min price for each installment. Can be formatted price or a integer value
+     * @param {Number}        maxInstallments   Max installments
+     * @param {Number}        [interest=0]      Interest rate
+     * @returns {Object}
+     * @example
+     *     setInstallment('R$ 3.499,00', 'R$ 430,00', 10) // {installments: 8, installmentValue: 43737, interest: 0}
+     *     setInstallment(349900, 43000, 10) // {installments: 8, installmentValue: 43737, interest: 0}
+     */
+    setInstallment(price, minPrice, maxInstallments, interest = 0) {
+        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+        minPrice = globalHelpers.isString(minPrice) ? this.unformatPrice(minPrice).unformatted : minPrice;
+        minPrice = ( minPrice < 1 ) ? 1 : minPrice;
+
+        maxInstallments = globalHelpers.toNumber(maxInstallments);
+        interest = globalHelpers.toNumber(interest);
+
+        let installments = parseInt(price / minPrice, 10);
+
+        if ( installments > maxInstallments ) {
+            installments = maxInstallments;
+        }
+
+        let installmentValue = price / installments;
+
+        if ( interest > 0 ) {
+            installmentValue = (price * Math.pow((1 + (interest / 100)), installments)) / installments;
+        }
+
+        installmentValue = Math.floor(installmentValue);
+
+        if ( installments > 0 ) {
+            return {
+                installments,
+                installmentValue,
+                interest,
+            };
+        }
+
+        return false;
+    },
+
+    /**
+     * Get the percentage of a discount
+     *
+     * @param  {String|Number}    oldPrice    Original price. Can be formatted price or a integer value.
+     * @param  {String|Number}    newPrice    Price with discount. Can be formatted price or a integer value.
+     * @param  {Number}           [length=0]  Number of decimals
+     * @returns {Number}
+     * @example
+     *     getPercentage('R$ 179,90', 'R$ 149,50'); // 17 (17% OFF)
+     *     getPercentage(17990, 14900, 2); // 17.18 (17.18% OFF)
+     */
+    getPercentage(oldPrice, newPrice, length = 0) {
+        oldPrice = globalHelpers.isString(oldPrice) ? this.unformatPrice(oldPrice).unformatted : oldPrice;
+        newPrice = globalHelpers.isString(newPrice) ? this.unformatPrice(newPrice).unformatted : newPrice;
+        const percent = parseFloat((((newPrice / oldPrice) * 100) - 100));
+
+        return Math.abs(percent.toFixed(length));
+    },
+
+    /**
+     * Returns a discount amount or adding a set value.
+     *
+     * @param  {String|Number}   price     Price to apply discount. Can be formatted price or a integer value.
+     * @param  {String|Number}   percent   Percentage to apply. Can be formatted price or a integer value.
+     * @param  {Boolean}         [formatted=false]   Format result
+     * @return {Object}
+     * @example
+     *     applyDiscountPercent('R$ 9,55', 37.27); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent('R$ 9,55', '37.27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent('R$ 9,55', '37,27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent(955, 37.27, true); // {discountPrice: 'R$ 3,55', priceWithDiscount: 'R$ 5,99', priceWithIncrease: 'R$ 13,10'}
+     */
+    applyDiscountPercent(price, percent, formatted = false) {
+        const getNumber = (str) => str.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+        percent = globalHelpers.isString(percent) ? globalHelpers.toNumber(getNumber(percent)) : percent;
+
+        const discount = (percent / 100) * price;
+        const discountPrice = Math.floor(discount);
+        const priceWithDiscount = Math.floor(price - discount);
+        const priceWithIncrease = Math.floor(price + discount);
+
+        return {
+            discountPrice: ( !formatted ) ? discountPrice : this.formatPrice(discountPrice),
+            priceWithDiscount: ( !formatted ) ? priceWithDiscount : this.formatPrice(priceWithDiscount),
+            priceWithIncrease: ( !formatted ) ? priceWithIncrease : this.formatPrice(priceWithIncrease),
+        };
+    },
+
+    /**
      * Formats price from Vtex API `/api/catalog_system/pub/products/search/`
      * to a correct `formatPrice` method
      *
@@ -87,9 +185,9 @@ export default {
      * @return {Object|Boolean}      An available SKU data or false
      */
     getFirstAvailableSku(product) {
-        // if ( !this._checkCamelize(product) ) {
-        //     throw new Error(CONSTANTS.camelize);
-        // }
+        if ( !this._checkCamelize(product) ) {
+            throw new Error(CONSTANTS.CAMELIZE);
+        }
 
         let newArr = {};
 

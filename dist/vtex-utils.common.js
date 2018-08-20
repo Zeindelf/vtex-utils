@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-19T21:13:01.067Z
+ * Date: 2018-08-20T05:11:47.500Z
  */
 
 'use strict';
@@ -19,13 +19,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.6.0
+ * Utilify.js v0.7.0
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-14T19:48:22.568Z
+ * Date: 2018-08-20T05:05:18.941Z
  */
 
 (function (global, factory) {
@@ -1118,6 +1118,57 @@ var globalHelpers = {
         }
 
         return dimensions;
+    },
+
+
+    /**
+     * Compare two semver version strings, returning -1, 0, or 1
+     * If the semver string `v1` is greater than `v2`, return 1. If the semver string `v2` is greater than `v1`, return -1. If `v1` equals `v2`, return 0
+     *
+     * @from @semver-compare
+     * @category Global
+     * @param  {String} v1 Your semver to compare
+     * @param  {String} v2 Compared semver
+     * @return {Number}    -1, 0, 1
+     */
+    semverCompare: function semverCompare(v1, v2) {
+        var semver = /^v?(?:\d+)(\.(?:[x*]|\d+)(\.(?:[x*]|\d+)(\.(?:[x*]|\d+))?(?:-[\da-z\-]+(?:\.[\da-z\-]+)*)?(?:\+[\da-z\-]+(?:\.[\da-z\-]+)*)?)?)?$/i;
+        var validate = function validate(version) {
+            if (!validateHelpers.isString(version)) {
+                throw new TypeError('Invalid argument: expected string');
+            }
+            if (!semver.test(version)) {
+                throw new Error('Invalid argument: not valid semver');
+            }
+        };
+
+        [v1, v2].forEach(validate);
+
+        var pa = v1.split('.');
+        var pb = v2.split('.');
+
+        for (var i = 0; i < 3; i++) {
+            var na = Number(pa[i]);
+            var nb = Number(pb[i]);
+
+            if (na > nb) {
+                return 1;
+            }
+
+            if (nb > na) {
+                return -1;
+            }
+
+            if (!isNaN(na) && isNaN(nb)) {
+                return 1;
+            }
+
+            if (isNaN(na) && !isNaN(nb)) {
+                return -1;
+            }
+        }
+
+        return 0;
     },
 
 
@@ -2616,6 +2667,11 @@ var GlobalHelpers = function () {
             return globalHelpers.resizeImageByRatio(type, newValue, aspectRatio, decimals);
         }
     }, {
+        key: 'semverCompare',
+        value: function semverCompare(v1, v2) {
+            return globalHelpers.semverCompare(v1, v2);
+        }
+    }, {
         key: 'shuffleArray',
         value: function shuffleArray(array) {
             return arrayHelpers.shuffleArray(array);
@@ -2912,7 +2968,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.6.0';
+  this.version = '0.7.0';
 
   /**
    * Package name
@@ -2993,6 +3049,10 @@ var defineProperty = function (obj, key, value) {
 
 var globalHelpers = utilify$1.globalHelpers;
 
+var CONSTANTS = {
+    CAMELIZE: 'You must set camelize your items to use this method'
+};
+
 var vtexHelpers = {
     /**
      * Formats Vtex price
@@ -3065,6 +3125,111 @@ var vtexHelpers = {
 
 
     /**
+     * Take the value of the installment with min price and max installments given
+     *
+     * @param {String|Number} price             Price to get installments. Can be formatted price or a integer value
+     * @param {String|Number} minPrice          Min price for each installment. Can be formatted price or a integer value
+     * @param {Number}        maxInstallments   Max installments
+     * @param {Number}        [interest=0]      Interest rate
+     * @returns {Object}
+     * @example
+     *     setInstallment('R$ 3.499,00', 'R$ 430,00', 10) // {installments: 8, installmentValue: 43737, interest: 0}
+     *     setInstallment(349900, 43000, 10) // {installments: 8, installmentValue: 43737, interest: 0}
+     */
+    setInstallment: function setInstallment(price, minPrice, maxInstallments) {
+        var interest = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+        minPrice = globalHelpers.isString(minPrice) ? this.unformatPrice(minPrice).unformatted : minPrice;
+        minPrice = minPrice < 1 ? 1 : minPrice;
+
+        maxInstallments = globalHelpers.toNumber(maxInstallments);
+        interest = globalHelpers.toNumber(interest);
+
+        var installments = parseInt(price / minPrice, 10);
+
+        if (installments > maxInstallments) {
+            installments = maxInstallments;
+        }
+
+        var installmentValue = price / installments;
+
+        if (interest > 0) {
+            installmentValue = price * Math.pow(1 + interest / 100, installments) / installments;
+        }
+
+        installmentValue = Math.floor(installmentValue);
+
+        if (installments > 0) {
+            return {
+                installments: installments,
+                installmentValue: installmentValue,
+                interest: interest
+            };
+        }
+
+        return false;
+    },
+
+
+    /**
+     * Get the percentage of a discount
+     *
+     * @param  {String|Number}    oldPrice    Original price. Can be formatted price or a integer value.
+     * @param  {String|Number}    newPrice    Price with discount. Can be formatted price or a integer value.
+     * @param  {Number}           [length=0]  Number of decimals
+     * @returns {Number}
+     * @example
+     *     getPercentage('R$ 179,90', 'R$ 149,50'); // 17 (17% OFF)
+     *     getPercentage(17990, 14900, 2); // 17.18 (17.18% OFF)
+     */
+    getPercentage: function getPercentage(oldPrice, newPrice) {
+        var length = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+
+        oldPrice = globalHelpers.isString(oldPrice) ? this.unformatPrice(oldPrice).unformatted : oldPrice;
+        newPrice = globalHelpers.isString(newPrice) ? this.unformatPrice(newPrice).unformatted : newPrice;
+        var percent = parseFloat(newPrice / oldPrice * 100 - 100);
+
+        return Math.abs(percent.toFixed(length));
+    },
+
+
+    /**
+     * Returns a discount amount or adding a set value.
+     *
+     * @param  {String|Number}   price     Price to apply discount. Can be formatted price or a integer value.
+     * @param  {String|Number}   percent   Percentage to apply. Can be formatted price or a integer value.
+     * @param  {Boolean}         [formatted=false]   Format result
+     * @return {Object}
+     * @example
+     *     applyDiscountPercent('R$ 9,55', 37.27); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent('R$ 9,55', '37.27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent('R$ 9,55', '37,27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+     *     applyDiscountPercent(955, 37.27, true); // {discountPrice: 'R$ 3,55', priceWithDiscount: 'R$ 5,99', priceWithIncrease: 'R$ 13,10'}
+     */
+    applyDiscountPercent: function applyDiscountPercent(price, percent) {
+        var formatted = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+        var getNumber = function getNumber(str) {
+            return str.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+        };
+        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+        percent = globalHelpers.isString(percent) ? globalHelpers.toNumber(getNumber(percent)) : percent;
+
+        var discount = percent / 100 * price;
+        var discountPrice = Math.floor(discount);
+        var priceWithDiscount = Math.floor(price - discount);
+        var priceWithIncrease = Math.floor(price + discount);
+
+        return {
+            discountPrice: !formatted ? discountPrice : this.formatPrice(discountPrice),
+            priceWithDiscount: !formatted ? priceWithDiscount : this.formatPrice(priceWithDiscount),
+            priceWithIncrease: !formatted ? priceWithIncrease : this.formatPrice(priceWithIncrease)
+        };
+    },
+
+
+    /**
      * Formats price from Vtex API `/api/catalog_system/pub/products/search/`
      * to a correct `formatPrice` method
      *
@@ -3084,9 +3249,9 @@ var vtexHelpers = {
      * @return {Object|Boolean}      An available SKU data or false
      */
     getFirstAvailableSku: function getFirstAvailableSku(product) {
-        // if ( !this._checkCamelize(product) ) {
-        //     throw new Error(CONSTANTS.camelize);
-        // }
+        if (!this._checkCamelize(product)) {
+            throw new Error(CONSTANTS.CAMELIZE);
+        }
 
         var newArr = {};
 
@@ -3773,6 +3938,7 @@ var VtexHelpers = function () {
         classCallCheck(this, VtexHelpers);
 
         this.getStoreName = window.jsnomeLoja;
+        this.getSalesChannel = window.jssalesChannel;
         this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName);
     }
 
@@ -3785,6 +3951,21 @@ var VtexHelpers = function () {
         key: 'unformatPrice',
         value: function unformatPrice(value, decimal, formatNumber) {
             return vtexHelpers.unformatPrice(value, decimal, formatNumber);
+        }
+    }, {
+        key: 'setInstallment',
+        value: function setInstallment(price, minPrice, maxInstallments, interest) {
+            return vtexHelpers.setInstallment(price, minPrice, maxInstallments, interest);
+        }
+    }, {
+        key: 'getPercentage',
+        value: function getPercentage(oldPrice, newPrice, length) {
+            return vtexHelpers.getPercentage(oldPrice, newPrice, length);
+        }
+    }, {
+        key: 'applyDiscountPercent',
+        value: function applyDiscountPercent(price, percent, formatted) {
+            return vtexHelpers.applyDiscountPercent(price, percent, formatted);
         }
     }, {
         key: 'fixProductSearchPrice',

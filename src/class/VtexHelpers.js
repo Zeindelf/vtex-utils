@@ -8,6 +8,7 @@ import vtexHelpers from './../utils/vtex-helpers.js';
 class VtexHelpers {
     constructor() {
         this.getStoreName = window.jsnomeLoja;
+        this.getSalesChannel = window.jssalesChannel;
         this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName);
     }
 
@@ -17,6 +18,18 @@ class VtexHelpers {
 
     unformatPrice(value, decimal, formatNumber) {
         return vtexHelpers.unformatPrice(value, decimal, formatNumber);
+    }
+
+    setInstallment(price, minPrice, maxInstallments, interest) {
+        return vtexHelpers.setInstallment(price, minPrice, maxInstallments, interest);
+    }
+
+    getPercentage(oldPrice, newPrice, length) {
+        return vtexHelpers.getPercentage(oldPrice, newPrice, length);
+    }
+
+    applyDiscountPercent(price, percent, formatted) {
+        return vtexHelpers.applyDiscountPercent(price, percent, formatted);
     }
 
     fixProductSearchPrice(val) {

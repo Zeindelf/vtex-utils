@@ -158,6 +158,87 @@ vtexHelpers.unformatPrice(['R$ 12,34', 'R$ 23,45', 'R$ 34,56']);
 ```
 
 
+### vtexHelpers.setInstallment(price, minPrice, maxInstallments[, interest])
+
+Take the value of the installment with min price and max installments given
+
+- **price**:
+  - Type: `String|Number`
+  - Price to get installments. Can be formatted price or a integer value.
+
+- **minPrice**:
+  - Type: `String|Number`
+  - Min price for each installment. Can be formatted price or a integer value.
+
+- **maxInstallments**:
+  - Type: `Number`
+  - Max installments
+
+- **interest** (optional):
+  - Type: `Number`
+  - Default: `0`
+  - Interest rate
+
+#### Example
+
+```js
+vtexHelpers.setInstallment('R$ 3.499,00', 'R$ 430,00', 10) // {installments: 8, installmentValue: 43737, interest: 0}
+vtexHelpers.setInstallment(349900, 43000, 10) // {installments: 8, installmentValue: 43737, interest: 0}
+```
+
+
+### vtexHelpers.getPercentage(oldPrice, newPrice[, length])
+
+Get the percentage of a discount
+
+- **oldPrice**:
+  - Type: `String|Number`
+  - Original price. Can be formatted price or a integer value.
+
+- **newPrice**:
+  - Type: `String|Number`
+  - Price with discount. Can be formatted price or a integer value.
+
+- **length** (optional):
+  - Type: `Number`
+  - Default: `0`
+  - Number of decimals
+
+#### Example
+
+```js
+vtexHelpers.getPercentage('R$ 179,90', 'R$ 149,50'); // 17 (17% OFF)
+vtexHelpers.getPercentage(17990, 14900, 2); // 17.18 (17.18% OFF)
+```
+
+
+### vtexHelpers.applyDiscountPercent(price, percent[, formatted])
+
+Returns a discount amount or adding a set value.
+
+- **price**:
+  - Type: `String|Number`
+  - Price to apply discount. Can be formatted price or a integer value.
+
+- **percent**:
+  - Type: `String|Number`
+  - Percentage to apply. Can be formatted price or a integer value.
+
+- **formatted** (optional):
+  - Type: `Boolean`
+  - Default: `false`
+  - Format result
+
+#### Example
+
+```js
+vtexHelpers.applyDiscountPercent('R$ 9,55', 37.27); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+vtexHelpers.applyDiscountPercent('R$ 9,55', '37.27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+vtexHelpers.applyDiscountPercent('R$ 9,55', '37,27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
+vtexHelpers.applyDiscountPercent(955, 37.27, true); // {discountPrice: 'R$ 3,55', priceWithDiscount: 'R$ 5,99', priceWithIncrease: 'R$ 13,10'}
+```
+
+
 ### vtexHelpers.fixProductSearchPrice(val)
 
 Formats price from Vtex API `/api/catalog_system/pub/products/search/` to use in `formatPrice` method
