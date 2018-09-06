@@ -15,7 +15,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.16.0';
+        this.version = '1.16.1';
 
         /**
          * Package name
@@ -46,6 +46,12 @@ class VtexUtils {
          * @type {Object}
          */
         this.storage = utilify.storage;
+
+        /**
+         * Javascript Cookies
+         * @type {Object}
+         */
+        this.cookies = utilify.cookies;
     }
 
     setRivetsUtilify(RivetsUtilify) {
