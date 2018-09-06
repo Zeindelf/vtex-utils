@@ -6,7 +6,7 @@
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-20T06:20:54.087Z
+ * Date: 2018-09-06T22:24:08.627Z
  */
 
 'use strict';
@@ -19,13 +19,13 @@ function createCommonjsModule(fn, module) {
 
 var utilify = createCommonjsModule(function (module, exports) {
 /*!!
- * Utilify.js v0.7.0
+ * Utilify.js v0.7.1
  * https://github.com/zeindelf/utilify-js
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-08-20T05:05:18.941Z
+ * Date: 2018-08-24T19:40:18.527Z
  */
 
 (function (global, factory) {
@@ -1541,6 +1541,19 @@ var validateHelpers = {
 
 
     /**
+     * Check if the given value is numeric (String or Number).
+     *
+     * @category Validate
+     * @param {*} value - The value to check.
+     * @return {boolean} Returns 'true' if the given value is a numeric, else 'false'.
+     */
+    isNumeric: function isNumeric(value) {
+        return (/^[0-9]*\.?[0-9]+$/.test(value)
+        );
+    },
+
+
+    /**
      * Check if the given value is an object
      *
      * @category Validate
@@ -2463,6 +2476,21 @@ var GlobalHelpers = function () {
             return validateHelpers.isNumber(value);
         }
     }, {
+        key: 'isNumeric',
+        value: function (_isNumeric) {
+            function isNumeric(_x) {
+                return _isNumeric.apply(this, arguments);
+            }
+
+            isNumeric.toString = function () {
+                return _isNumeric.toString();
+            };
+
+            return isNumeric;
+        }(function (value) {
+            return isNumeric(value);
+        })
+    }, {
         key: 'isObject',
         value: function isObject(value) {
             return validateHelpers.isObject(value);
@@ -2473,6 +2501,16 @@ var GlobalHelpers = function () {
             return validateHelpers.isObjectEmpty(obj);
         }
     }, {
+        key: 'isPercentage',
+        value: function isPercentage(percentage) {
+            return validateHelpers.isPercentage(percentage);
+        }
+    }, {
+        key: 'isPlainObject',
+        value: function isPlainObject(value) {
+            return validateHelpers.isPlainObject(value);
+        }
+    }, {
         key: 'isPrimitive',
         value: function isPrimitive(obj, type) {
             return validateHelpers.isPrimitive(obj, type);
@@ -2481,11 +2519,6 @@ var GlobalHelpers = function () {
         key: 'isRealNaN',
         value: function isRealNaN(obj) {
             return validateHelpers.isRealNaN(obj);
-        }
-    }, {
-        key: 'isPlainObject',
-        value: function isPlainObject(value) {
-            return validateHelpers.isPlainObject(value);
         }
     }, {
         key: 'isRegExp',
@@ -2968,7 +3001,7 @@ var Utilify = function Utilify() {
    * Version
    * @type {String}
    */
-  this.version = '0.7.0';
+  this.version = '0.7.1';
 
   /**
    * Package name
