@@ -129,6 +129,10 @@ export default {
      *     getPercentage(17990, 14900, 2); // 17.18 (17.18% OFF)
      */
     getPercentage(oldPrice, newPrice, length = 0) {
+        if ( oldPrice < newPrice || oldPrice < 1 || newPrice < 1 ) {
+            return 0;
+        }
+
         oldPrice = globalHelpers.isString(oldPrice) ? this.unformatPrice(oldPrice).unformatted : oldPrice;
         newPrice = globalHelpers.isString(newPrice) ? this.unformatPrice(newPrice).unformatted : newPrice;
         const percent = parseFloat((((newPrice / oldPrice) * 100) - 100));

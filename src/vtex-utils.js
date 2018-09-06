@@ -1,8 +1,9 @@
 
-import './rivets/init.formatters.js';
+import './utils/vender.jquery-ajax-retry';
+import './rivets/init.formatters';
 
-import VtexHelpers from './class/VtexHelpers.js';
-import {utilify} from './utils/vendor.utilify.js';
+import VtexHelpers from './class/VtexHelpers';
+import {utilify} from './utils/vendor.utilify';
 
 /**
  * Create a VtexUtils class
@@ -14,7 +15,7 @@ class VtexUtils {
          * Version
          * @type {String}
          */
-        this.version = '1.15.0';
+        this.version = '1.15.1';
 
         /**
          * Package name
