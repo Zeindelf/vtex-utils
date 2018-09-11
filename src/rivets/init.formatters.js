@@ -1,5 +1,5 @@
 
-import {utilify} from '../utils/vendor.utilify';
+import { utilify } from '../utils/vendor.utilify';
 import vtexHelpers from '../utils/vtex-helpers';
 
 const globalHelpers = utilify.globalHelpers;

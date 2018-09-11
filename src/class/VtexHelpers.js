@@ -1,5 +1,5 @@
 
-import vtexHelpers from './../utils/vtex-helpers.js';
+import vtexHelpers from '../utils/vtex-helpers';
 
 /**
  * Create a VtexHelpers class
@@ -9,7 +9,10 @@ class VtexHelpers {
     constructor() {
         this.getStoreName = window.jsnomeLoja;
         this.getSalesChannel = window.jssalesChannel;
-        this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName);
+        this.isUserLogged = ( vtexHelpers._isUserLogged(this.getStoreName) ) ? true : false;
+        this.getUserInfo = vtexHelpers._getUserInfo(this.getStoreName);
+        this.getRequestVerificationToken = vtexHelpers._getRequestVerificationToken(this.getStoreName);
+        this.logoutUrl = '/no-cache/user/logout';
     }
 
     formatPrice(number, thousands, decimals, length, currency) {

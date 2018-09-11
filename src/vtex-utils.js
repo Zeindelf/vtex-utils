@@ -1,9 +1,9 @@
 
-import './utils/vender.jquery-ajax-retry';
+import './utils/vendor.jquery-utils';
 import './rivets/init.formatters';
 
 import VtexHelpers from './class/VtexHelpers';
-import {utilify} from './utils/vendor.utilify';
+import { utilify } from './utils/vendor.utilify';
 
 /**
  * Create a VtexUtils class

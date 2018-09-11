@@ -1,7 +1,8 @@
 
-import {utilify} from './vendor.utilify.js';
+import { utilify } from './vendor.utilify';
 
 const globalHelpers = utilify.globalHelpers;
+const cookies = utilify.cookies;
 
 const CONSTANTS = {
     CAMELIZE: `You must set camelize your items to use this method`,
@@ -477,13 +478,7 @@ export default {
             return false;
         }
 
-        const groupedInstallments = commertialOffer.installments.reduce((r, a) => {
-            r[a.paymentSystemName] = r[a.paymentSystemName] || [];
-            r[a.paymentSystemName].push(a);
-            return r;
-        }, Object.create(null));
-
-        return globalHelpers.camelize(groupedInstallments);
+        return globalHelpers.groupObjectByValue(commertialOffer.installments, 'paymentSystemName', true);
     },
 
     getShipping(postalCode, skuId, quantity) {
@@ -765,36 +760,26 @@ export default {
      * @return {Boolean}
      */
     _isUserLogged(storeName) {
-        const check = this._getCookie(`VtexIdclientAutCookie_${storeName}`);
-
-        return ( check ) ? true : false;
+        return cookies.get(`VtexIdclientAutCookie_${storeName}`);
     },
 
-    _getCookie(name) {
-        const dc = document.cookie;
-        const prefix = name + '=';
-        let begin = dc.indexOf('; ' + prefix);
-        let end = dc.length; // Default to end of the string
-
-        // Found, and not in first position
-        if ( begin !== -1 ) {
-            // Exclude the "; "
-            begin += 2;
-        } else {
-            // See if cookie is in first position
-            begin = dc.indexOf(prefix);
-            // Not found at all or found as a portion of another cookie name
-            if ( begin === -1 || begin !== 0 ) {
-                return false;
-            }
+    _getUserInfo(storeName) {
+        if ( !this._isUserLogged(storeName) ) {
+            return false;
         }
 
-        // If we find a ';' somewhere after the prefix position then "end" is that position,
-        // otherwise it defaults to the end of the string
-        if ( dc.indexOf(';', begin) !== -1 ) {
-            end = dc.indexOf(';', begin);
-        }
+        const info = globalHelpers.parseJwt(this._isUserLogged(storeName));
 
-        return decodeURI(dc.substring(begin + prefix.length, end) ).replace(/"/g, '');
+        return {
+            userId: info.userId,
+            email: info.sub,
+            account: info.account,
+        };
     },
+
+    _getRequestVerificationToken(storeName) {
+        return ( !this._isUserLogged(storeName) )
+            ? false
+            : cookies.get('VTEXRequestVerificationToken');
+    }
 };

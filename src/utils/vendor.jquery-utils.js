@@ -1,10 +1,4 @@
-/*
- * jquery.ajax-retry
- * https://github.com/johnkpaul/jquery-ajax-retry
- *
- * Copyright (c) 2012 John Paul
- * Licensed under the MIT license.
- */
+
 /* eslint-disable */
 if ( typeof window !== 'object' ) {
     global.window = global;
@@ -12,6 +6,13 @@ if ( typeof window !== 'object' ) {
 }
 
 if ( 'jQuery' in window || '$' in window ) {
+    /*
+     * jquery.ajax-retry
+     * https://github.com/johnkpaul/jquery-ajax-retry
+     *
+     * Copyright (c) 2012 John Paul
+     * Licensed under the MIT license.
+     */
     (function($) {
       // enhance all ajax requests with our retry API
       $.ajaxPrefilter(function(options, originalOptions, jqXHR) {
@@ -74,5 +75,47 @@ if ( 'jQuery' in window || '$' in window ) {
           return output;
         };
       }
+    })(jQuery);
+
+    /*!
+     * jquery.requestanimationframe - 0.2.3-pre
+     * https://github.com/gnarf37/jquery-requestAnimationFrame
+     * Requires jQuery 1.8+
+     *
+     * Copyright (c) 2016 Corey Frang
+     * Licensed under the MIT license.
+     */
+     // UMD factory https://github.com/umdjs/umd/blob/master/jqueryPlugin.js
+    (function($) {
+        if ( Number(jQuery.fn.jquery.split('.')[ 0 ]) >= 3 ) {
+            if ( window.console && window.console.warn ) {
+                window.console.warn('The jquery.requestanimationframe plugin is not needed ' +
+                    'in jQuery 3.0 or newer as they handle it natively.');
+            }
+
+            return false;
+        }
+
+        var animating;
+
+        function raf() {
+            if ( animating ) {
+                window.requestAnimationFrame(raf);
+                jQuery.fx.tick();
+            }
+        }
+
+        if ( window.requestAnimationFrame ) {
+            jQuery.fx.timer = function(timer) {
+                if ( timer() && jQuery.timers.push(timer) && !animating ) {
+                    animating = true;
+                    raf();
+                }
+            };
+
+            jQuery.fx.stop = function() {
+                animating = false;
+            };
+        }
     })(jQuery);
 }
