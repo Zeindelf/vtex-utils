@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.16.1
+ * VtexUtils.js v1.17.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-09-11T15:33:33.976Z
+ * Date: 2018-09-11T20:10:39.443Z
  */
 
 var commonjsGlobal = typeof window !== 'undefined' ? window : typeof global !== 'undefined' ? global : typeof self !== 'undefined' ? self : {};
@@ -3481,11 +3481,11 @@ var globalHelpers = utilify$1.globalHelpers;
 var cookies = utilify$1.cookies;
 
 var CONSTANTS = {
-    CAMELIZE: 'You must set camelize your items to use this method'
+  CAMELIZE: 'You must set camelize your items to use this method'
 };
 
 var vtexHelpers = {
-    /**
+  /**
      * Formats Vtex price
      *
      * @param {integer}             number              The number to format
@@ -3495,19 +3495,19 @@ var vtexHelpers = {
      * @param {string}              [currency = 'R$ ']  Set currency
      * @return {string} The formatted price
      */
-    formatPrice: function formatPrice(number, thousands, decimals, length, currency) {
-        currency = globalHelpers.isString(currency) ? currency : 'R$ ';
-        length = !globalHelpers.isNumber(length) ? 2 : length;
+  formatPrice: function formatPrice(number, thousands, decimals, length, currency) {
+    currency = globalHelpers.isString(currency) ? currency : 'R$ ';
+    length = !globalHelpers.isNumber(length) ? 2 : length;
 
-        var re = '\\d(?=(\\d{' + 3 + '})+' + (length > 0 ? '\\D' : '$') + ')';
-        number = number / 100;
-        number = (number * 1).toFixed(Math.max(0, ~~length));
+    var re = '\\d(?=(\\d{' + 3 + '})+' + (length > 0 ? '\\D' : '$') + ')';
+    number = number / 100;
+    number = (number * 1).toFixed(Math.max(0, ~~length));
 
-        return currency + number.replace('.', decimals || ',').replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
-    },
+    return currency + number.replace('.', decimals || ',').replace(new RegExp(re, 'g'), '$&' + (thousands || '.'));
+  },
 
 
-    /**
+  /**
      * Unformat Vtex price
      *
      * @param {String|Array}    value                 Price formatted
@@ -3515,47 +3515,47 @@ var vtexHelpers = {
      * @param {integer}         [formatNumber=false]  Thousands separator (pt-BR default: '.')
      * @return {string|Array}   The unformatted price
      */
-    unformatPrice: function unformatPrice(value, decimal) {
-        var _this = this;
+  unformatPrice: function unformatPrice(value, decimal) {
+    var _this = this;
 
-        var formatNumber = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+    var formatNumber = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-        // Recursively unformat arrays:
-        if (globalHelpers.isArray(value)) {
-            return value.map(function (val) {
-                return _this.unformatPrice(val, decimal, formatNumber);
-            });
-        }
+    // Recursively unformat arrays:
+    if (globalHelpers.isArray(value)) {
+      return value.map(function (val) {
+        return _this.unformatPrice(val, decimal, formatNumber);
+      });
+    }
 
-        // Fails silently (need decent errors):
-        value = value || 0;
+    // Fails silently (need decent errors):
+    value = value || 0;
 
-        // Return the value as-is if it's already a number:
-        if (globalHelpers.isNumber(value)) {
-            return value;
-        }
+    // Return the value as-is if it's already a number:
+    if (globalHelpers.isNumber(value)) {
+      return value;
+    }
 
-        decimal = decimal || ',';
+    decimal = decimal || ',';
 
-        // Build regex to strip out everything except digits, decimal point and minus sign:
-        var format = '[^0-9-' + decimal + ']';
-        var regex = new RegExp(format, ['g']);
-        var unformatted = parseFloat(('' + value).replace(/\((?=\d+)(.*)\)/, '-$1') // Replace bracketed values with negatives
-        .replace(regex, '') // Strip out any cruft
-        .replace(decimal, '.') // Make sure decimal point is standard
-        ).toFixed(2);
+    // Build regex to strip out everything except digits, decimal point and minus sign:
+    var format = '[^0-9-' + decimal + ']';
+    var regex = new RegExp(format, ['g']);
+    var unformatted = parseFloat(('' + value).replace(/\((?=\d+)(.*)\)/, '-$1') // Replace bracketed values with negatives
+    .replace(regex, '') // Strip out any cruft
+    .replace(decimal, '.') // Make sure decimal point is standard
+    ).toFixed(2);
 
-        var values = unformatted.toString().split('.');
+    var values = unformatted.toString().split('.');
 
-        return {
-            unformatted: globalHelpers.toNumber(values.join('')) * 1,
-            real: formatNumber ? globalHelpers.formatNumber(values[0]) : values[0],
-            cents: values[1] || '00'
-        };
-    },
+    return {
+      unformatted: globalHelpers.toNumber(values.join('')) * 1,
+      real: formatNumber ? globalHelpers.formatNumber(values[0]) : values[0],
+      cents: values[1] || '00'
+    };
+  },
 
 
-    /**
+  /**
      * Take the value of the installment with min price and max installments given
      *
      * @param {String|Number} price             Price to get installments. Can be formatted price or a integer value
@@ -3567,43 +3567,43 @@ var vtexHelpers = {
      *     setInstallment('R$ 3.499,00', 'R$ 430,00', 10) // {installments: 8, installmentValue: 43737, interest: 0}
      *     setInstallment(349900, 43000, 10) // {installments: 8, installmentValue: 43737, interest: 0}
      */
-    setInstallment: function setInstallment(price, minPrice, maxInstallments) {
-        var interest = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+  setInstallment: function setInstallment(price, minPrice, maxInstallments) {
+    var interest = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
 
-        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
-        minPrice = globalHelpers.isString(minPrice) ? this.unformatPrice(minPrice).unformatted : minPrice;
-        minPrice = minPrice < 1 ? 1 : minPrice;
+    price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+    minPrice = globalHelpers.isString(minPrice) ? this.unformatPrice(minPrice).unformatted : minPrice;
+    minPrice = minPrice < 1 ? 1 : minPrice;
 
-        maxInstallments = globalHelpers.toNumber(maxInstallments);
-        interest = globalHelpers.toNumber(interest);
+    maxInstallments = globalHelpers.toNumber(maxInstallments);
+    interest = globalHelpers.toNumber(interest);
 
-        var installments = parseInt(price / minPrice, 10);
+    var installments = parseInt(price / minPrice, 10);
 
-        if (installments > maxInstallments) {
-            installments = maxInstallments;
-        }
+    if (installments > maxInstallments) {
+      installments = maxInstallments;
+    }
 
-        var installmentValue = price / installments;
+    var installmentValue = price / installments;
 
-        if (interest > 0) {
-            installmentValue = price * Math.pow(1 + interest / 100, installments) / installments;
-        }
+    if (interest > 0) {
+      installmentValue = price * Math.pow(1 + interest / 100, installments) / installments;
+    }
 
-        installmentValue = Math.floor(installmentValue);
+    installmentValue = Math.floor(installmentValue);
 
-        if (installments > 0) {
-            return {
-                installments: installments,
-                installmentValue: installmentValue,
-                interest: interest
-            };
-        }
+    if (installments > 0) {
+      return {
+        installments: installments,
+        installmentValue: installmentValue,
+        interest: interest
+      };
+    }
 
-        return false;
-    },
+    return false;
+  },
 
 
-    /**
+  /**
      * Get the percentage of a discount
      *
      * @param  {String|Number}    oldPrice    Original price. Can be formatted price or a integer value.
@@ -3614,22 +3614,22 @@ var vtexHelpers = {
      *     getPercentage('R$ 179,90', 'R$ 149,50'); // 17 (17% OFF)
      *     getPercentage(17990, 14900, 2); // 17.18 (17.18% OFF)
      */
-    getPercentage: function getPercentage(oldPrice, newPrice) {
-        var length = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
+  getPercentage: function getPercentage(oldPrice, newPrice) {
+    var length = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0;
 
-        if (oldPrice < newPrice || oldPrice < 1 || newPrice < 1) {
-            return 0;
-        }
+    if (oldPrice < newPrice || oldPrice < 1 || newPrice < 1) {
+      return 0;
+    }
 
-        oldPrice = globalHelpers.isString(oldPrice) ? this.unformatPrice(oldPrice).unformatted : oldPrice;
-        newPrice = globalHelpers.isString(newPrice) ? this.unformatPrice(newPrice).unformatted : newPrice;
-        var percent = parseFloat(newPrice / oldPrice * 100 - 100);
+    oldPrice = globalHelpers.isString(oldPrice) ? this.unformatPrice(oldPrice).unformatted : oldPrice;
+    newPrice = globalHelpers.isString(newPrice) ? this.unformatPrice(newPrice).unformatted : newPrice;
+    var percent = parseFloat(newPrice / oldPrice * 100 - 100);
 
-        return Math.abs(percent.toFixed(length));
-    },
+    return Math.abs(percent.toFixed(length));
+  },
 
 
-    /**
+  /**
      * Returns a discount amount or adding a set value.
      *
      * @param  {String|Number}   price     Price to apply discount. Can be formatted price or a integer value.
@@ -3642,85 +3642,85 @@ var vtexHelpers = {
      *     applyDiscountPercent('R$ 9,55', '37,27%'); // {discountPrice: 355, priceWithDiscount: 599, priceWithIncrease: 1310}
      *     applyDiscountPercent(955, 37.27, true); // {discountPrice: 'R$ 3,55', priceWithDiscount: 'R$ 5,99', priceWithIncrease: 'R$ 13,10'}
      */
-    applyDiscountPercent: function applyDiscountPercent(price, percent) {
-        var formatted = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  applyDiscountPercent: function applyDiscountPercent(price, percent) {
+    var formatted = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-        var getNumber = function getNumber(str) {
-            return str.replace(/,/g, '.').replace(/[^0-9.]/g, '');
-        };
-        price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
-        percent = globalHelpers.isString(percent) ? globalHelpers.toNumber(getNumber(percent)) : percent;
+    var getNumber = function getNumber(str) {
+      return str.replace(/,/g, '.').replace(/[^0-9.]/g, '');
+    };
+    price = globalHelpers.isString(price) ? this.unformatPrice(price).unformatted : price;
+    percent = globalHelpers.isString(percent) ? globalHelpers.toNumber(getNumber(percent)) : percent;
 
-        var discount = percent / 100 * price;
-        var discountPrice = Math.floor(discount);
-        var priceWithDiscount = Math.floor(price - discount);
-        var priceWithIncrease = Math.floor(price + discount);
+    var discount = percent / 100 * price;
+    var discountPrice = Math.floor(discount);
+    var priceWithDiscount = Math.floor(price - discount);
+    var priceWithIncrease = Math.floor(price + discount);
 
-        return {
-            discountPrice: !formatted ? discountPrice : this.formatPrice(discountPrice),
-            priceWithDiscount: !formatted ? priceWithDiscount : this.formatPrice(priceWithDiscount),
-            priceWithIncrease: !formatted ? priceWithIncrease : this.formatPrice(priceWithIncrease)
-        };
-    },
+    return {
+      discountPrice: !formatted ? discountPrice : this.formatPrice(discountPrice),
+      priceWithDiscount: !formatted ? priceWithDiscount : this.formatPrice(priceWithDiscount),
+      priceWithIncrease: !formatted ? priceWithIncrease : this.formatPrice(priceWithIncrease)
+    };
+  },
 
 
-    /**
+  /**
      * Formats price from Vtex API `/api/catalog_system/pub/products/search/`
      * to a correct `formatPrice` method
      *
      * @param  {Number} val Value to convert
      * @return {Integer}
      */
-    fixProductSearchPrice: function fixProductSearchPrice(val) {
-        val = globalHelpers.toNumber(val);
-        return val.toFixed(2).split('.').join('') * 1;
-    },
+  fixProductSearchPrice: function fixProductSearchPrice(val) {
+    val = globalHelpers.toNumber(val);
+    return val.toFixed(2).split('.').join('') * 1;
+  },
 
 
-    /**
+  /**
      * Get first available SKU from Vtex API `/api/catalog_system/` end point
      *
      * @param  {Object}  product     Product full data
      * @return {Object|Boolean}      An available SKU data or false
      */
-    getFirstAvailableSku: function getFirstAvailableSku(product) {
-        if (!this._checkCamelize(product)) {
-            throw new Error(CONSTANTS.CAMELIZE);
-        }
+  getFirstAvailableSku: function getFirstAvailableSku(product) {
+    if (!this._checkCamelize(product)) {
+      throw new Error(CONSTANTS.CAMELIZE);
+    }
 
-        var newArr = {};
+    var newArr = {};
 
-        if (product.hasOwnProperty('items')) {
-            product.items.some(function (item, index, oldArr) {
-                if (item.sellers[0].commertialOffer.availableQuantity > 0) {
-                    newArr = oldArr[index];
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-        if (product.hasOwnProperty('skus')) {
-            product.skus.some(function (item, index, oldArr) {
-                if (item.available) {
-                    newArr = oldArr[index];
-                    return true;
-                }
-
-                return false;
-            });
-        }
-
-        if (globalHelpers.length(newArr) > 0) {
-            return newArr;
+    if (product.hasOwnProperty('items')) {
+      product.items.some(function (item, index, oldArr) {
+        if (item.sellers[0].commertialOffer.availableQuantity > 0) {
+          newArr = oldArr[index];
+          return true;
         }
 
         return false;
-    },
+      });
+    }
+
+    if (product.hasOwnProperty('skus')) {
+      product.skus.some(function (item, index, oldArr) {
+        if (item.available) {
+          newArr = oldArr[index];
+          return true;
+        }
+
+        return false;
+      });
+    }
+
+    if (globalHelpers.length(newArr) > 0) {
+      return newArr;
+    }
+
+    return false;
+  },
 
 
-    /**
+  /**
      * Get the original VTEX image source from a thumb
      *
      * @param {string}      [src]   The source of the thumb
@@ -3729,12 +3729,12 @@ var vtexHelpers = {
      *     vtexHelpers.getOriginalImage('http://domain.vteximg.com.br/arquivos/ids/155242-292-292/image.png');
      *     // http://domain.vteximg.com.br/arquivos/ids/155242/image.png
      */
-    getOriginalImage: function getOriginalImage(src) {
-        return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
-    },
+  getOriginalImage: function getOriginalImage(src) {
+    return globalHelpers.isString(src) ? src.replace(/(ids\/[0-9]+)-([0-9-]+)\//, '$1/') : src;
+  },
 
 
-    /**
+  /**
      * Change the width & height from a given VTEX image source
      *
      * @param {string}      [src]       The source of the image
@@ -3748,23 +3748,23 @@ var vtexHelpers = {
      *     vtexHelpers.getResizedImage('http://domain.vteximg.com.br/arquivos/ids/155242/image.png', 100, 100);
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-100-100/image.png
      */
-    getResizedImage: function getResizedImage(src, width, height) {
-        if (globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || !globalHelpers.isString(src)) {
-            return src;
-        }
+  getResizedImage: function getResizedImage(src, width, height) {
+    if (globalHelpers.isUndefined(width) || globalHelpers.isUndefined(height) || !globalHelpers.isString(src)) {
+      return src;
+    }
 
-        width = Math.round(width);
-        height = Math.round(height);
+    width = Math.round(width);
+    height = Math.round(height);
 
-        src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, function (match, matchedWidth, matchedHeight) {
-            return match.replace('-' + matchedWidth + '-' + matchedHeight, '-' + width + '-' + height);
-        });
+    src = src.replace(/(?:ids\/[0-9]+)-([0-9]+)-([0-9]+)\//, function (match, matchedWidth, matchedHeight) {
+      return match.replace('-' + matchedWidth + '-' + matchedHeight, '-' + width + '-' + height);
+    });
 
-        return src.replace(/(ids\/[0-9]+)\//, '$1-' + width + '-' + height + '/');
-    },
+    return src.replace(/(ids\/[0-9]+)\//, '$1-' + width + '-' + height + '/');
+  },
 
 
-    /**
+  /**
      * Resize proportionally an VTEX image by aspect ratio
      *
      * @param {string}      [src]               The source of the image
@@ -3780,48 +3780,48 @@ var vtexHelpers = {
      *     vtexHelpers.getResizeImageProportionally(imgSrc, 'height', 150, (10/15));
      *     // http://domain.vteximg.com.br/arquivos/ids/155242-99-150/image.png
      */
-    getResizeImageByRatio: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
-        var newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
+  getResizeImageByRatio: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
+    var newValue = globalHelpers.resizeImageByRatio(type, newSize, aspectRatio);
 
-        return this.getResizedImage(src, newValue.width, newValue.height);
-    },
+    return this.getResizedImage(src, newValue.width, newValue.height);
+  },
 
 
-    /**
+  /**
      * Get the Vtex server time
      * @param {function} callback - The callback to call when the request finishes. The callback will a javascript Date object.
      * @return {promise} - jquery Ajax promise
      * @example
      *     vtexHelpers.getServerTime((date) => console.log(date.getFullYear()));
      */
-    getServerTime: function getServerTime(callback) {
-        return $.ajax({
-            url: '/no-cache/HoraAtualServidor.aspx',
-            type: 'get'
-        }).then(function (res) {
-            var monthBr = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+  getServerTime: function getServerTime(callback) {
+    return $.ajax({
+      url: '/no-cache/HoraAtualServidor.aspx',
+      type: 'get'
+    }).then(function (res) {
+      var monthBr = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
 
-            var time = res.match(/([0-9]+):([0-5][0-9]):([0-5][0-9])/)[0];
-            var day = parseInt(res.match(/[a-z]{3} ([0-9]{1,2})/)[1]);
-            var month = monthBr.indexOf(res.match(/[a-z]{3}/)[0]) + 1;
-            var year = parseInt(res.match(/[0-9]{4}/)[0]);
+      var time = res.match(/([0-9]+):([0-5][0-9]):([0-5][0-9])/)[0];
+      var day = parseInt(res.match(/[a-z]{3} ([0-9]{1,2})/)[1]);
+      var month = monthBr.indexOf(res.match(/[a-z]{3}/)[0]) + 1;
+      var year = parseInt(res.match(/[0-9]{4}/)[0]);
 
-            if (day < 10) {
-                day = '0' + day;
-            }
+      if (day < 10) {
+        day = '0' + day;
+      }
 
-            if (month < 10) {
-                month = '0' + month;
-            }
+      if (month < 10) {
+        month = '0' + month;
+      }
 
-            if (globalHelpers.isFunction(callback)) {
-                callback.call(null, new Date(year + '/' + month + '/' + day + ' ' + time));
-            }
-        });
-    },
+      if (globalHelpers.isFunction(callback)) {
+        callback.call(null, new Date(year + '/' + month + '/' + day + ' ' + time));
+      }
+    });
+  },
 
 
-    /**
+  /**
      * Get category tree
      * @param [categoryId] - Return the specific Category
      * @param [depth=50] - The tree depth
@@ -3830,34 +3830,34 @@ var vtexHelpers = {
      *     vtexHelpers.getCategories().then((res) => console.log(res)) // Return all categories
      *     vtexHelpers.getCategories(1000001, 1).then((res) => console.log(res)) // Return 1 level from category id
      */
-    getCategories: function getCategories(categoryId, depth) {
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            return $.ajax({
-                type: 'get',
-                url: '/api/catalog_system/pub/category/tree/' + (depth || 50),
-                dataType: 'json',
-                headers: {
-                    accept: 'application/json',
-                    contentType: 'application/json; charset=utf-8'
-                }
-            }).done(function (res) {
-                if (!globalHelpers.isUndefined(categoryId)) {
-                    def.resolve(globalHelpers.objectSearch(res, {
-                        id: categoryId
-                    }));
-                } else {
-                    def.resolve(res);
-                }
-            }).fail(function (err) {
-                return def.reject(err);
-            });
-        }).promise();
-    },
+  getCategories: function getCategories(categoryId, depth) {
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      return $.ajax({
+        type: 'get',
+        url: '/api/catalog_system/pub/category/tree/' + (depth || 50),
+        dataType: 'json',
+        headers: {
+          accept: 'application/json',
+          contentType: 'application/json; charset=utf-8'
+        }
+      }).done(function (res) {
+        if (!globalHelpers.isUndefined(categoryId)) {
+          def.resolve(globalHelpers.objectSearch(res, {
+            id: categoryId
+          }));
+        } else {
+          def.resolve(res);
+        }
+      }).fail(function (err) {
+        return def.reject(err);
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * Get product specification
      *
      * @param {Object}           [data]              Vtex API data from '/api/catalog_system/pub/products/search/' endpoint
@@ -3865,24 +3865,24 @@ var vtexHelpers = {
      * @param {Boolean|String}   [defaultValue]      Value if spec doesn't exists
      * @returns spec value or false/defaultVal if spec doesn't exists
      */
-    getProductSpec: function getProductSpec(data, specName) {
-        var defaultVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+  getProductSpec: function getProductSpec(data, specName) {
+    var defaultVal = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
 
-        if (globalHelpers.isUndefined(data[specName])) {
-            return defaultVal;
-        }
+    if (globalHelpers.isUndefined(data[specName])) {
+      return defaultVal;
+    }
 
-        if (globalHelpers.contains(specName, data.allSpecifications)) {
-            var specValue = data[specName] && data[specName][0];
+    if (globalHelpers.contains(specName, data.allSpecifications)) {
+      var specValue = data[specName] && data[specName][0];
 
-            return !globalHelpers.isUndefined(specValue) ? specValue : defaultVal;
-        }
+      return !globalHelpers.isUndefined(specValue) ? specValue : defaultVal;
+    }
 
-        return defaultVal;
-    },
+    return defaultVal;
+  },
 
 
-    /**
+  /**
      * Method to use with VtexCatalog
      *
      * Full methods:
@@ -3892,222 +3892,222 @@ var vtexHelpers = {
      *     const priceInfo = vtexHelpers.getProductPriceInfo(sellerInfo);
      *     const groupedInstallments = vtexHelpers.getGroupInstallments(productData);
      */
-    getProductSellerInfo: function getProductSellerInfo(product) {
-        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  getProductSellerInfo: function getProductSellerInfo(product) {
+    var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        var seller = sellerId ? sellerId : true;
-        var sellerKey = sellerId ? 'sellerId' : 'sellerDefault';
-        var availableProduct = this.getFirstAvailableSku(product);
+    var seller = sellerId ? sellerId : true;
+    var sellerKey = sellerId ? 'sellerId' : 'sellerDefault';
+    var availableProduct = this.getFirstAvailableSku(product);
 
-        if (availableProduct) {
-            return globalHelpers.objectSearch(availableProduct, defineProperty({}, sellerKey, seller));
-        }
+    if (availableProduct) {
+      return globalHelpers.objectSearch(availableProduct, defineProperty({}, sellerKey, seller));
+    }
 
-        return false;
-    },
+    return false;
+  },
 
 
-    /**
+  /**
      * Method to use with VtexCatalog
      */
-    getProductInstallments: function getProductInstallments(data) {
-        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  getProductInstallments: function getProductInstallments(data) {
+    var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        var commertialOffer = this._getCommertialInfo(data, sellerId);
+    var commertialOffer = this._getCommertialInfo(data, sellerId);
 
-        if (globalHelpers.isUndefined(commertialOffer)) {
-            return false;
-        }
+    if (globalHelpers.isUndefined(commertialOffer)) {
+      return false;
+    }
 
-        // Get by min price value
-        return commertialOffer.installments.reduce(function (prev, current) {
-            return prev.value < current.value ? prev : current;
-        }, {});
-    },
+    // Get by min price value
+    return commertialOffer.installments.reduce(function (prev, current) {
+      return prev.value < current.value ? prev : current;
+    }, {});
+  },
 
 
-    /**
+  /**
      * Method to use with VtexCatalog
      */
-    getProductBankInvoice: function getProductBankInvoice(product) {
-        var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  getProductBankInvoice: function getProductBankInvoice(product) {
+    var sellerId = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
-        var sellerInfo = this.getProductSellerInfo(product, sellerId);
+    var sellerInfo = this.getProductSellerInfo(product, sellerId);
 
-        if (sellerInfo) {
-            return globalHelpers.objectSearch(sellerInfo.commertialOffer.installments, { paymentSystemName: 'Boleto Bancário' });
-        }
+    if (sellerInfo) {
+      return globalHelpers.objectSearch(sellerInfo.commertialOffer.installments, { paymentSystemName: 'Boleto Bancário' });
+    }
 
-        return false;
-    },
+    return false;
+  },
 
 
-    /**
+  /**
      * Method to use with VtexCatalog
      */
-    getProductPriceInfo: function getProductPriceInfo(sellerInfo) {
-        if (!sellerInfo) {
-            return false;
+  getProductPriceInfo: function getProductPriceInfo(sellerInfo) {
+    if (!sellerInfo) {
+      return false;
+    }
+
+    var co = sellerInfo.commertialOffer;
+
+    var installments = this.getProductInstallments(sellerInfo);
+    var isInstallments = !globalHelpers.isObjectEmpty(installments);
+    var qty = co.availableQuantity;
+    var noListPrice = co.price === co.listPrice;
+    var fix = this.fixProductSearchPrice;
+    var format = this.formatPrice;
+
+    return {
+      available: qty ? true : false,
+      availableQuantity: qty,
+
+      sellerName: sellerInfo.sellerName,
+      sellerId: sellerInfo.sellerId,
+
+      bestPrice: qty ? fix(co.price) : 0,
+      listPrice: qty ? noListPrice ? false : fix(co.listPrice) : 0,
+
+      installments: qty && isInstallments ? installments.numberOfInstallments : 0,
+      installmentsInsterestRate: qty && isInstallments ? installments.interestRate : null,
+      installmentsValue: qty && isInstallments ? fix(installments.value) : 0,
+
+      bestPriceFormatted: qty ? format(fix(co.price)) : format(0),
+      listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
+      installmentsValueFormatted: qty && isInstallments ? format(fix(installments.value)) : format(0)
+    };
+  },
+
+
+  /**
+     * Method to use with VtexCatalog
+     */
+  getGroupInstallments: function getGroupInstallments(data, sellerId) {
+    var commertialOffer = this._getCommertialInfo(data, sellerId);
+
+    if (globalHelpers.isUndefined(commertialOffer)) {
+      return false;
+    }
+
+    return globalHelpers.groupObjectByValue(commertialOffer.installments, 'paymentSystemName', true);
+  },
+  getShipping: function getShipping(postalCode, skuId, quantity) {
+    if ('skuJson' in window) {
+      var firstSku = this.getFirstAvailableSku(skuJson);
+      skuId = skuId || firstSku.sku;
+    }
+
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      return $.ajax({
+        type: 'get',
+        url: '/frete/calcula/' + skuId,
+        data: {
+          shippinCep: postalCode.replace(/[^A-Za-z0-9]/g, ''),
+          quantity: quantity || 1
         }
+      }).then(function (res) {
+        var $html = $($.parseHTML(res));
+        var $tr = $html.find('tbody > tr');
+        var $p = $html.find('.valor');
 
-        var co = sellerInfo.commertialOffer;
-
-        var installments = this.getProductInstallments(sellerInfo);
-        var isInstallments = !globalHelpers.isObjectEmpty(installments);
-        var qty = co.availableQuantity;
-        var noListPrice = co.price === co.listPrice;
-        var fix = this.fixProductSearchPrice;
-        var format = this.formatPrice;
-
-        return {
-            available: qty ? true : false,
-            availableQuantity: qty,
-
-            sellerName: sellerInfo.sellerName,
-            sellerId: sellerInfo.sellerId,
-
-            bestPrice: qty ? fix(co.price) : 0,
-            listPrice: qty ? noListPrice ? false : fix(co.listPrice) : 0,
-
-            installments: qty && isInstallments ? installments.numberOfInstallments : 0,
-            installmentsInsterestRate: qty && isInstallments ? installments.interestRate : null,
-            installmentsValue: qty && isInstallments ? fix(installments.value) : 0,
-
-            bestPriceFormatted: qty ? format(fix(co.price)) : format(0),
-            listPriceFormatted: qty ? noListPrice ? false : format(fix(co.listPrice)) : noListPrice ? false : format(0),
-            installmentsValueFormatted: qty && isInstallments ? format(fix(installments.value)) : format(0)
+        var returnData = {
+          fullResponse: res
         };
-    },
 
+        var stripHtml = function stripHtml(str) {
+          return str.replace(/<\/?[^>]+(>|$)/g, '');
+        };
 
-    /**
-     * Method to use with VtexCatalog
-     */
-    getGroupInstallments: function getGroupInstallments(data, sellerId) {
-        var commertialOffer = this._getCommertialInfo(data, sellerId);
-
-        if (globalHelpers.isUndefined(commertialOffer)) {
-            return false;
+        if ($p.length) {
+          returnData.error = true;
+          returnData.formattedResponse = {
+            shippingText: globalHelpers.strCompact(stripHtml(res))
+          };
         }
 
-        return globalHelpers.groupObjectByValue(commertialOffer.installments, 'paymentSystemName', true);
-    },
-    getShipping: function getShipping(postalCode, skuId, quantity) {
-        if ('skuJson' in window) {
-            var firstSku = this.getFirstAvailableSku(skuJson);
-            skuId = skuId || firstSku.sku;
+        if ($tr.length) {
+          returnData.error = false;
+          returnData.formattedResponse = $tr.map(function (index, item) {
+            var $td = $(item).children('td');
+            var _shippingText = $td.eq(1).text().split(',');
+
+            var shippingValue = $td.eq(0).text();
+            var shippingType = _shippingText[0];
+            var shippingText = globalHelpers.ucfirst(globalHelpers.strCompact(_shippingText[1]));
+
+            return { shippingValue: shippingValue, shippingText: shippingText, shippingType: shippingType };
+          }).toArray();
         }
 
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            return $.ajax({
-                type: 'get',
-                url: '/frete/calcula/' + skuId,
-                data: {
-                    shippinCep: postalCode.replace(/[^A-Za-z0-9]/g, ''),
-                    quantity: quantity || 1
-                }
-            }).then(function (res) {
-                var $html = $($.parseHTML(res));
-                var $tr = $html.find('tbody > tr');
-                var $p = $html.find('.valor');
-
-                var returnData = {
-                    fullResponse: res
-                };
-
-                var stripHtml = function stripHtml(str) {
-                    return str.replace(/<\/?[^>]+(>|$)/g, '');
-                };
-
-                if ($p.length) {
-                    returnData.error = true;
-                    returnData.formattedResponse = {
-                        shippingText: globalHelpers.strCompact(stripHtml(res))
-                    };
-                }
-
-                if ($tr.length) {
-                    returnData.error = false;
-                    returnData.formattedResponse = $tr.map(function (index, item) {
-                        var $td = $(item).children('td');
-                        var _shippingText = $td.eq(1).text().split(',');
-
-                        var shippingValue = $td.eq(0).text();
-                        var shippingType = _shippingText[0];
-                        var shippingText = globalHelpers.ucfirst(globalHelpers.strCompact(_shippingText[1]));
-
-                        return { shippingValue: shippingValue, shippingText: shippingText, shippingType: shippingType };
-                    }).toArray();
-                }
-
-                return def.resolve(returnData);
-            }).fail(function (err) {
-                return def.reject(err);
-            });
-        }).promise();
-    },
+        return def.resolve(returnData);
+      }).fail(function (err) {
+        return def.reject(err);
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * From '/api/catalog_system/pub/products/search/' endpoint
      *
      * @returns {Array}  A new instance of array with skus ordered
      */
-    sortProductSearch: function sortProductSearch(product, map, dimension) {
-        var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  sortProductSearch: function sortProductSearch(product, map, dimension) {
+    var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-        if (!globalHelpers.isString(dimension)) {
-            throw new TypeError('\'dimension\' param must be a String value');
-        }
+    if (!globalHelpers.isString(dimension)) {
+      throw new TypeError('\'dimension\' param must be a String value');
+    }
 
-        if (!product.hasOwnProperty('items')) {
-            throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/search/{productId}\' endpoint');
-        }
+    if (!product.hasOwnProperty('items')) {
+      throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/search/{productId}\' endpoint');
+    }
 
-        dimension = this._checkCamelize(product) ? globalHelpers.camelize(dimension) : dimension;
-        return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
-    },
+    dimension = this._checkCamelize(product) ? globalHelpers.camelize(dimension) : dimension;
+    return globalHelpers.objectArraySortByValue(product.items, map, dimension, reverse);
+  },
 
 
-    /**
+  /**
      * From '/api/catalog_system/pub/products/variations/' endpoint (same as SkuJson)
      * If product data is camelized, set `map` manually or convert `dimensionsMap` prop to camelize too
      *
      * @returns {Array}  A new instance of array with skus ordered
      */
-    sortProductVariations: function sortProductVariations(product, map, dimension) {
-        var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+  sortProductVariations: function sortProductVariations(product, map, dimension) {
+    var reverse = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
 
-        if (!globalHelpers.isString(dimension)) {
-            throw new TypeError('\'dimension\' param must be a String value');
-        }
+    if (!globalHelpers.isString(dimension)) {
+      throw new TypeError('\'dimension\' param must be a String value');
+    }
 
-        if (!product.hasOwnProperty('skus')) {
-            throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/variations/{productId}\' endpoint or global variable \'skuJson\' on product page');
-        }
+    if (!product.hasOwnProperty('skus')) {
+      throw new Error('Product data must be an response from Vtex API \'/api/catalog_system/pub/products/variations/{productId}\' endpoint or global variable \'skuJson\' on product page');
+    }
 
-        map = globalHelpers.isArray(map) && map.length ? map : product.dimensionsMap[dimension];
+    map = globalHelpers.isArray(map) && map.length ? map : product.dimensionsMap[dimension];
 
-        return globalHelpers.objectArraySortByValue(product.skus, map, 'dimensions.' + dimension, reverse);
-    },
+    return globalHelpers.objectArraySortByValue(product.skus, map, 'dimensions.' + dimension, reverse);
+  },
 
 
-    /**
+  /**
      * Replace break lines from product descriptions/more
      *
      * @param  {string}  str  String to replace
      * @return {string}       New string with <br /> break lines
      */
-    replaceBreakLines: function replaceBreakLines(str) {
-        str = str.replace ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
+  replaceBreakLines: function replaceBreakLines(str) {
+    str = str.replace ? str.replace(/(?:\r\n|\r|\n)/g, '<br />') : '';
 
-        return str;
-    },
+    return str;
+  },
 
 
-    /**
+  /**
      * Convert a string IDs given into an integer array values
      *
      * @param  {String} str              String with IDs
@@ -4120,19 +4120,19 @@ var vtexHelpers = {
      *     const str2 = '1 - 2 - 3 - 4';
      *     stringIdsToArray(str2); // [1, 2, 3, 4]
      */
-    stringIdsToArray: function stringIdsToArray(str) {
-        var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
+  stringIdsToArray: function stringIdsToArray(str) {
+    var separator = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ',';
 
-        var splitStr = globalHelpers.explode(str, separator);
-        var arr = splitStr.map(function (item) {
-            return globalHelpers.toNumber(globalHelpers.strCompact(item));
-        });
+    var splitStr = globalHelpers.explode(str, separator);
+    var arr = splitStr.map(function (item) {
+      return globalHelpers.toNumber(globalHelpers.strCompact(item));
+    });
 
-        return globalHelpers.arrayCompact(arr);
-    },
+    return globalHelpers.arrayCompact(arr);
+  },
 
 
-    /**
+  /**
      * Check if the user is logged into Vtex
      * @return {promise} jQuery Ajax Promise
      * @example
@@ -4145,44 +4145,44 @@ var vtexHelpers = {
      *         console.log(err)
      *     });
      */
-    checkLogin: function checkLogin() {
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            return $.ajax({
-                type: 'get',
-                url: '/no-cache/profileSystem/getProfile'
-            }).done(function (res) {
-                if (globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined) {
-                    def.reject(res);
-                } else {
-                    def.resolve(res);
-                }
-            }).fail(function (err) {
-                return def.reject(err);
-            });
-        }).promise();
-    },
+  checkLogin: function checkLogin() {
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      return $.ajax({
+        type: 'get',
+        url: '/no-cache/profileSystem/getProfile'
+      }).done(function (res) {
+        if (globalHelpers.isUndefined(res.IsUserDefined) || !res.IsUserDefined) {
+          def.reject(res);
+        } else {
+          def.resolve(res);
+        }
+      }).fail(function (err) {
+        return def.reject(err);
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * Open default Vtex popup login
      *
      * @param  {boolean}  [noReload = false]  Reload page after login
      * @return {void}
      */
-    openPopupLogin: function openPopupLogin(noReload, _url) {
-        noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
-        _url = globalHelpers.isString(_url) ? _url : '/';
-        _url = noReload ? window.location.href : _url;
+  openPopupLogin: function openPopupLogin(noReload, _url) {
+    noReload = globalHelpers.isBoolean(noReload) ? noReload : false;
+    _url = globalHelpers.isString(_url) ? _url : '/';
+    _url = noReload ? window.location.href : _url;
 
-        vtexid.start({
-            returnUrl: _url
-        });
-    },
+    vtexid.start({
+      returnUrl: _url
+    });
+  },
 
 
-    /**
+  /**
      * Add items to cart
      *
      * @param  {Array}  items  Array of object with item(s)
@@ -4190,59 +4190,59 @@ var vtexHelpers = {
      * @param  {Integer/String} [salesChannel=1]  Sales channel id
      * @return {promise}
      */
-    addToCart: function addToCart(items, expectedOrderFormSections, salesChannel) {
-        if (!globalHelpers.isArray(items)) {
-            throw new TypeError('Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: \'1\'}, {id: 321, quantity: 2, seller: \'1\'}]');
-        }
+  addToCart: function addToCart(items, expectedOrderFormSections, salesChannel) {
+    if (!globalHelpers.isArray(items)) {
+      throw new TypeError('Items must be an Array of Object(s) with item(s) to add, e.g. var items = [{id: 123, quantity: 1, seller: \'1\'}, {id: 321, quantity: 2, seller: \'1\'}]');
+    }
 
-        if (globalHelpers.length(items) < 1) {
-            throw new Error('Items can\'t be an empty Array.');
-        }
+    if (globalHelpers.length(items) < 1) {
+      throw new Error('Items can\'t be an empty Array.');
+    }
 
-        expectedOrderFormSections = globalHelpers.isUndefined(expectedOrderFormSections) ? null : expectedOrderFormSections;
-        salesChannel = globalHelpers.isUndefined ? 1 : salesChannel;
+    expectedOrderFormSections = globalHelpers.isUndefined(expectedOrderFormSections) ? null : expectedOrderFormSections;
+    salesChannel = globalHelpers.isUndefined ? 1 : salesChannel;
 
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            return vtexjs.checkout.getOrderForm().done(function () {
-                return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done(function (orderForm) {
-                    return def.resolve(orderForm);
-                }).fail(function (err) {
-                    return def.reject();
-                });
-            }).fail(function (err) {
-                return def.reject(err);
-            });
-        }).promise();
-    },
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      return vtexjs.checkout.getOrderForm().done(function () {
+        return vtexjs.checkout.addToCart(items, expectedOrderFormSections, salesChannel).done(function (orderForm) {
+          return def.resolve(orderForm);
+        }).fail(function (err) {
+          return def.reject();
+        });
+      }).fail(function (err) {
+        return def.reject(err);
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * Empty the cart
      *
      * @return {promise} Order Form
      */
-    clearCart: function clearCart() {
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            vtexjs.checkout.getOrderForm().done(function (orderForm) {
-                if (orderForm.items.length) {
-                    return vtexjs.checkout.removeAllItems(orderForm.items).done(function (orderForm) {
-                        return def.resolve(orderForm);
-                    });
-                }
+  clearCart: function clearCart() {
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      vtexjs.checkout.getOrderForm().done(function (orderForm) {
+        if (orderForm.items.length) {
+          return vtexjs.checkout.removeAllItems(orderForm.items).done(function (orderForm) {
+            return def.resolve(orderForm);
+          });
+        }
 
-                return def.resolve(orderForm);
-            }).fail(function (err) {
-                return def.reject(err);
-            });
-        }).promise();
-    },
+        return def.resolve(orderForm);
+      }).fail(function (err) {
+        return def.reject(err);
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * Send notify me data
      *
      * @param  {String} name  Customer name
@@ -4250,106 +4250,106 @@ var vtexHelpers = {
      * @param  {Integer} skuId Sku ID
      * @return {Promise}
      */
-    notifyMe: function notifyMe(name, email, skuId) {
-        /* eslint-disable */
-        return $.Deferred(function (def) {
-            /* eslint-enable */
-            var successMessage = 'Cadastrado com sucesso. Assim que o produto for disponibilizado você receberá um email avisando.';
-            var errorMessage = 'Não foi possível cadastrar. Tente mais tarde.';
+  notifyMe: function notifyMe(name, email, skuId) {
+    /* eslint-disable */
+    return $.Deferred(function (def) {
+      /* eslint-enable */
+      var successMessage = 'Cadastrado com sucesso. Assim que o produto for disponibilizado você receberá um email avisando.';
+      var errorMessage = 'Não foi possível cadastrar. Tente mais tarde.';
 
-            return $.ajax({
-                url: '/no-cache/AviseMe.aspx',
-                type: 'post',
-                data: {
-                    notifymeClientName: name,
-                    notifymeClientEmail: email,
-                    notifymeIdSku: skuId
-                }
-            }).then(function (res) {
-                return def.resolve({ successMessage: successMessage });
-            }).fail(function (err) {
-                return def.reject({ errorMessage: errorMessage });
-            });
-        }).promise();
-    },
+      return $.ajax({
+        url: '/no-cache/AviseMe.aspx',
+        type: 'post',
+        data: {
+          notifymeClientName: name,
+          notifymeClientEmail: email,
+          notifymeIdSku: skuId
+        }
+      }).then(function (res) {
+        return def.resolve({ successMessage: successMessage });
+      }).fail(function (err) {
+        return def.reject({ errorMessage: errorMessage });
+      });
+    }).promise();
+  },
 
 
-    /**
+  /**
      * PRIVATE
      */
-    _checkCamelize: function _checkCamelize(product) {
-        if (product.hasOwnProperty('isCamelized') && product.isCamelized) {
-            return true;
-        }
+  _checkCamelize: function _checkCamelize(product) {
+    if (product.hasOwnProperty('isCamelized') && product.isCamelized) {
+      return true;
+    }
 
-        return false;
-    },
-    _getCommertialInfo: function _getCommertialInfo(data, sellerId) {
-        if (!globalHelpers.isPlainObject(data)) {
-            throw new TypeError('\'data\' must be an plain object');
-        }
+    return false;
+  },
+  _getCommertialInfo: function _getCommertialInfo(data, sellerId) {
+    if (!globalHelpers.isPlainObject(data)) {
+      throw new TypeError('\'data\' must be an plain object');
+    }
 
-        return data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
-    },
+    return data.hasOwnProperty('commertialOffer') ? data.commertialOffer : this.getProductSellerInfo(data, sellerId).commertialOffer;
+  },
 
 
-    /**
+  /**
      * Check if user is logged in
      *
      * @return {Boolean}
      */
-    _isUserLogged: function _isUserLogged(storeName) {
-        return cookies.get('VtexIdclientAutCookie_' + storeName);
-    },
-    _getUserInfo: function _getUserInfo(storeName) {
-        if (!this._isUserLogged(storeName)) {
-            return false;
-        }
-
-        var info = globalHelpers.parseJwt(this._isUserLogged(storeName));
-
-        return {
-            userId: info.userId,
-            email: info.sub,
-            account: info.account
-        };
-    },
-    _getRequestVerificationToken: function _getRequestVerificationToken(storeName) {
-        return !this._isUserLogged(storeName) ? false : cookies.get('VTEXRequestVerificationToken');
+  _isUserLogged: function _isUserLogged(storeName) {
+    return cookies.get('VtexIdclientAutCookie_' + storeName);
+  },
+  _getUserInfo: function _getUserInfo(storeName) {
+    if (!this._isUserLogged(storeName)) {
+      return false;
     }
+
+    var info = globalHelpers.parseJwt(this._isUserLogged(storeName));
+
+    return {
+      userId: info.userId,
+      email: info.sub,
+      account: info.account
+    };
+  },
+  _getRequestVerificationToken: function _getRequestVerificationToken(storeName) {
+    return !this._isUserLogged(storeName) ? false : cookies.get('VTEXRequestVerificationToken');
+  }
 };
 
 var globalHelpers$1 = utilify$1.globalHelpers;
 
 if ((typeof window === 'undefined' ? 'undefined' : _typeof(window)) !== 'object') {
-    global.window = global;
-    global.window.navigator = {};
+  global.window = global;
+  global.window.navigator = {};
 }
 
 if ('rivets' in window) {
-    rivets.formatters.formatPrice = function (target) {
-        return vtexHelpers.formatPrice(target);
-    };
-    rivets.formatters.getResizedImage = function (src, width, height) {
-        return vtexHelpers.getResizedImage(src, width, height);
-    };
-    rivets.formatters.getResizedImageByRatio = function (src, type, newSize, aspectRatio) {
-        return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
-    };
-    rivets.formatters.replaceBreakLines = function (target) {
-        return vtexHelpers.replaceBreakLines(target);
-    };
-    rivets.formatters.prefix = function (val, prefix) {
-        return prefix + val;
-    };
-    rivets.formatters.slugifyText = function (val) {
-        return globalHelpers$1.slugifyText(val);
-    };
+  rivets.formatters.formatPrice = function (target) {
+    return vtexHelpers.formatPrice(target);
+  };
+  rivets.formatters.getResizedImage = function (src, width, height) {
+    return vtexHelpers.getResizedImage(src, width, height);
+  };
+  rivets.formatters.getResizedImageByRatio = function (src, type, newSize, aspectRatio) {
+    return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
+  };
+  rivets.formatters.replaceBreakLines = function (target) {
+    return vtexHelpers.replaceBreakLines(target);
+  };
+  rivets.formatters.prefix = function (val, prefix) {
+    return prefix + val;
+  };
+  rivets.formatters.slugifyText = function (val) {
+    return globalHelpers$1.slugifyText(val);
+  };
 
-    rivets.formatters.productImgSize = rivets.formatters.getResizedImage;
-    rivets.formatters.getResizeImage = rivets.formatters.getResizedImage;
-    rivets.formatters.getResizeImageByRatio = rivets.formatters.getResizedImageByRatio;
-    rivets.formatters.productImgSizeByRatio = rivets.formatters.getResizedImageByRatio;
+  rivets.formatters.productImgSize = rivets.formatters.getResizedImage;
+  rivets.formatters.getResizeImage = rivets.formatters.getResizedImage;
+  rivets.formatters.getResizeImageByRatio = rivets.formatters.getResizedImageByRatio;
+  rivets.formatters.productImgSizeByRatio = rivets.formatters.getResizedImageByRatio;
 }
 
 /**
@@ -4358,159 +4358,159 @@ if ('rivets' in window) {
  */
 
 var VtexHelpers = function () {
-    function VtexHelpers() {
-        classCallCheck(this, VtexHelpers);
+  function VtexHelpers() {
+    classCallCheck(this, VtexHelpers);
 
-        this.getStoreName = window.jsnomeLoja;
-        this.getSalesChannel = window.jssalesChannel;
-        this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName) ? true : false;
-        this.getUserInfo = vtexHelpers._getUserInfo(this.getStoreName);
-        this.getRequestVerificationToken = vtexHelpers._getRequestVerificationToken(this.getStoreName);
-        this.logoutUrl = '/no-cache/user/logout';
+    this.getStoreName = window.jsnomeLoja;
+    this.getSalesChannel = window.jssalesChannel;
+    this.isUserLogged = vtexHelpers._isUserLogged(this.getStoreName) ? true : false;
+    this.getUserInfo = vtexHelpers._getUserInfo(this.getStoreName);
+    this.getRequestVerificationToken = vtexHelpers._getRequestVerificationToken(this.getStoreName);
+    this.logoutUrl = '/no-cache/user/logout';
+  }
+
+  createClass(VtexHelpers, [{
+    key: 'formatPrice',
+    value: function formatPrice(number, thousands, decimals, length, currency) {
+      return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
     }
-
-    createClass(VtexHelpers, [{
-        key: 'formatPrice',
-        value: function formatPrice(number, thousands, decimals, length, currency) {
-            return vtexHelpers.formatPrice(number, thousands, decimals, length, currency);
-        }
-    }, {
-        key: 'unformatPrice',
-        value: function unformatPrice(value, decimal, formatNumber) {
-            return vtexHelpers.unformatPrice(value, decimal, formatNumber);
-        }
-    }, {
-        key: 'setInstallment',
-        value: function setInstallment(price, minPrice, maxInstallments, interest) {
-            return vtexHelpers.setInstallment(price, minPrice, maxInstallments, interest);
-        }
-    }, {
-        key: 'getPercentage',
-        value: function getPercentage(oldPrice, newPrice, length) {
-            return vtexHelpers.getPercentage(oldPrice, newPrice, length);
-        }
-    }, {
-        key: 'applyDiscountPercent',
-        value: function applyDiscountPercent(price, percent, formatted) {
-            return vtexHelpers.applyDiscountPercent(price, percent, formatted);
-        }
-    }, {
-        key: 'fixProductSearchPrice',
-        value: function fixProductSearchPrice(val) {
-            return vtexHelpers.fixProductSearchPrice(val);
-        }
-    }, {
-        key: 'getFirstAvailableSku',
-        value: function getFirstAvailableSku(product) {
-            return vtexHelpers.getFirstAvailableSku(product);
-        }
-    }, {
-        key: 'getOriginalImage',
-        value: function getOriginalImage(src) {
-            return vtexHelpers.getOriginalImage(src);
-        }
-    }, {
-        key: 'getResizedImage',
-        value: function getResizedImage(src, width, height) {
-            return vtexHelpers.getResizedImage(src, width, height);
-        }
-    }, {
-        key: 'getResizeImageByRatio',
-        value: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
-            return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
-        }
-    }, {
-        key: 'getServerTime',
-        value: function getServerTime(callback) {
-            return vtexHelpers.getServerTime(callback);
-        }
-    }, {
-        key: 'getCategories',
-        value: function getCategories(depth, categoryId) {
-            return vtexHelpers.getCategories(depth, categoryId);
-        }
-    }, {
-        key: 'getProductSpec',
-        value: function getProductSpec(data, specName, defaultVal) {
-            return vtexHelpers.getProductSpec(data, specName, defaultVal);
-        }
-    }, {
-        key: 'getProductSellerInfo',
-        value: function getProductSellerInfo(product, sellerId) {
-            return vtexHelpers.getProductSellerInfo(product, sellerId);
-        }
-    }, {
-        key: 'getProductInstallments',
-        value: function getProductInstallments(product, sellerId) {
-            return vtexHelpers.getProductInstallments(product, sellerId);
-        }
-    }, {
-        key: 'getProductBankInvoice',
-        value: function getProductBankInvoice(product, sellerId) {
-            return vtexHelpers.getProductBankInvoice(product, sellerId);
-        }
-    }, {
-        key: 'getProductPriceInfo',
-        value: function getProductPriceInfo(sellerInfo) {
-            return vtexHelpers.getProductPriceInfo(sellerInfo);
-        }
-    }, {
-        key: 'getGroupInstallments',
-        value: function getGroupInstallments(data, sellerId) {
-            return vtexHelpers.getGroupInstallments(data, sellerId);
-        }
-    }, {
-        key: 'getShipping',
-        value: function getShipping(postalCode, skuId, quantity) {
-            return vtexHelpers.getShipping(postalCode, skuId, quantity);
-        }
-    }, {
-        key: 'sortProductSearch',
-        value: function sortProductSearch(product, map, dimension, reverse) {
-            return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
-        }
-    }, {
-        key: 'sortProductVariations',
-        value: function sortProductVariations(product, map, dimension, reverse) {
-            return vtexHelpers.sortProductVariations(product, map, dimension, reverse);
-        }
-    }, {
-        key: 'replaceBreakLines',
-        value: function replaceBreakLines(str) {
-            return vtexHelpers.replaceBreakLines(str);
-        }
-    }, {
-        key: 'stringIdsToArray',
-        value: function stringIdsToArray(str, separator) {
-            return vtexHelpers.stringIdsToArray(str, separator);
-        }
-    }, {
-        key: 'checkLogin',
-        value: function checkLogin() {
-            return vtexHelpers.checkLogin();
-        }
-    }, {
-        key: 'openPopupLogin',
-        value: function openPopupLogin(noReload) {
-            return vtexHelpers.openPopupLogin(noReload);
-        }
-    }, {
-        key: 'addToCart',
-        value: function addToCart(items, expectedOrderFormSections, salesChannel) {
-            return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
-        }
-    }, {
-        key: 'clearCart',
-        value: function clearCart() {
-            return vtexHelpers.clearCart();
-        }
-    }, {
-        key: 'notifyMe',
-        value: function notifyMe(name, email, skuId) {
-            return vtexHelpers.notifyMe(name, email, skuId);
-        }
-    }]);
-    return VtexHelpers;
+  }, {
+    key: 'unformatPrice',
+    value: function unformatPrice(value, decimal, formatNumber) {
+      return vtexHelpers.unformatPrice(value, decimal, formatNumber);
+    }
+  }, {
+    key: 'setInstallment',
+    value: function setInstallment(price, minPrice, maxInstallments, interest) {
+      return vtexHelpers.setInstallment(price, minPrice, maxInstallments, interest);
+    }
+  }, {
+    key: 'getPercentage',
+    value: function getPercentage(oldPrice, newPrice, length) {
+      return vtexHelpers.getPercentage(oldPrice, newPrice, length);
+    }
+  }, {
+    key: 'applyDiscountPercent',
+    value: function applyDiscountPercent(price, percent, formatted) {
+      return vtexHelpers.applyDiscountPercent(price, percent, formatted);
+    }
+  }, {
+    key: 'fixProductSearchPrice',
+    value: function fixProductSearchPrice(val) {
+      return vtexHelpers.fixProductSearchPrice(val);
+    }
+  }, {
+    key: 'getFirstAvailableSku',
+    value: function getFirstAvailableSku(product) {
+      return vtexHelpers.getFirstAvailableSku(product);
+    }
+  }, {
+    key: 'getOriginalImage',
+    value: function getOriginalImage(src) {
+      return vtexHelpers.getOriginalImage(src);
+    }
+  }, {
+    key: 'getResizedImage',
+    value: function getResizedImage(src, width, height) {
+      return vtexHelpers.getResizedImage(src, width, height);
+    }
+  }, {
+    key: 'getResizeImageByRatio',
+    value: function getResizeImageByRatio(src, type, newSize, aspectRatio) {
+      return vtexHelpers.getResizeImageByRatio(src, type, newSize, aspectRatio);
+    }
+  }, {
+    key: 'getServerTime',
+    value: function getServerTime(callback) {
+      return vtexHelpers.getServerTime(callback);
+    }
+  }, {
+    key: 'getCategories',
+    value: function getCategories(depth, categoryId) {
+      return vtexHelpers.getCategories(depth, categoryId);
+    }
+  }, {
+    key: 'getProductSpec',
+    value: function getProductSpec(data, specName, defaultVal) {
+      return vtexHelpers.getProductSpec(data, specName, defaultVal);
+    }
+  }, {
+    key: 'getProductSellerInfo',
+    value: function getProductSellerInfo(product, sellerId) {
+      return vtexHelpers.getProductSellerInfo(product, sellerId);
+    }
+  }, {
+    key: 'getProductInstallments',
+    value: function getProductInstallments(product, sellerId) {
+      return vtexHelpers.getProductInstallments(product, sellerId);
+    }
+  }, {
+    key: 'getProductBankInvoice',
+    value: function getProductBankInvoice(product, sellerId) {
+      return vtexHelpers.getProductBankInvoice(product, sellerId);
+    }
+  }, {
+    key: 'getProductPriceInfo',
+    value: function getProductPriceInfo(sellerInfo) {
+      return vtexHelpers.getProductPriceInfo(sellerInfo);
+    }
+  }, {
+    key: 'getGroupInstallments',
+    value: function getGroupInstallments(data, sellerId) {
+      return vtexHelpers.getGroupInstallments(data, sellerId);
+    }
+  }, {
+    key: 'getShipping',
+    value: function getShipping(postalCode, skuId, quantity) {
+      return vtexHelpers.getShipping(postalCode, skuId, quantity);
+    }
+  }, {
+    key: 'sortProductSearch',
+    value: function sortProductSearch(product, map, dimension, reverse) {
+      return vtexHelpers.sortProductSearch(product, map, dimension, reverse);
+    }
+  }, {
+    key: 'sortProductVariations',
+    value: function sortProductVariations(product, map, dimension, reverse) {
+      return vtexHelpers.sortProductVariations(product, map, dimension, reverse);
+    }
+  }, {
+    key: 'replaceBreakLines',
+    value: function replaceBreakLines(str) {
+      return vtexHelpers.replaceBreakLines(str);
+    }
+  }, {
+    key: 'stringIdsToArray',
+    value: function stringIdsToArray(str, separator) {
+      return vtexHelpers.stringIdsToArray(str, separator);
+    }
+  }, {
+    key: 'checkLogin',
+    value: function checkLogin() {
+      return vtexHelpers.checkLogin();
+    }
+  }, {
+    key: 'openPopupLogin',
+    value: function openPopupLogin(noReload) {
+      return vtexHelpers.openPopupLogin(noReload);
+    }
+  }, {
+    key: 'addToCart',
+    value: function addToCart(items, expectedOrderFormSections, salesChannel) {
+      return vtexHelpers.addToCart(items, expectedOrderFormSections, salesChannel);
+    }
+  }, {
+    key: 'clearCart',
+    value: function clearCart() {
+      return vtexHelpers.clearCart();
+    }
+  }, {
+    key: 'notifyMe',
+    value: function notifyMe(name, email, skuId) {
+      return vtexHelpers.notifyMe(name, email, skuId);
+    }
+  }]);
+  return VtexHelpers;
 }();
 
 /**
@@ -4519,59 +4519,59 @@ var VtexHelpers = function () {
  */
 
 var VtexUtils = function () {
-  function VtexUtils() {
-    classCallCheck(this, VtexUtils);
+     function VtexUtils() {
+          classCallCheck(this, VtexUtils);
 
-    /**
-     * Version
-     * @type {String}
-     */
-    this.version = '1.16.1';
+          /**
+               * Version
+               * @type {String}
+               */
+          this.version = '1.17.0';
 
-    /**
-     * Package name
-     * @type {String}
-     */
-    this.name = '@VtexUtils';
+          /**
+               * Package name
+               * @type {String}
+               */
+          this.name = '@VtexUtils';
 
-    /**
-     * Vtex Helpers instance
-     * @type {VtexHelpers}
-     */
-    this.vtexHelpers = new VtexHelpers();
+          /**
+               * Vtex Helpers instance
+               * @type {VtexHelpers}
+               */
+          this.vtexHelpers = new VtexHelpers();
 
-    /**
-     * Global Helpers instance
-     * @type {GlobalHelpers}
-     */
-    this.globalHelpers = utilify$1.globalHelpers;
+          /**
+               * Global Helpers instance
+               * @type {GlobalHelpers}
+               */
+          this.globalHelpers = utilify$1.globalHelpers;
 
-    /**
-     * Location Helpers instance
-     * @type {LocationHelpers}
-     */
-    this.locationHelpers = utilify$1.locationHelpers;
+          /**
+               * Location Helpers instance
+               * @type {LocationHelpers}
+               */
+          this.locationHelpers = utilify$1.locationHelpers;
 
-    /**
-     * Local/Session Storage
-     * @type {Object}
-     */
-    this.storage = utilify$1.storage;
+          /**
+               * Local/Session Storage
+               * @type {Object}
+               */
+          this.storage = utilify$1.storage;
 
-    /**
-     * Javascript Cookies
-     * @type {Object}
-     */
-    this.cookies = utilify$1.cookies;
-  }
+          /**
+               * Javascript Cookies
+               * @type {Object}
+               */
+          this.cookies = utilify$1.cookies;
+     }
 
-  createClass(VtexUtils, [{
-    key: 'setRivetsUtilify',
-    value: function setRivetsUtilify(RivetsUtilify) {
-      this.rivetsUtilify = new RivetsUtilify(utilify$1);
-    }
-  }]);
-  return VtexUtils;
+     createClass(VtexUtils, [{
+          key: 'setRivetsUtilify',
+          value: function setRivetsUtilify(RivetsUtilify) {
+               this.rivetsUtilify = new RivetsUtilify(utilify$1);
+          }
+     }]);
+     return VtexUtils;
 }();
 
 export default VtexUtils;
