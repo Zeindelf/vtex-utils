@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.17.0
+ * VtexUtils.js v1.18.0
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-09-11T20:10:39.443Z
+ * Date: 2018-09-16T20:01:06.011Z
  */
 
 (function (global, factory) {
@@ -186,13 +186,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*@preserve
-	 * Utilify.js v0.9.0
+	 * Utilify.js v0.10.0
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-09-10T05:37:09.653Z
+	 * Date: 2018-09-16T19:56:30.042Z
 	 */
 
 	(function (global, factory) {
@@ -1744,6 +1744,40 @@
 	        isChar: function isChar(value) {
 	            return this.isString(value) && value.length === 1;
 	        },
+	        isCnpj: function isCnpj(value) {
+	            var stripped = this._stripNumber(value);
+	            var equalDigits = this._verifierEqualDigits(stripped);
+
+	            // CNPJ must be defined
+	            // CNPJ must have 14 chars
+	            // CNPJ doesn't contains equal digits
+	            if (!stripped || stripped.length !== 14 || equalDigits) {
+	                return false;
+	            }
+
+	            var numbers = stripped.substr(0, 12);
+	            numbers += this._verifierCnpjDigit(numbers);
+	            numbers += this._verifierCnpjDigit(numbers);
+
+	            return numbers.substr(-2) === stripped.substr(-2);
+	        },
+	        isCpf: function isCpf(value) {
+	            var stripped = this._stripNumber(value);
+	            var equalDigits = this._verifierEqualDigits(stripped);
+
+	            // CPF must be defined
+	            // CPF must have 11 chars
+	            // CPF doesn't contains equal digits
+	            if (!stripped || stripped.length !== 11 || equalDigits) {
+	                return false;
+	            }
+
+	            var numbers = stripped.substr(0, 9);
+	            numbers += this._verifierCpfDigit(numbers);
+	            numbers += this._verifierCpfDigit(numbers);
+
+	            return numbers.substr(-2) === stripped.substr(-2);
+	        },
 
 
 	        /**
@@ -2027,6 +2061,50 @@
 	         */
 	        isUndefined: function isUndefined(value) {
 	            return value === undefined;
+	        },
+	        _verifierCpfDigit: function _verifierCpfDigit(numbers) {
+	            numbers = numbers.split('').map(function (number) {
+	                return parseInt(number, 10);
+	            });
+
+	            var modulus = numbers.length + 1;
+	            var multiplied = numbers.map(function (number, index) {
+	                return number * (modulus - index);
+	            });
+	            var mod = multiplied.reduce(function (buffer, number) {
+	                return buffer + number;
+	            }) % 11;
+
+	            return mod < 2 ? 0 : 11 - mod;
+	        },
+	        _verifierCnpjDigit: function _verifierCnpjDigit(numbers) {
+	            var index = 2;
+	            var reverse = numbers.split('').reduce(function (buffer, number) {
+	                return [parseInt(number, 10)].concat(buffer);
+	            }, []);
+
+	            var sum = reverse.reduce(function (buffer, number) {
+	                buffer += number * index;
+	                index = index === 9 ? 2 : index + 1;
+
+	                return buffer;
+	            }, 0);
+
+	            var mod = sum % 11;
+
+	            return mod < 2 ? 0 : 11 - mod;
+	        },
+	        _stripNumber: function _stripNumber(number) {
+	            return (number || '').toString().replace(/[^0-9]/g, '');
+	        },
+	        _verifierEqualDigits: function _verifierEqualDigits(number) {
+	            for (var i = 0, len = number.length; i < len - 1; i++) {
+	                if (number[i] !== number[i + 1]) {
+	                    return false;
+	                }
+	            }
+
+	            return true;
 	        }
 	    };
 
@@ -2863,6 +2941,16 @@
 	                return validateHelpers.isChar(value);
 	            }
 	        }, {
+	            key: 'isCnpj',
+	            value: function isCnpj(value) {
+	                return validateHelpers.isCnpj(value);
+	            }
+	        }, {
+	            key: 'isCpf',
+	            value: function isCpf(value) {
+	                return validateHelpers.isCpf(value);
+	            }
+	        }, {
 	            key: 'isDate',
 	            value: function isDate(value) {
 	                return validateHelpers.isDate(value);
@@ -3443,7 +3531,7 @@
 	       * Version
 	       * @type {String}
 	       */
-	      this.version = '0.9.0';
+	      this.version = '0.10.0';
 
 	      /**
 	       * Package name
@@ -4532,7 +4620,7 @@
 	               * Version
 	               * @type {String}
 	               */
-	          this.version = '1.17.0';
+	          this.version = '1.18.0';
 
 	          /**
 	               * Package name
