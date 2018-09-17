@@ -1,12 +1,12 @@
 
 /*!!
- * VtexUtils.js v1.18.0
+ * VtexUtils.js v1.18.1
  * https://github.com/zeindelf/vtex-utils
  *
  * Copyright (c) 2017-2018 Zeindelf
  * Released under the MIT license
  *
- * Date: 2018-09-16T20:01:06.011Z
+ * Date: 2018-09-17T18:32:03.664Z
  */
 
 (function (global, factory) {
@@ -186,13 +186,13 @@
 
 	var utilify = createCommonjsModule(function (module, exports) {
 	/*@preserve
-	 * Utilify.js v0.10.0
+	 * Utilify.js v0.10.1
 	 * https://github.com/zeindelf/utilify-js
 	 *
 	 * Copyright (c) 2017-2018 Zeindelf
 	 * Released under the MIT license
 	 *
-	 * Date: 2018-09-16T19:56:30.042Z
+	 * Date: 2018-09-17T18:11:50.467Z
 	 */
 
 	(function (global, factory) {
@@ -2619,7 +2619,7 @@
 	                return value;
 	            }
 
-	            return Number.isNaN(number) ? value : number;
+	            return validateHelpers.isNumber(number) ? value : number;
 	        }
 	    };
 
@@ -3531,7 +3531,7 @@
 	       * Version
 	       * @type {String}
 	       */
-	      this.version = '0.10.0';
+	      this.version = '0.10.1';
 
 	      /**
 	       * Package name
@@ -4620,7 +4620,7 @@
 	               * Version
 	               * @type {String}
 	               */
-	          this.version = '1.18.0';
+	          this.version = '1.18.1';
 
 	          /**
 	               * Package name
